@@ -1,0 +1,41 @@
+{
+  "name": "feplet",
+  "version": "0.0.0",
+  "description": "A Mustache-compatible templating language. Powerful under the hood. Simple behind the wheel.",
+  "main": "src/index.js",
+  "scripts": {
+    "bundle": "./node_modules/.bin/babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
+    "lint": "./node_modules/.bin/eslint run && ./node_modules/.bin/eslint src && ./node_modules/.bin/eslint test",
+    "test": "./node_modules/.bin/mocha test/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/electric-eloquence/feplet.git"
+  },
+  "keywords": [
+    "fepper",
+    "functional",
+    "lab",
+    "mustache",
+    "pattern",
+    "template"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/electric-eloquence/feplet/issues"
+  },
+  "homepage": "https://github.com/electric-eloquence/feplet#readme",
+  "dependencies": {
+    "hogan.js": "^3.0.2",
+    "json-eval": "^0.1.10"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "browserify": "^14.4.0",
+    "chai": "^4.1.2",
+    "eslint": "3.x",
+    "mocha": "^3.5.3",
+    "uglify-js": "^3.2.2"
+  }
+}

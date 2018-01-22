@@ -1,0 +1,8 @@
+{{> templates/01-bar }}
+{{> templates/00-simple(title: 'foo') }}
+{{# foo }}
+  {{> templates/05-parametered-partial(bar: true) }}
+{{/ foo }}
+{{# bar }}
+  {{> templates/00-simple(title: 'bar') }}
+{{/ bar }}
