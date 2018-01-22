@@ -15,10 +15,9 @@
   "keywords": [
     "fepper",
     "functional",
-    "lab",
     "mustache",
-    "pattern",
-    "template"
+    "template",
+    "templating"
   ],
   "license": "MIT",
   "bugs": {
