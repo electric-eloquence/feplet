@@ -2,9 +2,10 @@
 
 ### Why another Mustache-compatible templating language?
 
-This project arose from the needs of Fepper and its implementation of Pattern 
-Lab. Fepper requires the simplicity of Mustache (and not the complexity of 
-Handlebars), the flexible tag-to-data matching of Mustache (and not the rigid 
+This project arose from the needs of 
+<a href="http://fepper.io" target="blank">Fepper</a> and its implementation of 
+Pattern Lab. Fepper requires the simplicity of Mustache (and not the complexity 
+of Handlebars), the flexible tag-to-data matching of Mustache (and not the rigid 
 tag-to-data nesting hierarchy of Handlebars), and the speed of Mustache 
 (specifically the Hogan.js library) when compiling large template sets.
 

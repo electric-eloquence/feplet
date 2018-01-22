@@ -65,7 +65,7 @@ For recent versions of Node.js:
 const feplet = require('feplet')
 ```
 
-Older version of Node.js, not so supportive of ES6:
+For older versions of Node.js, not so supportive of ES6:
 
 ```javascript
 var feplet = require('feplet/dist/feplet.node.es5.js')
