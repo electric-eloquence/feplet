@@ -80,4 +80,9 @@ For browsers:
 </script>
 ```
 
+This browser implementation uses a minified ES5 bundle, which is slightly 
+(_very_ slightly) slower than its ES6 counterpart. If you do not support 
+older browsers, consider bundling the ES6 script directly for browser 
+consumption.
+
 <h3><a href="https://github.com/electric-eloquence/feplet/blob/master/ABOUT.md">More &raquo;</a></h3>
