@@ -10,7 +10,7 @@ Handlebars. The syntax for passing parameters follows the Pattern Lab
 convention:
 
 ```handlebars
-{{> partial_template(name: 'Alice')}}
+{{> partial_template(place: 'World')}}
 ```
 
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
@@ -31,32 +31,32 @@ named "partial\_template", and not to any partials nested further within.
 const feplet = require('feplet');
 
 const data = {
-  name: 'Alice'
+  place: 'World'
 };
 
 // These are references to Hogan.js methods:
-const template = feplet.compile('Hello {{name}}');
-const output = template.render(data); // Hello Alice
+const template = feplet.compile('Hello {{place}}');
+const output = template.render(data); // Hello World
 
 // These are also references to Hogan.js methods:
-const text = 'Hello <%name%>';
+const text = 'Hello <%place%>';
 const delimiters = '<% %>';
 const options = {delimiters};
 const scanned = feplet.scan(text, delimiters);
 const parsed = feplet.parse(scanned, text, options);
 const generated = feplet.generate(parsed, text, options);
-const output1 = generated.render(data); // Hello Alice
+const output1 = generated.render(data); // Hello World
 
 // This is a Feplet implementation:
 const partials = {
-  partial_template: '{{#nest}}{{#egg}}{{yolk}} {{name}}{{/egg}}{{/nest}}'
+  partial_template: '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}'
 };
 const includer = '{{> partial_template(nest: {egg: {yolk: "Yellow"} })}}';
 const output2 = feplet.render(
   includer,
-  {name: 'Alice'},
+  {place: 'World'},
   partials
-); // Yellow Alice
+); // Yellow World
 ```
 
 For recent versions of Node.js:
