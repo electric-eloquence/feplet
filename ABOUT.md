@@ -1,6 +1,6 @@
 # About Feplet
 
-### Why another Mustache-compatible templating language?
+### Why another Mustache-compatible templating engine?
 
 This project arose from the needs of 
 <a href="http://fepper.io" target="blank">Fepper</a> and its implementation of 
