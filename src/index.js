@@ -641,9 +641,7 @@ function styleModifierExtract(args) {
   };
 }
 
-const feplet = {};
-
-Object.assign(feplet, hogan);
+const feplet = Object.assign({}, hogan);
 
 feplet.preprocessPartialParams = function (template, partials) {
   const generated = hogan.compile(template);

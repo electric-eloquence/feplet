@@ -68,12 +68,10 @@ function closeTagBuild(args) {
   var closeStartStop = args.closeStartStop,
       parseObj = args.parseObj,
       partialText_ = args.partialText_;
-  var closeStart = closeStartStop.closeStart,
-      closeSpace0Start = closeStartStop.closeSpace0Start,
+  var closeSpace0Start = closeStartStop.closeSpace0Start,
       closeSpace0Stop = closeStartStop.closeSpace0Stop,
       closeSpace1Start = closeStartStop.closeSpace1Start,
-      closeSpace1Stop = closeStartStop.closeSpace1Stop,
-      closeStop = closeStartStop.closeStop;
+      closeSpace1Stop = closeStartStop.closeSpace1Stop;
 
   var i = void 0;
   var partialText = '';
@@ -81,8 +79,8 @@ function closeTagBuild(args) {
   i = parseObj.otag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\x02';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   partialText += '/';
@@ -104,8 +102,8 @@ function closeTagBuild(args) {
   i = parseObj.ctag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\x03';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   return {
@@ -173,12 +171,10 @@ function openTagBuild(args) {
   var openStartStop = args.openStartStop,
       parseObj = args.parseObj,
       partialText_ = args.partialText_;
-  var openStart = openStartStop.openStart,
-      openSpace0Start = openStartStop.openSpace0Start,
+  var openSpace0Start = openStartStop.openSpace0Start,
       openSpace0Stop = openStartStop.openSpace0Stop,
       openSpace1Start = openStartStop.openSpace1Start,
-      openSpace1Stop = openStartStop.openSpace1Stop,
-      openStop = openStartStop.openStop;
+      openSpace1Stop = openStartStop.openSpace1Stop;
 
   var i = void 0;
   var partialText = '';
@@ -186,8 +182,8 @@ function openTagBuild(args) {
   i = parseObj.otag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\x02';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   switch (parseObj.tag) {
@@ -224,8 +220,8 @@ function openTagBuild(args) {
   i = parseObj.ctag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\x03';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   return {
@@ -235,9 +231,7 @@ function openTagBuild(args) {
 
 function tagReplace(args) {
   var parseObj = args.parseObj,
-      partialText_ = args.partialText_,
-      partialShort = args.partialShort,
-      paramsObj = args.paramsObj;
+      partialText_ = args.partialText_;
 
 
   var otag = parseObj.otag;
@@ -256,12 +250,7 @@ function tagReplace(args) {
     case '{':
 
       var openStartStop = openStartStopGet({ parseObj: parseObj, partialText_: partialText_ });
-      var openStart = openStartStop.openStart,
-          openSpace0Start = openStartStop.openSpace0Start,
-          openSpace0Stop = openStartStop.openSpace0Stop,
-          openSpace1Start = openStartStop.openSpace1Start,
-          openSpace1Stop = openStartStop.openSpace1Stop,
-          openStop = openStartStop.openStop;
+      var openStart = openStartStop.openStart;
 
 
       partialText += partialText_.substring(0, openStart);
@@ -346,15 +335,15 @@ function paramsApplyByParamKey(args) {
     delimiters = '';
 
     for (var i = 0, l = otag.length; i < l; i++) {
-      //delimiters += 'u'; // For debugging.
       delimiters += '\x02';
+      //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
     }
 
     delimiters += ' ';
 
     for (var _i = 0, _l = ctag.length; _i < _l; _i++) {
-      //delimiters += 'u'; // For debugging.
       delimiters += '\x03';
+      //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
     }
   }
 
@@ -496,11 +485,9 @@ function paramKeysWithDotNotation(args) {
 
 function paramsObjToParamKeysArr(args) {
   var paramKeysArr_ = args.paramKeysArr_,
-      paramKeysShallowItr = args.paramKeysShallowItr,
       paramKeysShallowItrn = args.paramKeysShallowItrn,
       paramsObj = args.paramsObj,
-      parentObjAsStr = args.parentObjAsStr,
-      partialShort = args.partialShort;
+      parentObjAsStr = args.parentObjAsStr;
 
 
   if (paramKeysShallowItrn.done) {
@@ -631,9 +618,7 @@ function styleModifierExtract(args) {
   };
 }
 
-var feplet = {};
-
-Object.assign(feplet, hogan);
+var feplet = Object.assign({}, hogan);
 
 feplet.preprocessPartialParams = function (template, partials) {
   var generated = hogan.compile(template);
