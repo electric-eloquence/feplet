@@ -86,8 +86,8 @@ function closeTagBuild(args) {
   i = parseObj.otag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\u0002';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   partialText += '/';
@@ -109,8 +109,8 @@ function closeTagBuild(args) {
   i = parseObj.ctag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\u0003';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   return {
@@ -196,8 +196,8 @@ function openTagBuild(args) {
   i = parseObj.otag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\u0002';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   switch (parseObj.tag) {
@@ -234,8 +234,8 @@ function openTagBuild(args) {
   i = parseObj.ctag.length;
 
   while (i--) {
-    //partialText += 'u'; // For debugging.
     partialText += '\u0003';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
   }
 
   return {
@@ -360,15 +360,15 @@ function paramsApplyByParamKey(args) {
     delimiters = '';
 
     for (let i = 0, l = otag.length; i < l; i++) {
-      //delimiters += 'u'; // For debugging.
       delimiters += '\u0002';
+      //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
     }
 
     delimiters += ' ';
 
     for (let i = 0, l = ctag.length; i < l; i++) {
-      //delimiters += 'u'; // For debugging.
       delimiters += '\u0003';
+      //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
     }
   }
 
