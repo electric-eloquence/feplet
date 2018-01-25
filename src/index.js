@@ -264,7 +264,7 @@ function tagReplace(args) {
     case '<':
     case '^':
     case '_v':
-    case '{':
+    case '{': // eslint-disable-line no-case-declarations
 
       let openStartStop = openStartStopGet({parseObj, partialText_});
       let {
@@ -501,7 +501,7 @@ function paramKeysWithDotNotation(args) {
     let itemNext;
     let paramKey = parentObjSplit[i];
 
-    while (itemNext = parentObjSplit[++counter]) {
+    while (itemNext = parentObjSplit[++counter]) { // eslint-disable-line no-cond-assign
       paramKey += `.${itemNext}`;
 
       if (paramKeysArr.indexOf(paramKey) === -1) {
