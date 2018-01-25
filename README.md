@@ -14,9 +14,9 @@ convention:
 ```
 
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
-Any valid JSON5 string (minus the wrapping curly braces) can be passed. Be sure 
-that consecutive JSON5 curly braces are spaced to avoid being parsed as a stash 
-`}}`.
+Any valid <a href="http://json5.org" target="_blank">JSON5</a> string (minus the 
+wrapping curly braces) can be passed. Be sure that consecutive JSON5 curly 
+braces are spaced to avoid being parsed as a stash `}}`.
 
 ```handlebars
 {{> partial_template(nest: {egg: {yolk: 'Yellow'} })}}
