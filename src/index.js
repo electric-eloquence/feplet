@@ -761,11 +761,16 @@ feplet.render = function (template = '', context = {}, partials_ = {}) {
   let generated;
   let partials = partials_;
 
-  Object.values(partials).forEach((partialText) => {
+  // Remove any reference between partialsArr and partials object because we need to add to the partials object.
+  const partialsArr = Object.values(partials);
+
+  for (let i = 0, l = partialsArr.length; i < l; i++) {
+    const partialText = partialsArr[i];
+
     ({
       partials
     } = feplet.preprocessPartialParams(partialText, partials));
-  });
+  }
 
   ({
     generated,
