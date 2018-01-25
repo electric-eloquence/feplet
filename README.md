@@ -22,8 +22,9 @@ braces are spaced to avoid being parsed as a stash `}}`.
 {{> partial_template(nest: {egg: {yolk: 'Yellow'} })}}
 ```
 
-One thing to note is that data passed this way will apply only to the partial 
-named "partial\_template", and not to any partials nested further within.
+One thing to note is that the data passed in this example will apply only to the 
+partial named "partial\_template", and not to any partials nested further 
+within.
 
 ### Use
 
