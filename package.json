@@ -1,6 +1,6 @@
 {
   "name": "feplet",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A Mustache-compatible templating engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
