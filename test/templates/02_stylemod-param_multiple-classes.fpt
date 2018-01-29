@@ -1,0 +1,2 @@
+{{> templates/02-stylemod-atom:foo1|foo2(message: '2') }}
+

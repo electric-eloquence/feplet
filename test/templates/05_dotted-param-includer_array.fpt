@@ -1,0 +1,12 @@
+{{> templates/05-dotted-param(
+  baz: {
+    bez: [
+      {
+        biz: 'hack'
+      },
+      {
+        biz: 'heck'
+      }
+    ]
+  }
+) }}

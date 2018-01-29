@@ -1,0 +1,6 @@
+{{> templates/04-nested-param-same-name-as-non-param(
+  baz: [
+    { bez: 'hick', biz: 'hock' },
+    { bez: 'huck', biz: 'hyck' }
+  ]
+) }}

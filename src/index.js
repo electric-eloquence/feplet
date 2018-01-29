@@ -3,6 +3,35 @@
 const hogan = require('hogan.js');
 const jsonEval = require('json-eval');
 
+function getDotDelimitedProp(args) {
+  const {
+    obj,
+    prop_
+  } = args;
+
+  const propSplit = prop_.split('.');
+  const prop0 = propSplit.shift();
+  const prop = propSplit.join('.');
+
+  let value;
+
+  if (obj.hasOwnProperty(prop0)) {
+    const _value = obj[prop0];
+
+    if (_value && _value instanceof Object && prop.length) {
+      value = getDotDelimitedProp({
+        obj: _value,
+        prop_: prop
+      });
+    }
+    else {
+      value = _value;
+    }
+  }
+
+  return value;
+}
+
 function spacesCount(args) {
   const {
     count_,
@@ -246,9 +275,7 @@ function openTagBuild(args) {
 function tagReplace(args) {
   const {
     parseObj,
-    partialText_,
-    //partialShort, // For debugging.
-    //paramsObj // For debugging.
+    partialText_
   } = args;
 
   const otag = parseObj.otag;
@@ -313,14 +340,14 @@ function tagReplace(args) {
 function paramsApplyByParamKey(args) {
   const {
     delimiters_,
+    elementParse,
     paramKeysItr,
     paramKeysItrn,
-    elementParse,
+    paramsObj, // For debugging.
     parseObj,
     parseObjKey,
-    partialText_,
     partialShort, // For debugging.
-    paramsObj // For debugging.
+    partialText_
   } = args;
 
   if (paramKeysItrn.done) {
@@ -345,9 +372,7 @@ function paramsApplyByParamKey(args) {
         partialText
       } = tagReplace({
         parseObj,
-        partialText_,
-        partialShort, // For debugging.
-        paramsObj // For debugging.
+        partialText_
       }));
     }
   }
@@ -383,12 +408,12 @@ function paramsApplyToParseObj(args) {
   const {
     delimiters_,
     paramKeysArr,
+    paramsObj,
     parseObj,
     parseObjKeysItr,
     parseObjKeysItrn,
-    partialText_,
     partialShort, // For debugging.
-    paramsObj // For debugging.
+    partialText_
   } = args;
 
   if (parseObjKeysItrn.done) {
@@ -407,17 +432,68 @@ function paramsApplyToParseObj(args) {
   if (parseObjKey === 'nodes' && Array.isArray(elementParse)) {
     const elementParseItr = elementParse[Symbol.iterator]();
     const elementParseItrn = elementParseItr.next();
+    const paramsObjNested = getDotDelimitedProp({
+      obj: paramsObj,
+      prop_: parseObj.n
+    });
+
+    let paramKeysNew;
+    let paramsObjNew;
+
+    if (paramsObjNested) {
+      if (Array.isArray(paramsObjNested)) {
+        paramKeysNew = paramKeysArr;
+
+        for (let i = 0, l = paramsObjNested.length; i < l; i++) {
+          paramsObjNew = paramsObjNested[i];
+
+          const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+          const paramKeysShallowItrn = paramKeysShallowItr.next();
+          const paramKeysNewObj = paramsObjToParamKeysArr({
+            paramKeysArr_: [],
+            paramKeysShallowItr,
+            paramKeysShallowItrn,
+            paramsObj: paramsObjNew,
+            parentObjAsStr: '',
+            partialShort // For debugging.
+          });
+
+          paramKeysNew = paramKeysNew.concat(paramKeysNewObj.paramKeysArr);
+        }
+      }
+
+      else {
+        paramsObjNew = paramsObjNested;
+
+        const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+        const paramKeysShallowItrn = paramKeysShallowItr.next();
+        const paramKeysNewObj = paramsObjToParamKeysArr({
+          paramKeysArr_: [],
+          paramKeysShallowItr,
+          paramKeysShallowItrn,
+          paramsObj: paramsObjNew,
+          parentObjAsStr: '',
+          partialShort // For debugging.
+        });
+
+        paramKeysNew = paramKeysArr.concat(paramKeysNewObj.paramKeysArr);
+      }
+    }
+    else {
+      paramKeysNew = paramKeysArr;
+      paramsObjNew = paramsObj;
+    }
 
     ({
       delimiters,
       partialText
     } = paramsApply({
-      paramKeysArr,
+      paramKeysArr: paramKeysNew,
+      paramsObj: paramsObjNew,
       partialParseItr: elementParseItr,
       partialParseItrn: elementParseItrn,
-      partialText_,
       partialShort, // For debugging.
-      paramsObj // For debugging.
+      partialText_
     }));
   }
   else {
@@ -429,14 +505,14 @@ function paramsApplyToParseObj(args) {
       partialText
     } = paramsApplyByParamKey({
       delimiters_,
+      elementParse,
       paramKeysItr,
       paramKeysItrn,
-      elementParse,
+      paramsObj, // For debugging.
       parseObj,
       parseObjKey,
-      partialText_,
       partialShort, // For debugging.
-      paramsObj // For debugging.
+      partialText_
     }));
   }
 
@@ -451,11 +527,11 @@ function paramsApply(args) {
   const {
     delimiters_,
     paramKeysArr,
+    paramsObj,
     partialParseItr,
     partialParseItrn,
-    partialText_,
     partialShort, // For debugging.
-    paramsObj // For debugging.
+    partialText_
   } = args;
 
   if (partialParseItrn.done) {
@@ -475,12 +551,12 @@ function paramsApply(args) {
   } = paramsApplyToParseObj({
     delimiters_,
     paramKeysArr,
+    paramsObj,
     parseObj,
     parseObjKeysItr,
     parseObjKeysItrn,
-    partialText_,
     partialShort, // For debugging.
-    paramsObj // For debugging.
+    partialText_
   });
 
   args.delimiters_ = delimiters || delimiters_;
@@ -496,17 +572,17 @@ function paramKeysWithDotNotation(args) {
     parentObjSplit
   } = args;
 
-  for (let i = 0; i < parentObjSplit.length; i++) {
-    let counter = i;
-    let itemNext;
-    let paramKey = parentObjSplit[i];
+  let i = 0;
+  let itemNext;
+  let paramKey = parentObjSplit[i];
 
-    while (itemNext = parentObjSplit[++counter]) { // eslint-disable-line no-cond-assign
-      paramKey += `.${itemNext}`;
+  // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
+  // loop at index 1.
+  while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
+    paramKey += `.${itemNext}`;
 
-      if (paramKeysArr.indexOf(paramKey) === -1) {
-        paramKeysArr.push(paramKey);
-      }
+    if (paramKeysArr.indexOf(paramKey) === -1) {
+      paramKeysArr.push(paramKey);
     }
   }
 
@@ -534,7 +610,7 @@ function paramsObjToParamKeysArr(args) {
   let paramKeysArr = paramKeysArr_;
 
   // paramKeysArr_ should only contain unique keys.
-  if (!paramKeysArr.includes(key)) {
+  if (!parentObjAsStr && !paramKeysArr.includes(key)) {
     paramKeysArr.push(key);
   }
 
@@ -559,7 +635,6 @@ function paramsObjToParamKeysArr(args) {
 
             const parentObjSplit = parentObjAsStrNew.split('.');
 
-            parentObjSplit.push(paramKeysDeeperItrn.value);
             ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
           }
 
@@ -589,8 +664,6 @@ function paramsObjToParamKeysArr(args) {
 
         const parentObjSplit = parentObjAsStrNew.split('.');
 
-        parentObjSplit.push(paramKeysDeeperItrn.value);
-
         ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
       }
 
@@ -607,7 +680,7 @@ function paramsObjToParamKeysArr(args) {
     }
   }
   else {
-    const parentObjSplit = parentObjAsStr.split('.');
+    const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
     parentObjSplit.push(key);
     ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
@@ -623,8 +696,8 @@ function styleModifierExtract(args) {
   const {
     partialName
   } = args;
-  let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
 
+  let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
   let styleModifier = '';
 
   if (styleModifierMatch && styleModifierMatch[1]) {
@@ -731,11 +804,11 @@ feplet.preprocessPartialParams = function (template, partials) {
       partialText
     } = paramsApply({
       paramKeysArr,
+      paramsObj,
       partialParseItr,
       partialParseItrn,
-      partialText_,
       partialShort, // For debugging.
-      paramsObj // For debugging.
+      partialText_
     });
 
     if (delimiters) {
@@ -762,6 +835,7 @@ feplet.render = function (template = '', context = {}, partials_ = {}) {
   let partials = partials_;
 
   // Remove any reference between partialsArr and partials object because we need to add to the partials object.
+  // We therefore do not want to iterate on the partials object itself.
   const partialsArr = Object.values(partials);
 
   for (let i = 0, l = partialsArr.length; i < l; i++) {

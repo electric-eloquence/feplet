@@ -13,14 +13,14 @@ describe('Feplet', function () {
   it('should populate variables written in dot.notation', function () {
     const partials = {};
     const files = [
-      'templates/00-dot.mustache'
+      'templates/01-dotted.fpt'
     ];
 
     files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01-parametered-dot.mustache'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted.fpt'), enc);
 
     const render = feplet.render(
       templateText,
@@ -34,14 +34,14 @@ describe('Feplet', function () {
   it('should populate variables within an array written in dot.notation', function () {
     const partials = {};
     const files = [
-      'templates/01-dot-array.mustache'
+      'templates/01-dotted_array.fpt'
     ];
 
     files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/02-parametered-dot-array.mustache'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted_array.fpt'), enc);
 
     const render = feplet.render(
       templateText,
@@ -55,14 +55,14 @@ describe('Feplet', function () {
   it('should hydrate templates with variables passed per the Pattern Lab styleModifier convention', function () {
     const partials = {};
     const files = [
-      'templates/02-styled-atom.mustache'
+      'templates/02-stylemod-atom.fpt'
     ];
 
     files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/03-styled-molecule.mustache'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/02-stylemod-molecule.fpt'), enc);
 
     const render = feplet.render(
       templateText,
@@ -81,15 +81,15 @@ describe('Feplet', function () {
     function () {
       const partials = {};
       const files = [
-        'templates/02-styled-atom.mustache',
-        'templates/03-styled-molecule.mustache'
+        'templates/02-stylemod-atom.fpt',
+        'templates/02-stylemod-molecule.fpt'
       ];
 
       files.forEach((file) => {
-        partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/04-styled-organism.mustache'), enc);
+      const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/02-stylemod-organism.fpt'), enc);
 
       const render = feplet.render(
         templateText,
@@ -107,14 +107,14 @@ describe('Feplet', function () {
   it('should hydrate templates with multiple classes passed per Pattern Lab styleModifier', function () {
     const partials = {};
     const files = [
-      'templates/02-styled-atom.mustache'
+      'templates/02-stylemod-atom.fpt'
     ];
 
     files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/05-multiple-classes.mustache'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/02_stylemod-multiple-classes.fpt'), enc);
 
     const render = feplet.render(
       templateText,
@@ -128,20 +128,149 @@ describe('Feplet', function () {
     expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
   });
 
-  it('should recursively hydrate templates with data passed as parameters specific to that template', function () {
+  it('should hydrate templates with both data parameters and a Pattern Lab styleModifier', function () {
     const partials = {};
     const files = [
-      'templates/00-foo.mustache',
-      'templates/00-simple.mustache',
-      'templates/01-bar.mustache',
-      'templates/05-parametered-partial.mustache'
+      'templates/02-stylemod-atom.fpt'
     ];
 
     files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/05-parametered-partial.mustache'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/02_stylemod-param.fpt'), enc);
+
+    const render = feplet.render(
+      templateText,
+      {
+        message: 'MESSAGE',
+        description: 'DESCRIPTION'
+      },
+      partials
+    );
+
+    expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
+  });
+
+  it('should hydrate templates with both data parameters and a styleModifier with multiple classes', function () {
+    const partials = {};
+    const files = [
+      'templates/02-stylemod-atom.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText =
+      fs.readFileSync(path.resolve(__dirname, 'templates/02_stylemod-param_multiple-classes.fpt'), enc);
+
+    const render = feplet.render(
+      templateText,
+      {
+        message: 'MESSAGE',
+        description: 'DESCRIPTION'
+      },
+      partials
+    );
+
+    expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n\n');
+  });
+
+  it('should recursively hydrate templates with multiple classes passed per Pattern Lab styleModifier', function () {
+    const partials = {};
+    const files = [
+      'templates/02-stylemod-atom.fpt',
+      'templates/02_stylemod-multiple-classes.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText =
+      fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-multiple-classes-includer.fpt'), enc);
+
+    const render = feplet.render(
+      templateText,
+      {
+        message: 'MESSAGE',
+        description: 'DESCRIPTION'
+      },
+      partials
+    );
+
+    expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
+  });
+
+  it('should recursively hydrate templates with both data parameters and a Pattern Lab styleModifier', function () {
+    const partials = {};
+    const files = [
+      'templates/02-stylemod-atom.fpt',
+      'templates/02_stylemod-param.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-param-includer.fpt'), enc);
+
+    const render = feplet.render(
+      templateText,
+      {
+        message: 'MESSAGE',
+        description: 'DESCRIPTION'
+      },
+      partials
+    );
+
+    expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
+  });
+
+  it(
+    'should recursively hydrate templates with both data parameters and a styleModifier with multiple classes',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/02-stylemod-atom.fpt',
+        'templates/02_stylemod-param_multiple-classes.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText =
+        fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-param_multiple-classes-includer.fpt'), enc);
+
+      const render = feplet.render(
+        templateText,
+        {
+          message: 'MESSAGE',
+          description: 'DESCRIPTION'
+        },
+        partials
+      );
+
+      expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n\n');
+    }
+  );
+
+  it('should shut off otherwise infinite recursion paths with default false conditions', function () {
+    const partials = {};
+    const files = [
+      'templates/00-base.fpt',
+      'templates/00-nested.fpt',
+      'templates/00_base.fpt',
+      'templates/03-include-self-w-condition.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/03-include-self-w-condition.fpt'), enc);
 
     const render = feplet.render(
       templateText,
@@ -159,68 +288,21 @@ describe('Feplet', function () {
     expect(render).to.equal('No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n');
   });
 
-  it('should hydrate templates with both data parameters and a Pattern Lab styleModifier', function () {
-    const partials = {};
-    const files = [
-      'templates/02-styled-atom.mustache'
-    ];
-
-    files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
-    });
-
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/06-mixed-params.mustache'), enc);
-
-    const render = feplet.render(
-      templateText,
-      {
-        message: 'MESSAGE',
-        description: 'DESCRIPTION'
-      },
-      partials
-    );
-
-    expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
-  });
-
-  it('should hydrate templates with both data parameters and a styleModifier with multiple classes', function () {
-    const partials = {};
-    const files = [
-      'templates/02-styled-atom.mustache'
-    ];
-
-    files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
-    });
-
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/07-multiple-classes-params.mustache'), enc);
-
-    const render = feplet.render(
-      templateText,
-      {
-        message: 'MESSAGE',
-        description: 'DESCRIPTION'
-      },
-      partials
-    );
-
-    expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n\n');
-  });
-
   it('should shut off otherwise infinite recursion paths when flagged to do so by parameters', function () {
     const partials = {};
     const files = [
-      'templates/00-foo.mustache',
-      'templates/00-simple.mustache',
-      'templates/01-bar.mustache',
-      'templates/05-parametered-partial.mustache'
+      'templates/00-base.fpt',
+      'templates/00-nested.fpt',
+      'templates/00_base.fpt',
+      'templates/03-include-self-w-condition.fpt'
     ];
 
     files.forEach((file) => {
-      partials[file.replace(/\.mustache$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/07-anti-infinity-tester.mustache'), enc);
+    const templateText =
+      fs.readFileSync(path.resolve(__dirname, 'templates/03_include-self-w-condition-includer.fpt'), enc);
 
     const render = feplet.render(
       templateText,
@@ -236,5 +318,397 @@ describe('Feplet', function () {
     );
 
     expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
+  });
+
+  it(
+    'should render a nested parameter variable differently than a non-parameter variable of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText =
+        fs.readFileSync(path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer.fpt'), enc);
+
+      const render = feplet.render(
+        templateText,
+        {
+          bez: 'hack',
+          biz: 'heck'
+        },
+        partials
+      );
+
+      expect(render).to.equal('hack heck\n  hick hock\n');
+    }
+  );
+
+  it(
+    'should render an array of nested parameter variables differently from non-parameter variables of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt'), enc);
+
+      const render = feplet.render(
+        templateText,
+        {
+          bez: 'hack',
+          biz: 'heck'
+        },
+        partials
+      );
+
+      expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
+    }
+  );
+
+  it(
+    'should render a more deeply nested parameter variable differently then a non-parameter variable of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param_deep.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt'),
+        enc
+      );
+
+      const render = feplet.render(
+        templateText,
+        {
+          biz: 'hack',
+          boz: 'heck'
+        },
+        partials
+      );
+
+      expect(render).to.equal('hack heck\n  hick hock\n');
+    }
+  );
+
+  it(
+    'should render a deeply nested dot.notation parameter differently than a non-parameter variable of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
+        enc
+      );
+
+      const render = feplet.render(
+        templateText,
+        {
+          biz: {
+            boz: 'hack'
+          }
+        },
+        partials
+      );
+
+      expect(render).to.equal('hack\n    heck\n');
+    }
+  );
+
+  it(
+    // eslint-disable-next-line max-len
+    'should render a deeply nested array of dot.notation parameters differently than non-parameter variables of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
+        enc
+      );
+
+      const render = feplet.render(
+        templateText,
+        {
+          biz: {
+            boz: 'hack'
+          }
+        },
+        partials
+      );
+
+      expect(render).to.equal('hack\n    heck\n    hick\n');
+    }
+  );
+
+  it(
+    // eslint-disable-next-line max-len
+    'should render a moderately nested dot.notation parameter differently than a non-parameter variable of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
+        enc
+      );
+
+      const render = feplet.render(
+        templateText,
+        {
+          bez: {
+            biz: {
+              boz: 'hack'
+            }
+          }
+        },
+        partials
+      );
+
+      expect(render).to.equal('  hack\n    heck\n');
+    }
+  );
+
+  it(
+    // eslint-disable-next-line max-len
+    'should render a moderately nested array of dot.notation parameters differently than non-parameter variables of the same name',
+    function () {
+      const partials = {};
+      const files = [
+        'templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt'
+      ];
+
+      files.forEach((file) => {
+        partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+      });
+
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
+        enc
+      );
+
+      const render = feplet.render(
+        templateText,
+        {
+          bez: {
+            biz: [
+              {
+                boz: 'hack'
+              },
+              {
+                boz: 'heck'
+              }
+            ]
+          }
+        },
+        partials
+      );
+
+      expect(render).to.equal('  hack\n  heck\n    hick\n    hock\n');
+    }
+  );
+
+  it('should render a top-level dot.notation parameter that nests more tags', function () {
+    const partials = {};
+    const files = [
+      'templates/05-dotted-param.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/05_dotted-param-includer.fpt'), enc);
+
+    const render = feplet.render(
+      templateText,
+      {},
+      partials
+    );
+
+    expect(render).to.equal('  hack\n');}
+  );
+
+  it('should render an array of top-level dot.notation parameters that nest more tags', function () {
+    const partials = {};
+    const files = [
+      'templates/05-dotted-param.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/05_dotted-param-includer_array.fpt'), enc);
+
+    const render = feplet.render(
+      templateText,
+      {},
+      partials
+    );
+
+    expect(render).to.equal('  hack\n  heck\n');
+  });
+
+  it('should render a dot.notation parameter nested within a non-parameter', function () {
+    const partials = {};
+    const files = [
+      'templates/05-dotted-param_nested-in-non-param.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(
+      path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param.fpt'),
+      enc
+    );
+
+    const render = feplet.render(
+      templateText,
+      {
+        baz: {
+          bez: 'hack'
+        }
+      },
+      partials
+    );
+
+    expect(render).to.equal('  hack\n    heck\n');
+  });
+
+  it('should render an array of dot.notation parameters nested within a non-parameter', function () {
+    const partials = {};
+    const files = [
+      'templates/05-dotted-param_nested-in-non-param.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(
+      path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt'),
+      enc
+    );
+
+    const render = feplet.render(
+      templateText,
+      {
+        baz: {
+          bez: 'hack'
+        }
+      },
+      partials
+    );
+
+    expect(render).to.equal('  hack\n    heck\n    hick\n');
+  });
+
+  it('should render a deeply nested dot.notation parameter containing an array', function () {
+    const partials = {};
+    const files = [
+      'templates/06-dotted-array-param-inner.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(
+      path.resolve(__dirname, 'templates/06_dotted-array-param-inner-includer.fpt'),
+      enc
+    );
+
+    const render = feplet.render(
+      templateText,
+      {},
+      partials
+    );
+
+    expect(render).to.equal('    heck\n');
+  });
+
+  it('should render a moderately nested dot.notation parameter containing an array', function () {
+    const partials = {};
+    const files = [
+      'templates/06-dotted-array-param-middle.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(
+      path.resolve(__dirname, 'templates/06_dotted-array-param-middle-includer.fpt'),
+      enc
+    );
+
+    const render = feplet.render(
+      templateText,
+      {},
+      partials
+    );
+
+    expect(render).to.equal('    heck\n');
+  });
+
+  it('should render a top-level dot.notation parameter containing an array', function () {
+    const partials = {};
+    const files = [
+      'templates/06-dotted-array-param-outer.fpt'
+    ];
+
+    files.forEach((file) => {
+      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
+    });
+
+    const templateText = fs.readFileSync(
+      path.resolve(__dirname, 'templates/06_dotted-array-param-outer-includer.fpt'),
+      enc
+    );
+
+    const render = feplet.render(
+      templateText,
+      {},
+      partials
+    );
+
+    expect(render).to.equal('  heck\n');
   });
 });

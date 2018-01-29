@@ -1,0 +1,14 @@
+{{> templates/04-nested-param-same-name-as-non-param_dotted-middle(
+  baz: {
+    bez: {
+      biz: [
+        {
+          boz: 'hick'
+        },
+        {
+          boz: 'hock'
+        }
+      ]
+    }
+  }
+) }}

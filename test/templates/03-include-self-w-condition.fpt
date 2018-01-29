@@ -1,0 +1,8 @@
+{{> templates/00_base }}
+{{> templates/00-base(title: 'foo') }}
+{{# foo }}
+  {{> templates/03-include-self-w-condition(bar: true) }}
+{{/ foo }}
+{{# bar }}
+  {{> templates/00-base(title: 'bar') }}
+{{/ bar }}

@@ -1,0 +1,17 @@
+{{> templates/06-dotted-array-param-inner(
+  baz: {
+    bez: {
+      biz: [
+        {
+          boz: 'hack'
+        },
+        {
+          boz: 'heck'
+        },
+        {
+          boz: 'hick'
+        }
+      ]
+    }
+  }
+) }}

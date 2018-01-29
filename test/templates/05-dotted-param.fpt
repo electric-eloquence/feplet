@@ -1,0 +1,3 @@
+{{#baz.bez}}
+  {{biz}}
+{{/baz.bez}}

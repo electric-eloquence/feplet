@@ -1,0 +1,1 @@
+{{> templates/01-dotted(dot: { title: 'foo', message: 'bar' }) }}

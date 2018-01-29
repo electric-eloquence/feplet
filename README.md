@@ -10,7 +10,7 @@ Handlebars. The syntax for passing parameters follows the Pattern Lab
 convention:
 
 ```handlebars
-{{> partial_template(place: 'World')}}
+{{> partial_template(place: 'World') }}
 ```
 
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
@@ -19,7 +19,7 @@ wrapping curly braces) can be passed. Be sure that consecutive JSON5 curly
 braces are spaced to avoid being parsed as a stash `}}`.
 
 ```handlebars
-{{> partial_template(nest: {egg: {yolk: 'Yellow'} })}}
+{{> partial_template(nest: { egg: { yolk: 'Yellow' } }) }}
 ```
 
 One thing to note is that the data passed in this example will apply only to the 
@@ -52,7 +52,7 @@ const output1 = generated.render(data); // Hello World
 const partials = {
   partial_template: '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}'
 };
-const includer = '{{> partial_template(nest: {egg: {yolk: "Yellow"} })}}';
+const includer = '{{> partial_template(nest: { egg: { yolk: "Yellow" } }) }}';
 const output2 = feplet.render(
   includer,
   {place: 'World'},
