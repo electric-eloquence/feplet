@@ -3,6 +3,8 @@
 const hogan = require('hogan.js');
 const jsonEval = require('json-eval');
 
+// HELPER FUNCTIONS.
+
 function getDotDelimitedProp(args) {
   const {
     obj,
@@ -55,95 +57,6 @@ function spacesCount(args) {
 
   return {
     count
-  };
-}
-
-function closeStartStopGet(args) {
-  const {
-    parseObj,
-    partialText_
-  } = args;
-
-  let closeStart;
-  let closeSpace0Start;
-  let closeSpace0Stop;
-  let closeSpace1Start;
-  let closeSpace1Stop;
-  let closeStop;
-
-  closeStart = parseObj.end;
-  closeStop = closeStart;
-  closeStop += parseObj.otag.length;
-  closeStop += parseObj.tag.length;
-  closeSpace0Start = closeStop;
-  closeStop += spacesCount({count_: closeStop, inc: +1, partialText_}).count;
-  closeSpace0Stop = closeStop;
-  closeStop += parseObj.n.length;
-  closeSpace1Start = closeStop;
-  closeStop += spacesCount({count_: closeStop, inc: +1, partialText_}).count;
-  closeSpace1Stop = closeStop;
-  closeStop += parseObj.otag.length;
-
-  return {
-    closeStart,
-    closeSpace0Start,
-    closeSpace0Stop,
-    closeSpace1Start,
-    closeSpace1Stop,
-    closeStop
-  };
-}
-
-function closeTagBuild(args) {
-  const {
-    closeStartStop,
-    parseObj,
-    partialText_
-  } = args;
-
-  let {
-    //closeStart, // For debugging.
-    closeSpace0Start,
-    closeSpace0Stop,
-    closeSpace1Start,
-    closeSpace1Stop,
-    //closeStop // For debugging.
-  } = closeStartStop;
-  let i;
-  let partialText = '';
-
-  i = parseObj.otag.length;
-
-  while (i--) {
-    partialText += '\u0002';
-    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
-  }
-
-  partialText += '/';
-  i = closeSpace0Start;
-
-  while (i < closeSpace0Stop) {
-    partialText += partialText_[i];
-    i++;
-  }
-
-  partialText += parseObj.n;
-  i = closeSpace1Start;
-
-  while (i < closeSpace1Stop) {
-    partialText += partialText_[i];
-    i++;
-  }
-
-  i = parseObj.ctag.length;
-
-  while (i--) {
-    partialText += '\u0003';
-    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
-  }
-
-  return {
-    partialText
   };
 }
 
@@ -272,6 +185,243 @@ function openTagBuild(args) {
   };
 }
 
+function closeStartStopGet(args) {
+  const {
+    parseObj,
+    partialText_
+  } = args;
+
+  let closeStart;
+  let closeSpace0Start;
+  let closeSpace0Stop;
+  let closeSpace1Start;
+  let closeSpace1Stop;
+  let closeStop;
+
+  closeStart = parseObj.end;
+  closeStop = closeStart;
+  closeStop += parseObj.otag.length;
+  closeStop += parseObj.tag.length;
+  closeSpace0Start = closeStop;
+  closeStop += spacesCount({count_: closeStop, inc: +1, partialText_}).count;
+  closeSpace0Stop = closeStop;
+  closeStop += parseObj.n.length;
+  closeSpace1Start = closeStop;
+  closeStop += spacesCount({count_: closeStop, inc: +1, partialText_}).count;
+  closeSpace1Stop = closeStop;
+  closeStop += parseObj.otag.length;
+
+  return {
+    closeStart,
+    closeSpace0Start,
+    closeSpace0Stop,
+    closeSpace1Start,
+    closeSpace1Stop,
+    closeStop
+  };
+}
+
+function closeTagBuild(args) {
+  const {
+    closeStartStop,
+    parseObj,
+    partialText_
+  } = args;
+
+  let {
+    //closeStart, // For debugging.
+    closeSpace0Start,
+    closeSpace0Stop,
+    closeSpace1Start,
+    closeSpace1Stop,
+    //closeStop // For debugging.
+  } = closeStartStop;
+  let i;
+  let partialText = '';
+
+  i = parseObj.otag.length;
+
+  while (i--) {
+    partialText += '\u0002';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+  }
+
+  partialText += '/';
+  i = closeSpace0Start;
+
+  while (i < closeSpace0Stop) {
+    partialText += partialText_[i];
+    i++;
+  }
+
+  partialText += parseObj.n;
+  i = closeSpace1Start;
+
+  while (i < closeSpace1Stop) {
+    partialText += partialText_[i];
+    i++;
+  }
+
+  i = parseObj.ctag.length;
+
+  while (i--) {
+    partialText += '\u0003';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+  }
+
+  return {
+    partialText
+  };
+}
+
+function paramKeysWithDotNotation(args) {
+  const {
+    paramKeysArr,
+    parentObjSplit
+  } = args;
+
+  let i = 0;
+  let itemNext;
+  let paramKey = parentObjSplit[i];
+
+  // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
+  // loop at index 1.
+  while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
+    paramKey += `.${itemNext}`;
+
+    if (paramKeysArr.indexOf(paramKey) === -1) {
+      paramKeysArr.push(paramKey);
+    }
+  }
+
+  return {paramKeysArr};
+}
+
+function paramsObjToParamKeysArr(args) {
+  const {
+    paramKeysArr_,
+    //paramKeysShallowItr, // For debugging.
+    paramKeysShallowItrn,
+    paramsObj,
+    parentObjAsStr,
+    //partialShort // For debugging.
+  } = args;
+
+  if (paramKeysShallowItrn.done) {
+    return {
+      paramKeysArr: paramKeysArr_
+    };
+  }
+
+  const key = paramKeysShallowItrn.value;
+
+  let paramKeysArr = paramKeysArr_;
+
+  // paramKeysArr_ should only contain unique keys.
+  if (!parentObjAsStr && !paramKeysArr.includes(key)) {
+    paramKeysArr.push(key);
+  }
+
+  // Recurse deeper into paramsObj if this property is of type object.
+  if (paramsObj[key] && typeof paramsObj[key] === 'object') {
+    const paramsObjNestedObj = paramsObj[key];
+
+    // Recursion into an Array.
+    if (Array.isArray(paramsObjNestedObj)) {
+      for (let i = 0, l = paramsObjNestedObj.length; i < l; i++) {
+        const paramsObjArrayItem = paramsObjNestedObj[i];
+
+        if (paramsObjArrayItem && paramsObjArrayItem.constructor === Object) {
+          // Clone args object for recursion deeper into paramsObj.
+          const paramKeysDeeperItr = Object.keys(paramsObjArrayItem)[Symbol.iterator]();
+          const paramKeysDeeperItrn = paramKeysDeeperItr.next();
+
+          let parentObjAsStrNew = parentObjAsStr;
+
+          if (paramKeysDeeperItrn.value) {
+            parentObjAsStrNew += parentObjAsStr ? `.${key}.${i}` : `${key}.${i}`;
+
+            const parentObjSplit = parentObjAsStrNew.split('.');
+
+            ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
+          }
+
+          const argsDeeper = {
+            paramKeysArr_: paramKeysArr,
+            paramKeysShallowItr: paramKeysDeeperItr,
+            paramKeysShallowItrn: paramKeysDeeperItrn,
+            paramsObj: paramsObjArrayItem,
+            parentObjAsStr: parentObjAsStrNew,
+            partialShort: args.partialShort
+          };
+
+          ({paramKeysArr} = paramsObjToParamKeysArr(argsDeeper));
+        }
+      }
+    }
+    // Recursion into a plain Object.
+    else {
+      // Clone args object for recursion deeper into paramsObj.
+      const paramKeysDeeperItr = Object.keys(paramsObjNestedObj)[Symbol.iterator]();
+      const paramKeysDeeperItrn = paramKeysDeeperItr.next();
+
+      let parentObjAsStrNew = parentObjAsStr;
+
+      if (paramKeysDeeperItrn.value) {
+        parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
+
+        const parentObjSplit = parentObjAsStrNew.split('.');
+
+        ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
+      }
+
+      const argsDeeper = {
+        paramKeysArr_: paramKeysArr,
+        paramKeysShallowItr: paramKeysDeeperItr,
+        paramKeysShallowItrn: paramKeysDeeperItrn,
+        paramsObj: paramsObjNestedObj,
+        parentObjAsStr: parentObjAsStrNew,
+        partialShort: args.partialShort
+      };
+
+      ({paramKeysArr} = paramsObjToParamKeysArr(argsDeeper));
+    }
+  }
+  else {
+    const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
+
+    parentObjSplit.push(key);
+    ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
+  }
+
+  args.paramKeysArr_ = paramKeysArr;
+  args.paramKeysShallowItrn = args.paramKeysShallowItr.next();
+
+  return paramsObjToParamKeysArr(args);
+}
+
+function styleModifierExtract(args) {
+  const {
+    partialName
+  } = args;
+
+  let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
+  let styleModifier = '';
+
+  if (styleModifierMatch && styleModifierMatch[1]) {
+    styleModifier = styleModifierMatch[1].replace(/\|/g, ' ').trim();
+
+    if (!styleModifier) {
+      styleModifierMatch = null;
+    }
+  }
+
+  return {
+    styleModifierMatch,
+    styleModifier
+  };
+}
+
 function tagReplace(args) {
   const {
     parseObj,
@@ -337,16 +487,18 @@ function tagReplace(args) {
   };
 }
 
+// CORE FUNCTIONS.
+
 function paramsApplyByParamKey(args) {
   const {
     delimiters_,
     elementParse,
     paramKeysItr,
     paramKeysItrn,
-    paramsObj, // For debugging.
+    //paramsObj, // For debugging.
     parseObj,
     parseObjKey,
-    partialShort, // For debugging.
+    //partialShort, // For debugging.
     partialText_
   } = args;
 
@@ -566,153 +718,7 @@ function paramsApply(args) {
   return paramsApply(args);
 }
 
-function paramKeysWithDotNotation(args) {
-  const {
-    paramKeysArr,
-    parentObjSplit
-  } = args;
-
-  let i = 0;
-  let itemNext;
-  let paramKey = parentObjSplit[i];
-
-  // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
-  // loop at index 1.
-  while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
-    paramKey += `.${itemNext}`;
-
-    if (paramKeysArr.indexOf(paramKey) === -1) {
-      paramKeysArr.push(paramKey);
-    }
-  }
-
-  return {paramKeysArr};
-}
-
-function paramsObjToParamKeysArr(args) {
-  const {
-    paramKeysArr_,
-    //paramKeysShallowItr, // For debugging.
-    paramKeysShallowItrn,
-    paramsObj,
-    parentObjAsStr,
-    //partialShort // For debugging.
-  } = args;
-
-  if (paramKeysShallowItrn.done) {
-    return {
-      paramKeysArr: paramKeysArr_
-    };
-  }
-
-  const key = paramKeysShallowItrn.value;
-
-  let paramKeysArr = paramKeysArr_;
-
-  // paramKeysArr_ should only contain unique keys.
-  if (!parentObjAsStr && !paramKeysArr.includes(key)) {
-    paramKeysArr.push(key);
-  }
-
-  // Recurse deeper into paramsObj if this property is of type object.
-  if (paramsObj[key] && typeof paramsObj[key] === 'object') {
-    const paramsObjNestedObj = paramsObj[key];
-
-    // Recursion into an Array.
-    if (Array.isArray(paramsObjNestedObj)) {
-      for (let i = 0, l = paramsObjNestedObj.length; i < l; i++) {
-        const paramsObjArrayItem = paramsObjNestedObj[i];
-
-        if (paramsObjArrayItem && paramsObjArrayItem.constructor === Object) {
-          // Clone args object for recursion deeper into paramsObj.
-          const paramKeysDeeperItr = Object.keys(paramsObjArrayItem)[Symbol.iterator]();
-          const paramKeysDeeperItrn = paramKeysDeeperItr.next();
-
-          let parentObjAsStrNew = parentObjAsStr;
-
-          if (paramKeysDeeperItrn.value) {
-            parentObjAsStrNew += parentObjAsStr ? `.${key}.${i}` : `${key}.${i}`;
-
-            const parentObjSplit = parentObjAsStrNew.split('.');
-
-            ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
-          }
-
-          const argsDeeper = {
-            paramKeysArr_: paramKeysArr,
-            paramKeysShallowItr: paramKeysDeeperItr,
-            paramKeysShallowItrn: paramKeysDeeperItrn,
-            paramsObj: paramsObjArrayItem,
-            parentObjAsStr: parentObjAsStrNew,
-            partialShort: args.partialShort
-          };
-
-          ({paramKeysArr} = paramsObjToParamKeysArr(argsDeeper));
-        }
-      }
-    }
-    // Recursion into a plain Object.
-    else {
-      // Clone args object for recursion deeper into paramsObj.
-      const paramKeysDeeperItr = Object.keys(paramsObjNestedObj)[Symbol.iterator]();
-      const paramKeysDeeperItrn = paramKeysDeeperItr.next();
-
-      let parentObjAsStrNew = parentObjAsStr;
-
-      if (paramKeysDeeperItrn.value) {
-        parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
-
-        const parentObjSplit = parentObjAsStrNew.split('.');
-
-        ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
-      }
-
-      const argsDeeper = {
-        paramKeysArr_: paramKeysArr,
-        paramKeysShallowItr: paramKeysDeeperItr,
-        paramKeysShallowItrn: paramKeysDeeperItrn,
-        paramsObj: paramsObjNestedObj,
-        parentObjAsStr: parentObjAsStrNew,
-        partialShort: args.partialShort
-      };
-
-      ({paramKeysArr} = paramsObjToParamKeysArr(argsDeeper));
-    }
-  }
-  else {
-    const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
-
-    parentObjSplit.push(key);
-    ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
-  }
-
-  args.paramKeysArr_ = paramKeysArr;
-  args.paramKeysShallowItrn = args.paramKeysShallowItr.next();
-
-  return paramsObjToParamKeysArr(args);
-}
-
-function styleModifierExtract(args) {
-  const {
-    partialName
-  } = args;
-
-  let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
-  let styleModifier = '';
-
-  if (styleModifierMatch && styleModifierMatch[1]) {
-    styleModifier = styleModifierMatch[1].replace(/\|/g, ' ').trim();
-
-    if (!styleModifier) {
-      styleModifierMatch = null;
-    }
-  }
-
-  return {
-    styleModifierMatch,
-    styleModifier
-  };
-}
+// PREPARE FOR EXPORT.
 
 const feplet = Object.assign({}, hogan);
 

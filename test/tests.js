@@ -560,8 +560,8 @@ describe('Feplet', function () {
       partials
     );
 
-    expect(render).to.equal('  hack\n');}
-  );
+    expect(render).to.equal('  hack\n');
+  });
 
   it('should render an array of top-level dot.notation parameters that nest more tags', function () {
     const partials = {};
