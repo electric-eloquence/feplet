@@ -5,6 +5,35 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var hogan = require('hogan.js');
 var jsonEval = require('json-eval');
 
+// HELPER FUNCTIONS.
+
+function getDotDelimitedProp(args) {
+  var obj = args.obj,
+      prop_ = args.prop_;
+
+
+  var propSplit = prop_.split('.');
+  var prop0 = propSplit.shift();
+  var prop = propSplit.join('.');
+
+  var value = void 0;
+
+  if (obj.hasOwnProperty(prop0)) {
+    var _value = obj[prop0];
+
+    if (_value && _value instanceof Object && prop.length) {
+      value = getDotDelimitedProp({
+        obj: _value,
+        prop_: prop
+      });
+    } else {
+      value = _value;
+    }
+  }
+
+  return value;
+}
+
 function spacesCount(args) {
   var count_ = args.count_,
       inc = args.inc,
@@ -26,88 +55,6 @@ function spacesCount(args) {
 
   return {
     count: count
-  };
-}
-
-function closeStartStopGet(args) {
-  var parseObj = args.parseObj,
-      partialText_ = args.partialText_;
-
-
-  var closeStart = void 0;
-  var closeSpace0Start = void 0;
-  var closeSpace0Stop = void 0;
-  var closeSpace1Start = void 0;
-  var closeSpace1Stop = void 0;
-  var closeStop = void 0;
-
-  closeStart = parseObj.end;
-  closeStop = closeStart;
-  closeStop += parseObj.otag.length;
-  closeStop += parseObj.tag.length;
-  closeSpace0Start = closeStop;
-  closeStop += spacesCount({ count_: closeStop, inc: +1, partialText_: partialText_ }).count;
-  closeSpace0Stop = closeStop;
-  closeStop += parseObj.n.length;
-  closeSpace1Start = closeStop;
-  closeStop += spacesCount({ count_: closeStop, inc: +1, partialText_: partialText_ }).count;
-  closeSpace1Stop = closeStop;
-  closeStop += parseObj.otag.length;
-
-  return {
-    closeStart: closeStart,
-    closeSpace0Start: closeSpace0Start,
-    closeSpace0Stop: closeSpace0Stop,
-    closeSpace1Start: closeSpace1Start,
-    closeSpace1Stop: closeSpace1Stop,
-    closeStop: closeStop
-  };
-}
-
-function closeTagBuild(args) {
-  var closeStartStop = args.closeStartStop,
-      parseObj = args.parseObj,
-      partialText_ = args.partialText_;
-  var closeSpace0Start = closeStartStop.closeSpace0Start,
-      closeSpace0Stop = closeStartStop.closeSpace0Stop,
-      closeSpace1Start = closeStartStop.closeSpace1Start,
-      closeSpace1Stop = closeStartStop.closeSpace1Stop;
-
-  var i = void 0;
-  var partialText = '';
-
-  i = parseObj.otag.length;
-
-  while (i--) {
-    partialText += '\x02';
-    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
-  }
-
-  partialText += '/';
-  i = closeSpace0Start;
-
-  while (i < closeSpace0Stop) {
-    partialText += partialText_[i];
-    i++;
-  }
-
-  partialText += parseObj.n;
-  i = closeSpace1Start;
-
-  while (i < closeSpace1Stop) {
-    partialText += partialText_[i];
-    i++;
-  }
-
-  i = parseObj.ctag.length;
-
-  while (i--) {
-    partialText += '\x03';
-    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
-  }
-
-  return {
-    partialText: partialText
   };
 }
 
@@ -229,6 +176,242 @@ function openTagBuild(args) {
   };
 }
 
+function closeStartStopGet(args) {
+  var parseObj = args.parseObj,
+      partialText_ = args.partialText_;
+
+
+  var closeStart = void 0;
+  var closeSpace0Start = void 0;
+  var closeSpace0Stop = void 0;
+  var closeSpace1Start = void 0;
+  var closeSpace1Stop = void 0;
+  var closeStop = void 0;
+
+  closeStart = parseObj.end;
+  closeStop = closeStart;
+  closeStop += parseObj.otag.length;
+  closeStop += parseObj.tag.length;
+  closeSpace0Start = closeStop;
+  closeStop += spacesCount({ count_: closeStop, inc: +1, partialText_: partialText_ }).count;
+  closeSpace0Stop = closeStop;
+  closeStop += parseObj.n.length;
+  closeSpace1Start = closeStop;
+  closeStop += spacesCount({ count_: closeStop, inc: +1, partialText_: partialText_ }).count;
+  closeSpace1Stop = closeStop;
+  closeStop += parseObj.otag.length;
+
+  return {
+    closeStart: closeStart,
+    closeSpace0Start: closeSpace0Start,
+    closeSpace0Stop: closeSpace0Stop,
+    closeSpace1Start: closeSpace1Start,
+    closeSpace1Stop: closeSpace1Stop,
+    closeStop: closeStop
+  };
+}
+
+function closeTagBuild(args) {
+  var closeStartStop = args.closeStartStop,
+      parseObj = args.parseObj,
+      partialText_ = args.partialText_;
+  var closeSpace0Start = closeStartStop.closeSpace0Start,
+      closeSpace0Stop = closeStartStop.closeSpace0Stop,
+      closeSpace1Start = closeStartStop.closeSpace1Start,
+      closeSpace1Stop = closeStartStop.closeSpace1Stop;
+
+  var i = void 0;
+  var partialText = '';
+
+  i = parseObj.otag.length;
+
+  while (i--) {
+    partialText += '\x02';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+  }
+
+  partialText += '/';
+  i = closeSpace0Start;
+
+  while (i < closeSpace0Stop) {
+    partialText += partialText_[i];
+    i++;
+  }
+
+  partialText += parseObj.n;
+  i = closeSpace1Start;
+
+  while (i < closeSpace1Stop) {
+    partialText += partialText_[i];
+    i++;
+  }
+
+  i = parseObj.ctag.length;
+
+  while (i--) {
+    partialText += '\x03';
+    //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+  }
+
+  return {
+    partialText: partialText
+  };
+}
+
+function paramKeysWithDotNotation(args) {
+  var paramKeysArr = args.paramKeysArr,
+      parentObjSplit = args.parentObjSplit;
+
+
+  var i = 0;
+  var itemNext = void 0;
+  var paramKey = parentObjSplit[i];
+
+  // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
+  // loop at index 1.
+  while (itemNext = parentObjSplit[++i]) {
+    // eslint-disable-line no-cond-assign
+    paramKey += '.' + itemNext;
+
+    if (paramKeysArr.indexOf(paramKey) === -1) {
+      paramKeysArr.push(paramKey);
+    }
+  }
+
+  return { paramKeysArr: paramKeysArr };
+}
+
+function paramsObjToParamKeysArr(args) {
+  var paramKeysArr_ = args.paramKeysArr_,
+      paramKeysShallowItrn = args.paramKeysShallowItrn,
+      paramsObj = args.paramsObj,
+      parentObjAsStr = args.parentObjAsStr;
+
+
+  if (paramKeysShallowItrn.done) {
+    return {
+      paramKeysArr: paramKeysArr_
+    };
+  }
+
+  var key = paramKeysShallowItrn.value;
+
+  var paramKeysArr = paramKeysArr_;
+
+  // paramKeysArr_ should only contain unique keys.
+  if (!parentObjAsStr && !paramKeysArr.includes(key)) {
+    paramKeysArr.push(key);
+  }
+
+  // Recurse deeper into paramsObj if this property is of type object.
+  if (paramsObj[key] && _typeof(paramsObj[key]) === 'object') {
+    var paramsObjNestedObj = paramsObj[key];
+
+    // Recursion into an Array.
+    if (Array.isArray(paramsObjNestedObj)) {
+      for (var i = 0, l = paramsObjNestedObj.length; i < l; i++) {
+        var paramsObjArrayItem = paramsObjNestedObj[i];
+
+        if (paramsObjArrayItem && paramsObjArrayItem.constructor === Object) {
+          // Clone args object for recursion deeper into paramsObj.
+          var paramKeysDeeperItr = Object.keys(paramsObjArrayItem)[Symbol.iterator]();
+          var paramKeysDeeperItrn = paramKeysDeeperItr.next();
+
+          var parentObjAsStrNew = parentObjAsStr;
+
+          if (paramKeysDeeperItrn.value) {
+            parentObjAsStrNew += parentObjAsStr ? '.' + key + '.' + i : key + '.' + i;
+
+            var parentObjSplit = parentObjAsStrNew.split('.');
+
+            var _paramKeysWithDotNota = paramKeysWithDotNotation({ paramKeysArr: paramKeysArr, parentObjSplit: parentObjSplit });
+
+            paramKeysArr = _paramKeysWithDotNota.paramKeysArr;
+          }
+
+          var argsDeeper = {
+            paramKeysArr_: paramKeysArr,
+            paramKeysShallowItr: paramKeysDeeperItr,
+            paramKeysShallowItrn: paramKeysDeeperItrn,
+            paramsObj: paramsObjArrayItem,
+            parentObjAsStr: parentObjAsStrNew,
+            partialShort: args.partialShort
+          };
+
+          var _paramsObjToParamKeys = paramsObjToParamKeysArr(argsDeeper);
+
+          paramKeysArr = _paramsObjToParamKeys.paramKeysArr;
+        }
+      }
+    }
+    // Recursion into a plain Object.
+    else {
+        // Clone args object for recursion deeper into paramsObj.
+        var _paramKeysDeeperItr = Object.keys(paramsObjNestedObj)[Symbol.iterator]();
+        var _paramKeysDeeperItrn = _paramKeysDeeperItr.next();
+
+        var _parentObjAsStrNew = parentObjAsStr;
+
+        if (_paramKeysDeeperItrn.value) {
+          _parentObjAsStrNew += parentObjAsStr ? '.' + key : key;
+
+          var _parentObjSplit = _parentObjAsStrNew.split('.');
+
+          var _paramKeysWithDotNota2 = paramKeysWithDotNotation({ paramKeysArr: paramKeysArr, parentObjSplit: _parentObjSplit });
+
+          paramKeysArr = _paramKeysWithDotNota2.paramKeysArr;
+        }
+
+        var _argsDeeper = {
+          paramKeysArr_: paramKeysArr,
+          paramKeysShallowItr: _paramKeysDeeperItr,
+          paramKeysShallowItrn: _paramKeysDeeperItrn,
+          paramsObj: paramsObjNestedObj,
+          parentObjAsStr: _parentObjAsStrNew,
+          partialShort: args.partialShort
+        };
+
+        var _paramsObjToParamKeys2 = paramsObjToParamKeysArr(_argsDeeper);
+
+        paramKeysArr = _paramsObjToParamKeys2.paramKeysArr;
+      }
+  } else {
+    var _parentObjSplit2 = parentObjAsStr ? parentObjAsStr.split('.') : [];
+
+    _parentObjSplit2.push(key);
+
+    var _paramKeysWithDotNota3 = paramKeysWithDotNotation({ paramKeysArr: paramKeysArr, parentObjSplit: _parentObjSplit2 });
+
+    paramKeysArr = _paramKeysWithDotNota3.paramKeysArr;
+  }
+
+  args.paramKeysArr_ = paramKeysArr;
+  args.paramKeysShallowItrn = args.paramKeysShallowItr.next();
+
+  return paramsObjToParamKeysArr(args);
+}
+
+function styleModifierExtract(args) {
+  var partialName = args.partialName;
+
+
+  var styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
+  var styleModifier = '';
+
+  if (styleModifierMatch && styleModifierMatch[1]) {
+    styleModifier = styleModifierMatch[1].replace(/\|/g, ' ').trim();
+
+    if (!styleModifier) {
+      styleModifierMatch = null;
+    }
+  }
+
+  return {
+    styleModifierMatch: styleModifierMatch,
+    styleModifier: styleModifier
+  };
+}
+
 function tagReplace(args) {
   var parseObj = args.parseObj,
       partialText_ = args.partialText_;
@@ -248,6 +431,7 @@ function tagReplace(args) {
     case '^':
     case '_v':
     case '{':
+      // eslint-disable-line no-case-declarations
 
       var openStartStop = openStartStopGet({ parseObj: parseObj, partialText_: partialText_ });
       var openStart = openStartStop.openStart;
@@ -287,16 +471,16 @@ function tagReplace(args) {
   };
 }
 
+// CORE FUNCTIONS.
+
 function paramsApplyByParamKey(args) {
   var delimiters_ = args.delimiters_,
+      elementParse = args.elementParse,
       paramKeysItr = args.paramKeysItr,
       paramKeysItrn = args.paramKeysItrn,
-      elementParse = args.elementParse,
       parseObj = args.parseObj,
       parseObjKey = args.parseObjKey,
-      partialText_ = args.partialText_,
-      partialShort = args.partialShort,
-      paramsObj = args.paramsObj;
+      partialText_ = args.partialText_;
 
 
   if (paramKeysItrn.done) {
@@ -317,9 +501,7 @@ function paramsApplyByParamKey(args) {
     if (elementParse === paramKey) {
       var _tagReplace = tagReplace({
         parseObj: parseObj,
-        partialText_: partialText_,
-        partialShort: partialShort, // For debugging.
-        paramsObj: paramsObj // For debugging.
+        partialText_: partialText_
       });
 
       otag = _tagReplace.otag;
@@ -357,12 +539,12 @@ function paramsApplyByParamKey(args) {
 function paramsApplyToParseObj(args) {
   var delimiters_ = args.delimiters_,
       paramKeysArr = args.paramKeysArr,
+      paramsObj = args.paramsObj,
       parseObj = args.parseObj,
       parseObjKeysItr = args.parseObjKeysItr,
       parseObjKeysItrn = args.parseObjKeysItrn,
-      partialText_ = args.partialText_,
       partialShort = args.partialShort,
-      paramsObj = args.paramsObj;
+      partialText_ = args.partialText_;
 
 
   if (parseObjKeysItrn.done) {
@@ -381,14 +563,62 @@ function paramsApplyToParseObj(args) {
   if (parseObjKey === 'nodes' && Array.isArray(elementParse)) {
     var elementParseItr = elementParse[Symbol.iterator]();
     var elementParseItrn = elementParseItr.next();
+    var paramsObjNested = getDotDelimitedProp({
+      obj: paramsObj,
+      prop_: parseObj.n
+    });
+
+    var paramKeysNew = void 0;
+    var paramsObjNew = void 0;
+
+    if (paramsObjNested) {
+      if (Array.isArray(paramsObjNested)) {
+        paramKeysNew = paramKeysArr;
+
+        for (var i = 0, l = paramsObjNested.length; i < l; i++) {
+          paramsObjNew = paramsObjNested[i];
+
+          var paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+          var paramKeysShallowItrn = paramKeysShallowItr.next();
+          var paramKeysNewObj = paramsObjToParamKeysArr({
+            paramKeysArr_: [],
+            paramKeysShallowItr: paramKeysShallowItr,
+            paramKeysShallowItrn: paramKeysShallowItrn,
+            paramsObj: paramsObjNew,
+            parentObjAsStr: '',
+            partialShort: partialShort // For debugging.
+          });
+
+          paramKeysNew = paramKeysNew.concat(paramKeysNewObj.paramKeysArr);
+        }
+      } else {
+        paramsObjNew = paramsObjNested;
+
+        var _paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+        var _paramKeysShallowItrn = _paramKeysShallowItr.next();
+        var _paramKeysNewObj = paramsObjToParamKeysArr({
+          paramKeysArr_: [],
+          paramKeysShallowItr: _paramKeysShallowItr,
+          paramKeysShallowItrn: _paramKeysShallowItrn,
+          paramsObj: paramsObjNew,
+          parentObjAsStr: '',
+          partialShort: partialShort // For debugging.
+        });
+
+        paramKeysNew = paramKeysArr.concat(_paramKeysNewObj.paramKeysArr);
+      }
+    } else {
+      paramKeysNew = paramKeysArr;
+      paramsObjNew = paramsObj;
+    }
 
     var _paramsApply = paramsApply({
-      paramKeysArr: paramKeysArr,
+      paramKeysArr: paramKeysNew,
+      paramsObj: paramsObjNew,
       partialParseItr: elementParseItr,
       partialParseItrn: elementParseItrn,
-      partialText_: partialText_,
       partialShort: partialShort, // For debugging.
-      paramsObj: paramsObj // For debugging.
+      partialText_: partialText_
     });
 
     delimiters = _paramsApply.delimiters;
@@ -399,14 +629,14 @@ function paramsApplyToParseObj(args) {
 
     var _paramsApplyByParamKe = paramsApplyByParamKey({
       delimiters_: delimiters_,
+      elementParse: elementParse,
       paramKeysItr: paramKeysItr,
       paramKeysItrn: paramKeysItrn,
-      elementParse: elementParse,
+      paramsObj: paramsObj, // For debugging.
       parseObj: parseObj,
       parseObjKey: parseObjKey,
-      partialText_: partialText_,
       partialShort: partialShort, // For debugging.
-      paramsObj: paramsObj // For debugging.
+      partialText_: partialText_
     });
 
     delimiters = _paramsApplyByParamKe.delimiters;
@@ -423,11 +653,11 @@ function paramsApplyToParseObj(args) {
 function paramsApply(args) {
   var delimiters_ = args.delimiters_,
       paramKeysArr = args.paramKeysArr,
+      paramsObj = args.paramsObj,
       partialParseItr = args.partialParseItr,
       partialParseItrn = args.partialParseItrn,
-      partialText_ = args.partialText_,
       partialShort = args.partialShort,
-      paramsObj = args.paramsObj;
+      partialText_ = args.partialText_;
 
 
   if (partialParseItrn.done) {
@@ -444,12 +674,12 @@ function paramsApply(args) {
   var _paramsApplyToParseOb = paramsApplyToParseObj({
     delimiters_: delimiters_,
     paramKeysArr: paramKeysArr,
+    paramsObj: paramsObj,
     parseObj: parseObj,
     parseObjKeysItr: parseObjKeysItr,
     parseObjKeysItrn: parseObjKeysItrn,
-    partialText_: partialText_,
     partialShort: partialShort, // For debugging.
-    paramsObj: paramsObj // For debugging.
+    partialText_: partialText_
   }),
       delimiters = _paramsApplyToParseOb.delimiters,
       partialText = _paramsApplyToParseOb.partialText;
@@ -461,162 +691,7 @@ function paramsApply(args) {
   return paramsApply(args);
 }
 
-function paramKeysWithDotNotation(args) {
-  var paramKeysArr = args.paramKeysArr,
-      parentObjSplit = args.parentObjSplit;
-
-
-  for (var i = 0; i < parentObjSplit.length; i++) {
-    var counter = i;
-    var itemNext = void 0;
-    var paramKey = parentObjSplit[i];
-
-    while (itemNext = parentObjSplit[++counter]) {
-      paramKey += '.' + itemNext;
-
-      if (paramKeysArr.indexOf(paramKey) === -1) {
-        paramKeysArr.push(paramKey);
-      }
-    }
-  }
-
-  return { paramKeysArr: paramKeysArr };
-}
-
-function paramsObjToParamKeysArr(args) {
-  var paramKeysArr_ = args.paramKeysArr_,
-      paramKeysShallowItrn = args.paramKeysShallowItrn,
-      paramsObj = args.paramsObj,
-      parentObjAsStr = args.parentObjAsStr;
-
-
-  if (paramKeysShallowItrn.done) {
-    return {
-      paramKeysArr: paramKeysArr_
-    };
-  }
-
-  var key = paramKeysShallowItrn.value;
-
-  var paramKeysArr = paramKeysArr_;
-
-  // paramKeysArr_ should only contain unique keys.
-  if (!paramKeysArr.includes(key)) {
-    paramKeysArr.push(key);
-  }
-
-  // Recurse deeper into paramsObj if this property is of type object.
-  if (paramsObj[key] && _typeof(paramsObj[key]) === 'object') {
-    var paramsObjNestedObj = paramsObj[key];
-
-    // Recursion into an Array.
-    if (Array.isArray(paramsObjNestedObj)) {
-      for (var i = 0, l = paramsObjNestedObj.length; i < l; i++) {
-        var paramsObjArrayItem = paramsObjNestedObj[i];
-
-        if (paramsObjArrayItem && paramsObjArrayItem.constructor === Object) {
-          // Clone args object for recursion deeper into paramsObj.
-          var paramKeysDeeperItr = Object.keys(paramsObjArrayItem)[Symbol.iterator]();
-          var paramKeysDeeperItrn = paramKeysDeeperItr.next();
-
-          var parentObjAsStrNew = parentObjAsStr;
-
-          if (paramKeysDeeperItrn.value) {
-            parentObjAsStrNew += parentObjAsStr ? '.' + key + '.' + i : key + '.' + i;
-
-            var parentObjSplit = parentObjAsStrNew.split('.');
-
-            parentObjSplit.push(paramKeysDeeperItrn.value);
-
-            var _paramKeysWithDotNota = paramKeysWithDotNotation({ paramKeysArr: paramKeysArr, parentObjSplit: parentObjSplit });
-
-            paramKeysArr = _paramKeysWithDotNota.paramKeysArr;
-          }
-
-          var argsDeeper = {
-            paramKeysArr_: paramKeysArr,
-            paramKeysShallowItr: paramKeysDeeperItr,
-            paramKeysShallowItrn: paramKeysDeeperItrn,
-            paramsObj: paramsObjArrayItem,
-            parentObjAsStr: parentObjAsStrNew,
-            partialShort: args.partialShort
-          };
-
-          var _paramsObjToParamKeys = paramsObjToParamKeysArr(argsDeeper);
-
-          paramKeysArr = _paramsObjToParamKeys.paramKeysArr;
-        }
-      }
-    }
-    // Recursion into a plain Object.
-    else {
-        // Clone args object for recursion deeper into paramsObj.
-        var _paramKeysDeeperItr = Object.keys(paramsObjNestedObj)[Symbol.iterator]();
-        var _paramKeysDeeperItrn = _paramKeysDeeperItr.next();
-
-        var _parentObjAsStrNew = parentObjAsStr;
-
-        if (_paramKeysDeeperItrn.value) {
-          _parentObjAsStrNew += parentObjAsStr ? '.' + key : key;
-
-          var _parentObjSplit = _parentObjAsStrNew.split('.');
-
-          _parentObjSplit.push(_paramKeysDeeperItrn.value);
-
-          var _paramKeysWithDotNota2 = paramKeysWithDotNotation({ paramKeysArr: paramKeysArr, parentObjSplit: _parentObjSplit });
-
-          paramKeysArr = _paramKeysWithDotNota2.paramKeysArr;
-        }
-
-        var _argsDeeper = {
-          paramKeysArr_: paramKeysArr,
-          paramKeysShallowItr: _paramKeysDeeperItr,
-          paramKeysShallowItrn: _paramKeysDeeperItrn,
-          paramsObj: paramsObjNestedObj,
-          parentObjAsStr: _parentObjAsStrNew,
-          partialShort: args.partialShort
-        };
-
-        var _paramsObjToParamKeys2 = paramsObjToParamKeysArr(_argsDeeper);
-
-        paramKeysArr = _paramsObjToParamKeys2.paramKeysArr;
-      }
-  } else {
-    var _parentObjSplit2 = parentObjAsStr.split('.');
-
-    _parentObjSplit2.push(key);
-
-    var _paramKeysWithDotNota3 = paramKeysWithDotNotation({ paramKeysArr: paramKeysArr, parentObjSplit: _parentObjSplit2 });
-
-    paramKeysArr = _paramKeysWithDotNota3.paramKeysArr;
-  }
-
-  args.paramKeysArr_ = paramKeysArr;
-  args.paramKeysShallowItrn = args.paramKeysShallowItr.next();
-
-  return paramsObjToParamKeysArr(args);
-}
-
-function styleModifierExtract(args) {
-  var partialName = args.partialName;
-
-  var styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
-
-  var styleModifier = '';
-
-  if (styleModifierMatch && styleModifierMatch[1]) {
-    styleModifier = styleModifierMatch[1].replace(/\|/g, ' ').trim();
-
-    if (!styleModifier) {
-      styleModifierMatch = null;
-    }
-  }
-
-  return {
-    styleModifierMatch: styleModifierMatch,
-    styleModifier: styleModifier
-  };
-}
+// PREPARE FOR EXPORT.
 
 var feplet = Object.assign({}, hogan);
 
@@ -706,11 +781,11 @@ feplet.preprocessPartialParams = function (template, partials) {
 
     var _paramsApply2 = paramsApply({
       paramKeysArr: paramKeysArr,
+      paramsObj: paramsObj,
       partialParseItr: partialParseItr,
       partialParseItrn: partialParseItrn,
-      partialText_: partialText_,
       partialShort: partialShort, // For debugging.
-      paramsObj: paramsObj // For debugging.
+      partialText_: partialText_
     }),
         delimiters = _paramsApply2.delimiters,
         partialText = _paramsApply2.partialText;
@@ -741,11 +816,17 @@ feplet.render = function () {
   var generated = void 0;
   var partials = partials_;
 
-  Object.values(partials).forEach(function (partialText) {
+  // Remove any reference between partialsArr and partials object because we need to add to the partials object.
+  // We therefore do not want to iterate on the partials object itself.
+  var partialsArr = Object.values(partials);
+
+  for (var i = 0, l = partialsArr.length; i < l; i++) {
+    var partialText = partialsArr[i];
+
     var _feplet$preprocessPar = feplet.preprocessPartialParams(partialText, partials);
 
     partials = _feplet$preprocessPar.partials;
-  });
+  }
 
   var _feplet$preprocessPar2 = feplet.preprocessPartialParams(template, partials);
 
