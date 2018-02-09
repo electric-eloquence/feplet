@@ -4,9 +4,9 @@
   "description": "A Mustache-compatible templating engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
-    "bundle": "./node_modules/.bin/babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
-    "lint": "./node_modules/.bin/eslint run && ./node_modules/.bin/eslint src && ./node_modules/.bin/eslint test",
-    "test": "./node_modules/.bin/mocha test/tests.js"
+    "bundle": "babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
+    "lint": "eslint run && eslint src && eslint test",
+    "test": "mocha test/tests.js"
   },
   "repository": {
     "type": "git",
@@ -25,8 +25,9 @@
   },
   "homepage": "https://github.com/electric-eloquence/feplet#readme",
   "dependencies": {
-    "hogan.js": "^3.0.2",
-    "json-eval": "^0.1.10"
+    "json-eval": "^0.1.10",
+    "mkdirp": "^0.3.0",
+    "nopt": "^1.0.10"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -36,5 +37,8 @@
     "eslint": "3.x",
     "mocha": "^3.5.3",
     "uglify-js": "^3.2.2"
+  },
+  "bin": {
+    "hulk": "bin/hulk"
   }
 }

@@ -29,47 +29,53 @@ within.
 ### Use
 
 ```javascript
-const feplet = require('feplet');
+const Feplet = require('feplet');
 
 const data = {
   place: 'World'
 };
 
 // These are references to Hogan.js methods:
-const template = feplet.compile('Hello {{place}}');
+const template = Feplet.compile('Hello {{place}}');
 const output = template.render(data); // Hello World
 
 // These are also references to Hogan.js methods:
 const text = 'Hello <%place%>';
 const delimiters = '<% %>';
 const options = {delimiters};
-const scanned = feplet.scan(text, delimiters);
-const parsed = feplet.parse(scanned, text, options);
-const generated = feplet.generate(parsed, text, options);
-const output1 = generated.render(data); // Hello World
+const scanned = Feplet.scan(text, delimiters);
+const parsed = Feplet.parse(scanned, text, options);
+const generation = Feplet.generate(parsed, text, options);
+const output1 = generation.render(data); // Hello World
 
 // This is a Feplet implementation:
+const partialTemplate = '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}';
 const partials = {
-  partial_template: '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}'
+  partial_template: partialTemplate
 };
 const includer = '{{> partial_template(nest: { egg: { yolk: "Yellow" } }) }}';
-const output2 = feplet.render(
+const output2 = Feplet.render(
   includer,
-  {place: 'World'},
+  data,
   partials
 ); // Yellow World
+
+// Better yet, instantiate the Feplet class to cache the data if you need to use them more than once:
+const feplet = new Feplet(data);
+feplet.registerPartial('partial_template', partialTemplate);
+const output3 = feplet.render(includer); // Yellow World
 ```
 
 For recent versions of Node.js:
 
 ```javascript
-const feplet = require('feplet')
+const Feplet = require('feplet')
 ```
 
 For older versions of Node.js, not so supportive of ES6:
 
 ```javascript
-var feplet = require('feplet/dist/feplet.node.es5.js')
+var Feplet = require('feplet/dist/feplet.node.es5.js')
 ```
 
 For browsers:
@@ -77,7 +83,7 @@ For browsers:
 ```html
 <script src="dist/feplet.browser.min.js"></script>
 <script>
-  var feplet = window.Feplet;
+  var Feplet = window.Feplet;
 </script>
 ```
 

@@ -1,9 +1,36 @@
 'use strict';
 
-const hogan = require('hogan.js');
+const hogan = require('../lib/hogan.js/lib/hogan.js');
 const jsonEval = require('json-eval');
 
+const paramRegex = /\([\S\s]*\)/;
+
 // HELPER FUNCTIONS.
+
+function contextKeysPreprocess(args) {
+  const {
+    contextKeys_
+  } = args;
+
+  const contextKeys = contextKeys_.slice();
+
+  for (let i = 0, l = contextKeys_.length; i < l; i++) {
+    const contextKey = contextKeys_[i];
+    const contextKeySplit = contextKey.split('.');
+
+    while (contextKeySplit.length > 1) {
+      contextKeySplit.shift();
+
+      const contextKeyNew = contextKeySplit.join('.');
+
+      if (contextKeys.indexOf(contextKeyNew) === -1) {
+        contextKeys.push(contextKeyNew);
+      }
+    }
+  }
+
+  return {contextKeys};
+}
 
 function getDotDelimitedProp(args) {
   const {
@@ -274,130 +301,130 @@ function closeTagBuild(args) {
   };
 }
 
-function paramKeysWithDotNotation(args) {
+function dataKeysWithDotNotation(args) {
   const {
-    paramKeysArr,
+    dataKeys,
     parentObjSplit
   } = args;
 
   let i = 0;
   let itemNext;
-  let paramKey = parentObjSplit[i];
+  let dataKey = parentObjSplit[i];
 
   // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
   // loop at index 1.
   while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
-    paramKey += `.${itemNext}`;
+    dataKey += `.${itemNext}`;
 
-    if (paramKeysArr.indexOf(paramKey) === -1) {
-      paramKeysArr.push(paramKey);
+    if (dataKeys.indexOf(dataKey) === -1) {
+      dataKeys.push(dataKey);
     }
   }
 
-  return {paramKeysArr};
+  return {dataKeys};
 }
 
-function paramsObjToParamKeysArr(args) {
+function dataObjToDataKeysArr(args) {
   const {
-    paramKeysArr_,
-    //paramKeysShallowItr, // For debugging.
-    paramKeysShallowItrn,
-    paramsObj,
+    dataKeys_,
+    //dataKeysShallowItr, // For debugging.
+    dataKeysShallowItrn,
+    dataObj,
     parentObjAsStr,
     //partialShort // For debugging.
   } = args;
 
-  if (paramKeysShallowItrn.done) {
+  if (dataKeysShallowItrn.done) {
     return {
-      paramKeysArr: paramKeysArr_
+      dataKeys: dataKeys_
     };
   }
 
-  const key = paramKeysShallowItrn.value;
+  const key = dataKeysShallowItrn.value;
 
-  let paramKeysArr = paramKeysArr_;
+  let dataKeys = dataKeys_;
 
-  // paramKeysArr_ should only contain unique keys.
-  if (!parentObjAsStr && !paramKeysArr.includes(key)) {
-    paramKeysArr.push(key);
+  // dataKeys_ should only contain unique keys.
+  if (!parentObjAsStr && !dataKeys.includes(key)) {
+    dataKeys.push(key);
   }
 
-  // Recurse deeper into paramsObj if this property is of type object.
-  if (paramsObj[key] && typeof paramsObj[key] === 'object') {
-    const paramsObjNestedObj = paramsObj[key];
+  // Recurse deeper into dataObj if this property is of type object.
+  if (dataObj[key] && typeof dataObj[key] === 'object') {
+    const dataObjNestedObj = dataObj[key];
 
     // Recursion into an Array.
-    if (Array.isArray(paramsObjNestedObj)) {
-      for (let i = 0, l = paramsObjNestedObj.length; i < l; i++) {
-        const paramsObjArrayItem = paramsObjNestedObj[i];
+    if (Array.isArray(dataObjNestedObj)) {
+      for (let i = 0, l = dataObjNestedObj.length; i < l; i++) {
+        const dataObjArrayItem = dataObjNestedObj[i];
 
-        if (paramsObjArrayItem && paramsObjArrayItem.constructor === Object) {
-          // Clone args object for recursion deeper into paramsObj.
-          const paramKeysDeeperItr = Object.keys(paramsObjArrayItem)[Symbol.iterator]();
-          const paramKeysDeeperItrn = paramKeysDeeperItr.next();
+        if (dataObjArrayItem && dataObjArrayItem.constructor === Object) {
+          // Clone args object for recursion deeper into dataObj.
+          const dataKeysDeeperItr = Object.keys(dataObjArrayItem)[Symbol.iterator]();
+          const dataKeysDeeperItrn = dataKeysDeeperItr.next();
 
           let parentObjAsStrNew = parentObjAsStr;
 
-          if (paramKeysDeeperItrn.value) {
+          if (dataKeysDeeperItrn.value) {
             parentObjAsStrNew += parentObjAsStr ? `.${key}.${i}` : `${key}.${i}`;
 
             const parentObjSplit = parentObjAsStrNew.split('.');
 
-            ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
+            ({dataKeys} = dataKeysWithDotNotation({dataKeys, parentObjSplit}));
           }
 
           const argsDeeper = {
-            paramKeysArr_: paramKeysArr,
-            paramKeysShallowItr: paramKeysDeeperItr,
-            paramKeysShallowItrn: paramKeysDeeperItrn,
-            paramsObj: paramsObjArrayItem,
+            dataKeys_: dataKeys,
+            dataKeysShallowItr: dataKeysDeeperItr,
+            dataKeysShallowItrn: dataKeysDeeperItrn,
+            dataObj: dataObjArrayItem,
             parentObjAsStr: parentObjAsStrNew,
             partialShort: args.partialShort
           };
 
-          ({paramKeysArr} = paramsObjToParamKeysArr(argsDeeper));
+          ({dataKeys} = dataObjToDataKeysArr(argsDeeper));
         }
       }
     }
     // Recursion into a plain Object.
     else {
-      // Clone args object for recursion deeper into paramsObj.
-      const paramKeysDeeperItr = Object.keys(paramsObjNestedObj)[Symbol.iterator]();
-      const paramKeysDeeperItrn = paramKeysDeeperItr.next();
+      // Clone args object for recursion deeper into dataObj.
+      const dataKeysDeeperItr = Object.keys(dataObjNestedObj)[Symbol.iterator]();
+      const dataKeysDeeperItrn = dataKeysDeeperItr.next();
 
       let parentObjAsStrNew = parentObjAsStr;
 
-      if (paramKeysDeeperItrn.value) {
+      if (dataKeysDeeperItrn.value) {
         parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
 
         const parentObjSplit = parentObjAsStrNew.split('.');
 
-        ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
+        ({dataKeys} = dataKeysWithDotNotation({dataKeys, parentObjSplit}));
       }
 
       const argsDeeper = {
-        paramKeysArr_: paramKeysArr,
-        paramKeysShallowItr: paramKeysDeeperItr,
-        paramKeysShallowItrn: paramKeysDeeperItrn,
-        paramsObj: paramsObjNestedObj,
+        dataKeys_: dataKeys,
+        dataKeysShallowItr: dataKeysDeeperItr,
+        dataKeysShallowItrn: dataKeysDeeperItrn,
+        dataObj: dataObjNestedObj,
         parentObjAsStr: parentObjAsStrNew,
         partialShort: args.partialShort
       };
 
-      ({paramKeysArr} = paramsObjToParamKeysArr(argsDeeper));
+      ({dataKeys} = dataObjToDataKeysArr(argsDeeper));
     }
   }
   else {
     const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
     parentObjSplit.push(key);
-    ({paramKeysArr} = paramKeysWithDotNotation({paramKeysArr, parentObjSplit}));
+    ({dataKeys} = dataKeysWithDotNotation({dataKeys, parentObjSplit}));
   }
 
-  args.paramKeysArr_ = paramKeysArr;
-  args.paramKeysShallowItrn = args.paramKeysShallowItr.next();
+  args.dataKeys_ = dataKeys;
+  args.dataKeysShallowItrn = args.dataKeysShallowItr.next();
 
-  return paramsObjToParamKeysArr(args);
+  return dataObjToDataKeysArr(args);
 }
 
 function styleModifierExtract(args) {
@@ -434,7 +461,6 @@ function tagReplace(args) {
   let partialText = '';
 
   switch (parseObj.tag) {
-    case '!':
     case '#':
     case '$':
     case '&':
@@ -489,12 +515,12 @@ function tagReplace(args) {
 
 // CORE FUNCTIONS.
 
-function paramsApplyByParamKey(args) {
+function paramsApplyByKeyArrays(args) {
   const {
+    contextKeys,
     delimiters_,
-    elementParse,
-    paramKeysItr,
-    paramKeysItrn,
+    tagParseVal,
+    paramKeys,
     //paramsObj, // For debugging.
     parseObj,
     parseObjKey,
@@ -502,22 +528,16 @@ function paramsApplyByParamKey(args) {
     partialText_
   } = args;
 
-  if (paramKeysItrn.done) {
-    return {
-      delimiters: delimiters_,
-      partialText: partialText_
-    };
-  }
-
-  const paramKey = paramKeysItrn.value;
-
   let delimiters;
   let otag;
   let ctag;
   let partialText;
 
   if (parseObjKey === 'n') {
-    if (elementParse === paramKey) {
+    if (
+      paramKeys.indexOf(tagParseVal) > -1 ||
+      contextKeys.indexOf(tagParseVal) === -1
+    ) {
       ({
         otag,
         ctag,
@@ -549,22 +569,22 @@ function paramsApplyByParamKey(args) {
     }
   }
 
-  args.delimiters_ = delimiters || delimiters_;
-  args.paramKeysItrn = paramKeysItr.next();
-  args.partialText_ = partialText || partialText_;
-
-  return paramsApplyByParamKey(args);
+  return {
+    delimiters: delimiters || delimiters_,
+    partialText: partialText || partialText_
+  };
 }
 
 function paramsApplyToParseObj(args) {
   const {
+    contextKeys,
     delimiters_,
-    paramKeysArr,
+    paramKeys,
     paramsObj,
     parseObj,
     parseObjKeysItr,
     parseObjKeysItrn,
-    partialShort, // For debugging.
+    //partialShort, // For debugging.
     partialText_
   } = args;
 
@@ -576,14 +596,14 @@ function paramsApplyToParseObj(args) {
   }
 
   const parseObjKey = parseObjKeysItrn.value;
-  const elementParse = parseObj[parseObjKey];
+  const tagParse = parseObj[parseObjKey];
 
   let partialText;
   let delimiters;
 
-  if (parseObjKey === 'nodes' && Array.isArray(elementParse)) {
-    const elementParseItr = elementParse[Symbol.iterator]();
-    const elementParseItrn = elementParseItr.next();
+  if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
+    const tagParseItr = tagParse[Symbol.iterator]();
+    const tagParseItrn = tagParseItr.next();
     const paramsObjNested = getDotDelimitedProp({
       obj: paramsObj,
       prop_: parseObj.n
@@ -594,23 +614,23 @@ function paramsApplyToParseObj(args) {
 
     if (paramsObjNested) {
       if (Array.isArray(paramsObjNested)) {
-        paramKeysNew = paramKeysArr;
+        paramKeysNew = paramKeys;
 
         for (let i = 0, l = paramsObjNested.length; i < l; i++) {
           paramsObjNew = paramsObjNested[i];
 
           const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
           const paramKeysShallowItrn = paramKeysShallowItr.next();
-          const paramKeysNewObj = paramsObjToParamKeysArr({
-            paramKeysArr_: [],
-            paramKeysShallowItr,
-            paramKeysShallowItrn,
-            paramsObj: paramsObjNew,
+          const {dataKeys} = dataObjToDataKeysArr({
+            dataKeys_: [],
+            dataKeysShallowItr: paramKeysShallowItr,
+            dataKeysShallowItrn: paramKeysShallowItrn,
+            dataObj: paramsObjNew,
             parentObjAsStr: '',
-            partialShort // For debugging.
+            //partialShort // For debugging.
           });
 
-          paramKeysNew = paramKeysNew.concat(paramKeysNewObj.paramKeysArr);
+          paramKeysNew = paramKeysNew.concat(dataKeys);
         }
       }
 
@@ -619,20 +639,20 @@ function paramsApplyToParseObj(args) {
 
         const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
         const paramKeysShallowItrn = paramKeysShallowItr.next();
-        const paramKeysNewObj = paramsObjToParamKeysArr({
-          paramKeysArr_: [],
-          paramKeysShallowItr,
-          paramKeysShallowItrn,
-          paramsObj: paramsObjNew,
+        const {dataKeys} = dataObjToDataKeysArr({
+          dataKeys_: [],
+          dataKeysShallowItr: paramKeysShallowItr,
+          dataKeysShallowItrn: paramKeysShallowItrn,
+          dataObj: paramsObjNew,
           parentObjAsStr: '',
-          partialShort // For debugging.
+          //partialShort // For debugging.
         });
 
-        paramKeysNew = paramKeysArr.concat(paramKeysNewObj.paramKeysArr);
+        paramKeysNew = paramKeys.concat(dataKeys);
       }
     }
     else {
-      paramKeysNew = paramKeysArr;
+      paramKeysNew = paramKeys;
       paramsObjNew = paramsObj;
     }
 
@@ -640,30 +660,28 @@ function paramsApplyToParseObj(args) {
       delimiters,
       partialText
     } = paramsApply({
-      paramKeysArr: paramKeysNew,
+      contextKeys,
+      paramKeys: paramKeysNew,
       paramsObj: paramsObjNew,
-      partialParseItr: elementParseItr,
-      partialParseItrn: elementParseItrn,
-      partialShort, // For debugging.
+      partialParseItr: tagParseItr,
+      partialParseItrn: tagParseItrn,
+      //partialShort, // For debugging.
       partialText_
     }));
   }
   else {
-    const paramKeysItr = paramKeysArr[Symbol.iterator]();
-    const paramKeysItrn = paramKeysItr.next();
-
     ({
       delimiters,
       partialText
-    } = paramsApplyByParamKey({
+    } = paramsApplyByKeyArrays({
+      contextKeys,
       delimiters_,
-      elementParse,
-      paramKeysItr,
-      paramKeysItrn,
-      paramsObj, // For debugging.
+      tagParseVal: tagParse,
+      paramKeys,
+      //paramsObj, // For debugging.
       parseObj,
       parseObjKey,
-      partialShort, // For debugging.
+      //partialShort, // For debugging.
       partialText_
     }));
   }
@@ -677,12 +695,13 @@ function paramsApplyToParseObj(args) {
 
 function paramsApply(args) {
   const {
+    contextKeys,
     delimiters_,
-    paramKeysArr,
+    paramKeys,
     paramsObj,
     partialParseItr,
     partialParseItrn,
-    partialShort, // For debugging.
+    //partialShort, // For debugging.
     partialText_
   } = args;
 
@@ -701,13 +720,14 @@ function paramsApply(args) {
     delimiters,
     partialText
   } = paramsApplyToParseObj({
+    contextKeys,
     delimiters_,
-    paramKeysArr,
+    paramKeys,
     paramsObj,
     parseObj,
     parseObjKeysItr,
     parseObjKeysItrn,
-    partialShort, // For debugging.
+    //partialShort, // For debugging.
     partialText_
   });
 
@@ -718,30 +738,34 @@ function paramsApply(args) {
   return paramsApply(args);
 }
 
-// PREPARE FOR EXPORT.
+// REFERENCES FOR STATIC AND INSTANCE METHODS
 
-const feplet = Object.assign({}, hogan);
+function preprocessPartialParams(template, compilation_, partials_, partialsComp_, contextKeys_) {
+  const partials = partials_ || this.partials || {};
+  const partialsComp = partialsComp_ || this.partialsComp || {};
+  const contextKeys = contextKeys_ || this.contextKeys || [];
 
-feplet.preprocessPartialParams = function (template, partials) {
-  const generated = hogan.compile(template);
+  let paramsMatch;
+  let styleModifier;
+  let styleModifierMatch;
 
-  for (let i in generated.partials) {
-    if (!generated.partials.hasOwnProperty(i)) {
+  const compilation = compilation_ || hogan.compile(template);
+
+  for (let i in compilation.partials) {
+    if (!compilation.partials.hasOwnProperty(i)) {
       continue;
     }
 
-    const partialFull = generated.partials[i].name;
+    const partialFull = compilation.partials[i].name;
 
     if (partials[partialFull]) {
       continue;
     }
 
-    const paramsMatch = partialFull.match(/\([\S\s]*\)/);
+    paramsMatch = partialFull.match(paramRegex);
 
     let paramsObj;
     let partialShort = partialFull;
-    let styleModifierMatch;
-    let styleModifier;
 
     if (paramsMatch) {
       const paramsStr = paramsMatch[0];
@@ -789,14 +813,15 @@ feplet.preprocessPartialParams = function (template, partials) {
 
     const paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
     const paramKeysShallowItrn = paramKeysShallowItr.next();
-    const {paramKeysArr} = paramsObjToParamKeysArr({
-      paramKeysArr_: [],
-      paramKeysShallowItr,
-      paramKeysShallowItrn,
-      paramsObj,
+    const {dataKeys} = dataObjToDataKeysArr({
+      dataKeys_: [],
+      dataKeysShallowItr: paramKeysShallowItr,
+      dataKeysShallowItrn: paramKeysShallowItrn,
+      dataObj: paramsObj,
       parentObjAsStr: '',
-      partialShort // For debugging.
+      //partialShort // For debugging.
     });
+    const paramKeys = dataKeys;
 
     let partialText_ = partials[partialShort] || '';
 
@@ -809,11 +834,12 @@ feplet.preprocessPartialParams = function (template, partials) {
       delimiters,
       partialText
     } = paramsApply({
-      paramKeysArr,
+      contextKeys,
+      paramKeys,
       paramsObj,
       partialParseItr,
       partialParseItrn,
-      partialShort, // For debugging.
+      //partialShort, // For debugging.
       partialText_
     });
 
@@ -821,24 +847,30 @@ feplet.preprocessPartialParams = function (template, partials) {
       const options = {delimiters};
       const partialScanNew = hogan.scan(partialText, delimiters);
       const partialParseArrNew = hogan.parse(partialScanNew, partialText, options);
-      const partialGenerated = hogan.generate(partialParseArrNew, partialText, options);
+      const partialGeneration = hogan.generate(partialParseArrNew, partialText, options);
 
-      partials[partialFull] = partialGenerated.render(paramsObj);
+      partials[partialFull] = partialGeneration.render(paramsObj);
+      partialsComp[partialFull] = hogan.compile(partials[partialFull]);
     }
     else {
       partials[partialFull] = partialText;
+      partialsComp[partialFull] = hogan.generate(partialParseArr, partialText, {});
     }
   }
 
   return {
-    generated,
-    partials
+    compilation,
+    partials,
+    partialsComp
   };
-};
+}
 
-feplet.render = function (template = '', context = {}, partials_ = {}) {
-  let generated;
-  let partials = partials_;
+function compile(text, options, partials_, partialsComp_, contextKeys_) {
+  const contextKeys = contextKeys_ || this.contextKeys;
+  const compilation = hogan.compile(text, options);
+
+  let partials = partials_ || this.partials || {};
+  let partialsComp = partialsComp_ || this.partialsComp || {};
 
   // Remove any reference between partialsArr and partials object because we need to add to the partials object.
   // We therefore do not want to iterate on the partials object itself.
@@ -849,21 +881,122 @@ feplet.render = function (template = '', context = {}, partials_ = {}) {
 
     ({
       partials
-    } = feplet.preprocessPartialParams(partialText, partials));
+    } = preprocessPartialParams(partialText, partialsComp[i], partials, partialsComp, contextKeys));
   }
 
   ({
-    generated,
-    partials
-  } = feplet.preprocessPartialParams(template, partials));
+    partials,
+    partialsComp
+  } = preprocessPartialParams(text, compilation, partials, partialsComp, contextKeys));
 
-  return generated.render(context, partials);
-};
+  return compilation;
+}
+
+function preprocessContextKeys(context) {
+  if (!context) {
+    return [];
+  }
+
+  const dataKeysShallowItr = Object.keys(context)[Symbol.iterator]();
+  const dataKeysShallowItrn = dataKeysShallowItr.next();
+  const {dataKeys} = dataObjToDataKeysArr({
+    dataKeys_: [],
+    dataKeysShallowItr,
+    dataKeysShallowItrn,
+    dataObj: context,
+    parentObjAsStr: '',
+  });
+
+  const {contextKeys} = contextKeysPreprocess({contextKeys_: dataKeys});
+
+  return contextKeys;
+}
+
+function registerPartial(name, partialTemplate, partialComp_, partials_, partialsComp_) {
+  const partials = partials_ || this.partials || {};
+  const partialsComp = partialsComp_ || this.partialsComp || {};
+
+  if (!partials[name]) {
+    partials[name] = partialTemplate;
+  }
+
+  if (!partialsComp[name]) {
+    const partialComp = partialComp_ || hogan.compile(partialTemplate);
+
+    partialsComp[name] = partialComp;
+  }
+
+  return {
+    partials,
+    partialsComp
+  };
+}
+
+function unregisterPartial(name, partials_, partialsComp_) {
+  const partials = partials_ || this.partials || {};
+  const partialsComp = partialsComp_ || this.partialsComp || {};
+
+  delete partials[name];
+  delete partialsComp[name];
+
+  return {
+    partials,
+    partialsComp
+  };
+}
+
+function render(template = '', context_, partials_, partialsComp_, contextKeys_) {
+  const context = context_ || this.context || {};
+  const partials = partials_ || this.partials || {};
+  const partialsComp = partialsComp_ || this.partialsComp || {};
+  const contextKeys = contextKeys_ || this.contextKeys || [];
+
+  const compilation = compile(template, null, partials, partialsComp, contextKeys);
+
+  return compilation.render(context, partials, null, partialsComp);
+}
+
+// PREPARE FOR EXPORT.
+
+function Feplet(context, partials, partialsComp, contextKeys) {
+  this.context = context || {}; 
+  this.partials = partials || {};
+  this.partialsComp = partialsComp || {};
+  this.contextKeys = contextKeys || preprocessContextKeys(context);
+}
+
+// STATIC METHODS.
+
+Object.assign(Feplet, hogan);
+
+Feplet.compile = compile;
+
+Feplet.preprocessContextKeys = preprocessContextKeys;
+
+Feplet.preprocessPartialParams = preprocessPartialParams;
+
+Feplet.registerPartial = registerPartial;
+
+Feplet.unregisterPartial = unregisterPartial;
+
+Feplet.render = render;
+
+// INSTANCE METHODS.
+
+Feplet.prototype.compile = compile;
+
+Feplet.prototype.preprocessPartialParams = preprocessPartialParams;
+
+Feplet.prototype.registerPartial = registerPartial;
+
+Feplet.prototype.unregisterPartial = unregisterPartial;
+
+Feplet.prototype.render = render;
 
 if (typeof window === 'object') {
   // Following the convention of first-letter caps for packages attached to the window object (like Hogan and Mustache)
   // but since this isn't a class, keeping it all lowercase for Node and for internal use.
-  window.Feplet = feplet;
+  window.Feplet = Feplet;
 }
 
-module.exports = feplet;
+module.exports = Feplet;
