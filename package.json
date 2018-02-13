@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/electric-eloquence/feplet#readme",
   "dependencies": {
-    "json-eval": "^0.1.10",
+    "json-eval": "^0.2.0",
     "mkdirp": "0.3.0",
     "nopt": "1.0.10"
   },
