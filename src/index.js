@@ -994,8 +994,6 @@ Feplet.prototype.unregisterPartial = unregisterPartial;
 Feplet.prototype.render = render;
 
 if (typeof window === 'object') {
-  // Following the convention of first-letter caps for packages attached to the window object (like Hogan and Mustache)
-  // but since this isn't a class, keeping it all lowercase for Node and for internal use.
   window.Feplet = Feplet;
 }
 

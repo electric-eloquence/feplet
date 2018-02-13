@@ -4,9 +4,11 @@
   "description": "A Mustache-compatible templating engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
-    "bundle": "babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
-    "lint": "eslint run && eslint src && eslint test",
-    "test": "mocha test/tests.js"
+    "bundle": "npx babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
+    "lint": "npx eslint run && npx eslint src && npx eslint test",
+    "prepush": "npm test",
+    "test": "npx mocha test/tests.js",
+    "watch": "npx nodemon --watch src -e js --exec 'npm run bundle'"
   },
   "repository": {
     "type": "git",
@@ -33,10 +35,12 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "browserify": "^14.4.0",
-    "chai": "^4.1.2",
+    "chai": "4.x",
     "eslint": "3.x",
-    "mocha": "^3.5.3",
-    "uglify-js": "^3.2.2"
+    "husky": "^0.14.3",
+    "mocha": "3.x",
+    "nodemon": "^1.14.12",
+    "uglify-es": "3.3.9"
   },
   "bin": {
     "hulk": "bin/hulk"
