@@ -1,4 +1,4 @@
-{{> templates/00_base }}
+{{> templates/00_nested }}
 {{> templates/00-base(title: 'foo') }}
 {{# foo }}
   {{> templates/03-include-self-w-condition(bar: true) }}

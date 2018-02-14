@@ -928,11 +928,31 @@ function render() {
   var contextKeys_ = arguments[4];
 
   var context = context_ || this.context || {};
-  var partials = partials_ || this.partials || {};
-  var partialsComp = partialsComp_ || this.partialsComp || {};
   var contextKeys = contextKeys_ || this.contextKeys || [];
 
-  var compilation = compile(template, null, partials, partialsComp, contextKeys);
+  var partials = partials_ || this.partials || {};
+  var partialsComp = partialsComp_ || this.partialsComp || {};
+
+  for (var i in partials) {
+    if (!partials.hasOwnProperty(i)) {
+      continue;
+    }
+
+    if (!partialsComp[i]) {
+      var _registerPartial = registerPartial(i, partials[i], null, partials, partialsComp);
+
+      partials = _registerPartial.partials;
+      partialsComp = _registerPartial.partialsComp;
+    }
+  }
+
+  var compilation = void 0;
+
+  if (Object.keys(partialsComp).length) {
+    compilation = compile(template, null, partials, partialsComp, contextKeys);
+  } else {
+    compilation = hogan.compile(template);
+  }
 
   return compilation.render(context, partials, null, partialsComp);
 }

@@ -1,167 +1,171 @@
-'use strict';
+var templates;
+var i;
+var partials;
+var templateText;
+var render;
 
-const fs = require('fs');
-const path = require('path');
+var main = document.getElementById('main');
 
-const expect = require('chai').expect;
+templates = {
+  'templates/00-base.fpt': '{{ title }}\n' +
+'{{ message }}\n',
+  'templates/00-nested.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n' +
+'{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n',
+  'templates/00-array.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n' +
+'{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n',
+  'templates/01-dotted.fpt': '{{ dot.title }}\n' +
+'{{ dot.message }}\n'
+};
 
-const Feplet = require('../src/index');
+for (i in templates) {
+  if (!templates.hasOwnProperty(i)) {
+    continue;
+  }
 
-const enc = 'utf8';
+  let data;
 
-describe('Feplet', function () {
-  it('should hydrate templates with variables', function () {
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00-base.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+  switch (i) {
+    case 'templates/00-base.fpt':
+      data = {
         title: 'foo',
         message: 'bar'
-      }
-    );
+      };
+      break;
 
-    expect(render).to.equal('foo\nbar\n');
-  });
-
-  it('should hydrate templates with nested variables', function () {
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00-nested.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+    case 'templates/00-nested.fpt':
+      data = {
         check: {
           i18n: true
         }
       }
-    );
+      break;
 
-    expect(render).to.equal('\nYes\n');
-  });
-
-  it('should hydrate templates with an array of variables', function () {
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00-nested.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+    case 'templates/00-array.fpt':
+      data = {
         check: [
           {
             i18n: true
           }
         ]
       }
-    );
+      break;
 
-    expect(render).to.equal('\nYes\n');
-  });
-
-  it('should hydrate variables written in dot.notation', function () {
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01-dotted.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+    case 'templates/01-dotted.fpt':
+      data = {
         dot: {
           title: 'foo',
           message: 'bar'
         }
-      }
-    );
+      };
+      break;
+  }
 
-    expect(render).to.equal('foo\nbar\n');
-  });
+  render = Feplet.render(
+    templates[i],
+    data
+  );
 
-  it('should recursively hydrate templates with variables', function () {
-    const files = [
-      'templates/00-base.fpt'
-    ];
-    const partials = {};
+  const contentParagraph = document.createElement('p');
 
-    files.forEach((file) => {
-      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
-    });
+  contentParagraph.innerHTML = '<b>' + i + ':</b><br>';
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_base.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+  switch (i) {
+    case 'templates/00-base.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "foo\\nbar\\n"<br>';
+      break;
+
+    case 'templates/00-nested.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "\\nYes\\n"<br>';
+      break;
+
+    case 'templates/00-array.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "\\nYes\\n"<br>';
+      break;
+
+    case 'templates/01-dotted.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "foo\\nbar\\n"<br>';
+      break;
+  }
+
+  contentParagraph.innerHTML += 'Actually equals "' + render.replace(/\n/g, '\\n') + '"</p>';
+
+  main.appendChild(contentParagraph);
+}
+
+templates = {
+  'templates/00-base.fpt': '{{ title }}\n' +
+'{{ message }}\n',
+  'templates/00-nested.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n' +
+'{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n',
+  'templates/00-array.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n' +
+'{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n'
+};
+
+for (i in templates) {
+  if (!templates.hasOwnProperty(i)) {
+    continue;
+  }
+
+  let data;
+
+  switch (i) {
+    case 'templates/00-base.fpt':
+      data = {
         title: 'foo',
         message: 'bar'
-      },
-      partials
-    );
+      };
+      break;
 
-    expect(render).to.equal('foo\nbar\n');
-  });
-
-  it('should recursively hydrate templates with nested variables', function () {
-    const files = [
-      'templates/00-nested.fpt'
-    ];
-    const partials = {};
-
-    files.forEach((file) => {
-      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
-    });
-
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_nested.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+    case 'templates/00-nested.fpt':
+      data = {
         check: {
           i18n: true
         }
-      },
-      partials
-    );
+      }
+      break;
 
-    expect(render).to.equal('\nYes\n');
-  });
-
-  it('should recursively hydrate templates with an array of variables', function () {
-    const files = [
-      'templates/00-nested.fpt'
-    ];
-    const partials = {};
-
-    files.forEach((file) => {
-      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
-    });
-
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_nested.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {
+    case 'templates/00-array.fpt':
+      data = {
         check: [
           {
             i18n: true
           }
         ]
-      },
-      partials
-    );
+      }
+      break;
+  }
 
-    expect(render).to.equal('\nYes\n');
-  });
+  render = Feplet.render(
+    templates[i],
+    data
+  );
 
-  it('should recursively hydrate variables written in dot.notation', function () {
-    const files = [
-      'templates/01-dotted.fpt'
-    ];
-    const partials = {};
+  const contentParagraph = document.createElement('p');
 
-    files.forEach((file) => {
-      partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
-    });
+  contentParagraph.innerHTML = '<b>' + i + ':</b><br>';
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted.fpt'), enc);
-    const render = Feplet.render(
-      templateText,
-      {},
-      partials
-    );
+  switch (i) {
+    case 'templates/00-base.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "foo\\nbar\\n"<br>';
+      break;
 
-    expect(render).to.equal('foo\nbar\n');
-  });
+    case 'templates/00-nested.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "\\nYes\\n"<br>';
+      break;
 
-  it('should recursively hydrate variables within an array written in dot.notation', function () {
+    case 'templates/00-array.fpt':
+      contentParagraph.innerHTML += 'Expected to equal "\\nYes\\n"<br>';
+      break;
+  }
+
+  contentParagraph.innerHTML += 'Actually equals "' + render.replace(/\n/g, '\\n') + '"</p>';
+
+  main.appendChild(contentParagraph);
+}
+
+
+/*
+  it('should populate variables within an array written in dot.notation', function () {
     const files = [
       'templates/01-dotted_array.fpt'
     ];
@@ -376,7 +380,7 @@ describe('Feplet', function () {
     const files = [
       'templates/00-base.fpt',
       'templates/00-nested.fpt',
-      'templates/00_nested.fpt',
+      'templates/00_base.fpt',
       'templates/03-include-self-w-condition.fpt'
     ];
 
@@ -404,7 +408,7 @@ describe('Feplet', function () {
     const files = [
       'templates/00-base.fpt',
       'templates/00-nested.fpt',
-      'templates/00_nested.fpt',
+      'templates/00_base.fpt',
       'templates/03-include-self-w-condition.fpt'
     ];
 
@@ -783,3 +787,4 @@ describe('Feplet', function () {
     expect(render).to.equal('  heck\n');
   });
 });
+*/

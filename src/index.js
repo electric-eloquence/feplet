@@ -947,11 +947,32 @@ function unregisterPartial(name, partials_, partialsComp_) {
 
 function render(template = '', context_, partials_, partialsComp_, contextKeys_) {
   const context = context_ || this.context || {};
-  const partials = partials_ || this.partials || {};
-  const partialsComp = partialsComp_ || this.partialsComp || {};
   const contextKeys = contextKeys_ || this.contextKeys || [];
 
-  const compilation = compile(template, null, partials, partialsComp, contextKeys);
+  let partials = partials_ || this.partials || {};
+  let partialsComp = partialsComp_ || this.partialsComp || {};
+
+  for (let i in partials) {
+    if (!partials.hasOwnProperty(i)) {
+      continue;
+    }
+
+    if (!partialsComp[i]) {
+      ({
+        partials,
+        partialsComp
+      } = registerPartial(i, partials[i], null, partials, partialsComp));
+    }
+  }
+
+  let compilation;
+
+  if (Object.keys(partialsComp).length) {
+    compilation = compile(template, null, partials, partialsComp, contextKeys);
+  }
+  else {
+    compilation = hogan.compile(template);
+  }
 
   return compilation.render(context, partials, null, partialsComp);
 }
