@@ -68,6 +68,23 @@ describe('Feplet', function () {
     expect(render).to.equal('foo\nbar\n');
   });
 
+  it('should hydrate variables within an array written in dot.notation', function () {
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01-dotted_array.fpt'), enc);
+    const render = Feplet.render(
+      templateText,
+      {
+        dot: [
+          {
+            title: 'foo',
+            message: 'bar'
+          }
+        ]
+      }
+    );
+
+    expect(render).to.equal('foo\nbar\n');
+  });
+
   it('should recursively hydrate templates with variables', function () {
     const files = [
       'templates/00-base.fpt'
@@ -288,7 +305,7 @@ describe('Feplet', function () {
       fs.readFileSync(path.resolve(__dirname, 'templates/02_stylemod-param_multiple-classes.fpt'), enc);
     const render = feplet.render(templateText);
 
-    expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n\n');
+    expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
   });
 
   it('should recursively hydrate templates with multiple classes passed per Pattern Lab styleModifier', function () {
@@ -358,7 +375,7 @@ describe('Feplet', function () {
         fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-param_multiple-classes-includer.fpt'), enc);
       const render = feplet.render(templateText);
 
-      expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n\n');
+      expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
     }
   );
 

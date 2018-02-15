@@ -433,19 +433,21 @@ function styleModifierExtract(args) {
   } = args;
 
   let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
-  let styleModifier = '';
+  let styleModClasses = '';
 
   if (styleModifierMatch && styleModifierMatch[1]) {
-    styleModifier = styleModifierMatch[1].replace(/\|/g, ' ').trim();
+    styleModClasses = styleModifierMatch[1].replace(/\|/g, ' ').trim();
 
-    if (!styleModifier) {
+    if (!styleModClasses) {
       styleModifierMatch = null;
     }
   }
 
+  // We'll search and replace "styleModClasses" to shorten the file prior to minification.
+  // "styleModClasses" can't be used in function names, and mustn't match the paramsObj property named "styleModifier".
   return {
     styleModifierMatch,
-    styleModifier
+    styleModClasses
   };
 }
 
@@ -746,7 +748,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
   const contextKeys = contextKeys_ || this.contextKeys || [];
 
   let paramsMatch;
-  let styleModifier;
+  let styleModClasses;
   let styleModifierMatch;
 
   const compilation = compilation_ || hogan.compile(template);
@@ -774,7 +776,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
 
       ({
         styleModifierMatch,
-        styleModifier
+        styleModClasses
       } = styleModifierExtract({partialName: partialShort}));
 
       if (partialFull !== partialShort) {
@@ -793,7 +795,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
     else {
       ({
         styleModifierMatch,
-        styleModifier
+        styleModClasses
       } = styleModifierExtract({partialName: partialFull}));
     }
 
@@ -807,8 +809,8 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
 
     paramsObj = paramsObj || {};
 
-    if (styleModifier) {
-      paramsObj.styleModifier = styleModifier;
+    if (styleModClasses) {
+      paramsObj.styleModifier = styleModClasses;
     }
 
     const paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();

@@ -422,19 +422,21 @@ function styleModifierExtract(args) {
 
 
   var styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
-  var styleModifier = '';
+  var styleModClasses = '';
 
   if (styleModifierMatch && styleModifierMatch[1]) {
-    styleModifier = styleModifierMatch[1].replace(/\|/g, ' ').trim();
+    styleModClasses = styleModifierMatch[1].replace(/\|/g, ' ').trim();
 
-    if (!styleModifier) {
+    if (!styleModClasses) {
       styleModifierMatch = null;
     }
   }
 
+  // We'll search and replace "styleModClasses" to shorten the file prior to minification.
+  // "styleModClasses" can't be used in function names, and mustn't match the paramsObj property named "styleModifier".
   return {
     styleModifierMatch: styleModifierMatch,
-    styleModifier: styleModifier
+    styleModClasses: styleModClasses
   };
 }
 
@@ -717,7 +719,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
   var contextKeys = contextKeys_ || this.contextKeys || [];
 
   var paramsMatch = void 0;
-  var styleModifier = void 0;
+  var styleModClasses = void 0;
   var styleModifierMatch = void 0;
 
   var compilation = compilation_ || hogan.compile(template);
@@ -746,7 +748,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
       var _styleModifierExtract = styleModifierExtract({ partialName: partialShort });
 
       styleModifierMatch = _styleModifierExtract.styleModifierMatch;
-      styleModifier = _styleModifierExtract.styleModifier;
+      styleModClasses = _styleModifierExtract.styleModClasses;
 
 
       if (partialFull !== partialShort) {
@@ -764,7 +766,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
       var _styleModifierExtract2 = styleModifierExtract({ partialName: partialFull });
 
       styleModifierMatch = _styleModifierExtract2.styleModifierMatch;
-      styleModifier = _styleModifierExtract2.styleModifier;
+      styleModClasses = _styleModifierExtract2.styleModClasses;
     }
 
     if (styleModifierMatch) {
@@ -777,8 +779,8 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
 
     paramsObj = paramsObj || {};
 
-    if (styleModifier) {
-      paramsObj.styleModifier = styleModifier;
+    if (styleModClasses) {
+      paramsObj.styleModifier = styleModClasses;
     }
 
     var paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();

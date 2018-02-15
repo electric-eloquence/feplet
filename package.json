@@ -7,6 +7,7 @@
     "bundle": "npx babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
     "lint": "npx eslint run && npx eslint src && npx eslint test",
     "prepush": "npm test",
+    "serve": "npx http-server .",
     "test": "npx mocha test/tests.js",
     "watch": "npx nodemon --watch src -e js --exec 'npm run bundle'"
   },
@@ -37,6 +38,7 @@
     "browserify": "^14.4.0",
     "chai": "4.x",
     "eslint": "3.x",
+    "http-server": "^0.11.1",
     "husky": "^0.14.3",
     "mocha": "3.x",
     "nodemon": "^1.14.12",
