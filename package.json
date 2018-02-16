@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "bundle": "npx babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
+    "devel": "npm run watch & npm run serve",
     "lint": "npx eslint run && npx eslint src && npx eslint test",
     "prepush": "npm test",
     "serve": "npx http-server .",
