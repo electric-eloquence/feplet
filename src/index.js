@@ -443,8 +443,9 @@ function styleModifierExtract(args) {
     }
   }
 
-  // We'll search and replace "styleModClasses" to shorten the file prior to minification.
-  // "styleModClasses" can't be used in function names, and mustn't match the paramsObj property named "styleModifier".
+  // Because we search and replace structured object properties to shorten the file prior to minification, we cannot
+  // use "styleModifier" or other function substrings as structured object property names. "styleModifier" is also
+  // reserved as a property name on paramsObj. Using "styleModClasses" instead.
   return {
     styleModifierMatch,
     styleModClasses
@@ -990,7 +991,7 @@ function Feplet(context, partials, partialsComp, contextKeys) {
 
 // STATIC METHODS.
 
-Object.assign(Feplet, hogan);
+Object.assign(Feplet, hogan); // hogan is not a class so the constructor does not get overridden.
 
 Feplet.compile = compile;
 

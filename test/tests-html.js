@@ -221,6 +221,20 @@ var templates1 = {
 '{{#baz}}{{#bez}}\n' +
 '  {{biz}} {{boz}}\n' +
 '{{/bez}}{{/baz}}\n',
+  'templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt': '{{biz.boz}}\n' +
+'{{#baz}}\n' +
+'  {{#bez}}\n' +
+'    {{biz.boz}}\n' +
+'  {{/bez}}\n' +
+'{{/baz}}\n',
+  'templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt': '{{#bez.biz}}\n' +
+'  {{boz}}\n' +
+'{{/bez.biz}}\n' +
+'{{#baz}}\n' +
+'  {{#bez.biz}}\n' +
+'    {{boz}}\n' +
+'  {{/bez.biz}}\n' +
+'{{/baz}}\n',
   'templates/04_nested-param-same-name-as-non-param-includer.fpt': '{{> templates/04-nested-param-same-name-as-non-param(baz: { bez: "hick", biz: "hock" }) }}\n',
   'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': '{{> templates/04-nested-param-same-name-as-non-param(\n' +
 '  baz: [\n' +
@@ -228,7 +242,144 @@ var templates1 = {
 '    { bez: "huck", biz: "hyck" }\n' +
 '  ]\n' +
 ') }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': '{{> templates/04-nested-param-same-name-as-non-param_deep(baz: { bez: { biz: "hick", boz: "hock" } }) }}\n'
+  'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': '{{> templates/04-nested-param-same-name-as-non-param_deep(baz: { bez: { biz: "hick", boz: "hock" } }) }}\n',
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': '{{> templates/04-nested-param-same-name-as-non-param_dotted-inner(baz: { bez: { biz: { boz: "heck" } } }) }}\n',
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': '{{> templates/04-nested-param-same-name-as-non-param_dotted-inner(\n' +
+'  baz: {\n' +
+'    bez: [\n' +
+'      {\n' +
+'        biz: {\n' +
+'          boz: "heck"\n' +
+'        }\n' +
+'      },\n' +
+'      {\n' +
+'        biz: {\n' +
+'          boz: "hick"\n' +
+'        }\n' +
+'      }\n' +
+'    ]\n' +
+'  }\n' +
+') }}\n',
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': '{{> templates/04-nested-param-same-name-as-non-param_dotted-middle(baz: { bez: { biz: { boz: "heck" } } }) }}\n',
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': '{{> templates/04-nested-param-same-name-as-non-param_dotted-middle(\n' +
+'  baz: {\n' +
+'    bez: {\n' +
+'      biz: [\n' +
+'        {\n' +
+'          boz: "hick"\n' +
+'        },\n' +
+'        {\n' +
+'          boz: "hock"\n' +
+'        }\n' +
+'      ]\n' +
+'    }\n' +
+'  }\n' +
+') }}\n',
+  'templates/05-dotted-param.fpt': '{{#baz.bez}}\n' +
+'  {{biz}}\n' +
+'{{/baz.bez}}\n',
+  'templates/05-dotted-param_nested-in-non-param.fpt': '{{#baz}}\n' +
+'  {{bez}}\n' +
+'  {{#biz.boz}}\n' +
+'    {{buz}}\n' +
+'  {{/biz.boz}}\n' +
+'{{/baz}}\n',
+  'templates/05_dotted-param-includer.fpt': '{{> templates/05-dotted-param(baz: { bez: { biz: "hack" } }) }}\n',
+  'templates/05_dotted-param-includer_array.fpt': '{{> templates/05-dotted-param(\n' +
+'  baz: {\n' +
+'    bez: [\n' +
+'      {\n' +
+'        biz: "hack"\n' +
+'      },\n' +
+'      {\n' +
+'        biz: "heck"\n' +
+'      }\n' +
+'    ]\n' +
+'  }\n' +
+') }}\n',
+  'templates/05_dotted-param-includer_nested-in-non-param.fpt': '{{> templates/05-dotted-param_nested-in-non-param(biz: { boz: { buz: "heck" } }) }}\n',
+  'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': '{{> templates/05-dotted-param_nested-in-non-param(\n' +
+'  biz: {\n' +
+'    boz: [\n' +
+'      {\n' +
+'        buz: "heck"\n' +
+'      },\n' +
+'      {\n' +
+'        buz: "hick"\n' +
+'      }\n' +
+'    ]\n' +
+'  }\n' +
+') }}\n',
+  'templates/06-dotted-array-param-inner.fpt': '{{#baz}}\n' +
+'  {{#bez}}\n' +
+'    {{biz.1.boz}}\n' +
+'  {{/bez}}\n' +
+'{{/baz}}\n',
+  'templates/06-dotted-array-param-middle.fpt': '{{#baz}}\n' +
+'  {{#bez.1.biz}}\n' +
+'    {{boz}}\n' +
+'  {{/bez.1.biz}}\n' +
+'{{/baz}}\n',
+  'templates/06_dotted-array-param-inner-includer.fpt': '{{> templates/06-dotted-array-param-inner(\n' +
+'  baz: {\n' +
+'    bez: {\n' +
+'      biz: [\n' +
+'        {\n' +
+'          boz: "hack"\n' +
+'        },\n' +
+'        {\n' +
+'          boz: "heck"\n' +
+'        },\n' +
+'        {\n' +
+'          boz: "hick"\n' +
+'        }\n' +
+'      ]\n' +
+'    }\n' +
+'  }\n' +
+') }}\n',
+  'templates/06_dotted-array-param-middle-includer.fpt': '{{> templates/06-dotted-array-param-middle(\n' +
+'  baz: {\n' +
+'    bez: [\n' +
+'      {\n' +
+'        biz: {\n' +
+'          boz: "hack"\n' +
+'        }\n' +
+'      },\n' +
+'      {\n' +
+'        biz: {\n' +
+'          boz: "heck"\n' +
+'        }\n' +
+'      },\n' +
+'      {\n' +
+'        biz: {\n' +
+'          boz: "hick"\n' +
+'        }\n' +
+'      }\n' +
+'    ]\n' +
+'  }\n' +
+') }}\n',
+  'templates/06-dotted-array-param-outer.fpt': '{{#baz.1.bez}}\n' +
+'  {{biz}}\n' +
+'{{/baz.1.bez}}\n',
+  'templates/06_dotted-array-param-outer-includer.fpt': '{{> templates/06-dotted-array-param-outer(\n' +
+'  baz: [\n' +
+'    {\n' +
+'      bez: {\n' +
+'        biz: "hack"\n' +
+'      }\n' +
+'    },\n' +
+'    {\n' +
+'      bez: {\n' +
+'        biz: "heck"\n' +
+'      }\n' +
+'    },\n' +
+'    {\n' +
+'      bez: {\n' +
+'        biz: "hick"\n' +
+'      }\n' +
+'    }\n' +
+'  ]\n' +
+') }}\n'
 };
 
 Object.keys(templates1).forEach(function (template) {
@@ -393,6 +544,106 @@ Object.keys(templates1).forEach(function (template) {
       );
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_deep', templates1['templates/04-nested-param-same-name-as-non-param_deep.fpt']);
       break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt':
+      feplet = new Feplet(
+        {
+          biz: {
+            boz: 'hack'
+          }
+        }
+      );
+      feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-inner', templates1['templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt']);
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt':
+      feplet = new Feplet(
+        {
+          biz: {
+            boz: 'hack'
+          }
+        }
+      );
+      feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-inner', templates1['templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt']);
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt':
+      feplet = new Feplet(
+        {
+          bez: {
+            biz: {
+              boz: 'hack'
+            }
+          }
+        }
+      );
+      feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-middle', templates1['templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt']);
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt':
+      feplet = new Feplet(
+        {
+          bez: {
+            biz: [
+              {
+                boz: 'hack'
+              },
+              {
+                boz: 'heck'
+              }
+            ]
+          }
+        }
+      );
+      feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-middle', templates1['templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt']);
+      break;
+
+    case 'templates/05_dotted-param-includer.fpt':
+      feplet = new Feplet({});
+      feplet.registerPartial('templates/05-dotted-param', templates1['templates/05-dotted-param.fpt']);
+      break;
+
+    case 'templates/05_dotted-param-includer_array.fpt':
+      feplet = new Feplet({});
+      feplet.registerPartial('templates/05-dotted-param', templates1['templates/05-dotted-param.fpt']);
+      break;
+
+    case 'templates/05_dotted-param-includer_nested-in-non-param.fpt':
+      feplet = new Feplet(
+        {
+          baz: {
+            bez: 'hack'
+          }
+        }
+      );
+      feplet.registerPartial('templates/05-dotted-param_nested-in-non-param', templates1['templates/05-dotted-param_nested-in-non-param.fpt']);
+      break;
+
+    case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt':
+      feplet = new Feplet(
+        {
+          baz: {
+            bez: 'hack'
+          }
+        }
+      );
+      feplet.registerPartial('templates/05-dotted-param_nested-in-non-param', templates1['templates/05-dotted-param_nested-in-non-param.fpt']);
+      break;
+
+    case 'templates/06_dotted-array-param-inner-includer.fpt':
+      feplet = new Feplet({});
+      feplet.registerPartial('templates/06-dotted-array-param-inner', templates1['templates/06-dotted-array-param-inner.fpt']);
+      break;
+
+    case 'templates/06_dotted-array-param-middle-includer.fpt':
+      feplet = new Feplet({});
+      feplet.registerPartial('templates/06-dotted-array-param-middle', templates1['templates/06-dotted-array-param-middle.fpt']);
+      break;
+
+    case 'templates/06_dotted-array-param-outer-includer.fpt':
+      feplet = new Feplet({});
+      feplet.registerPartial('templates/06-dotted-array-param-outer', templates1['templates/06-dotted-array-param-outer.fpt']);
+      break;
   }
 
   var contentParagraph;
@@ -468,6 +719,61 @@ Object.keys(templates1).forEach(function (template) {
     case 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt':
       contentParagraph.innerHTML = '' + ++i + '. Should render a more deeply nested parameter variable differently then a non-parameter variable of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'hack heck\\n  hick hock\\n\'<br>';
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a deeply nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'hack\\n    heck\\n\'<br>';
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a deeply nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'hack\\n    heck\\n    hick\\n\'<br>';
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a moderately nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  hack\\n    heck\\n\'<br>';
+      break;
+
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a moderately nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  hack\\n  heck\\n    hick\\n    hock\\n\'<br>';
+      break;
+
+    case 'templates/05_dotted-param-includer.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a top-level dot.notation parameter that nests more tags:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  hack\\n\'<br>';
+      break;
+
+    case 'templates/05_dotted-param-includer_array.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render an array of top-level dot.notation parameters that nest more tags:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  hack\\n  heck\\n\'<br>';
+      break;
+
+    case 'templates/05_dotted-param-includer_nested-in-non-param.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a dot.notation parameter nested within a non-parameter:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  hack\\n    heck\\n\'<br>';
+      break;
+
+    case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render an array of dot.notation parameters nested within a non-parameter:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  hack\\n    heck\\n    hick\\n\'<br>';
+      break;
+
+    case 'templates/06_dotted-array-param-inner-includer.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a deeply nested dot.notation parameter containing an array:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'    heck\\n\'<br>';
+      break;
+
+    case 'templates/06_dotted-array-param-middle-includer.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a moderately nested dot.notation parameter containing an array:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'    heck\\n\'<br>';
+      break;
+
+    case 'templates/06_dotted-array-param-outer-includer.fpt':
+      contentParagraph.innerHTML = '' + ++i + '. Should render a top-level dot.notation parameter containing an array:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'  heck\\n\'<br>';
       break;
   }
 
