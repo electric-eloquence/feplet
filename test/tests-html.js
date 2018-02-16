@@ -1,3 +1,6 @@
+/* eslint-disable max-len, quotes, strict */
+
+var Feplet = window.Feplet;
 var i = 0;
 var main = document.getElementById('main');
 var templates = {

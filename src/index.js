@@ -983,7 +983,7 @@ function render(template = '', context_, partials_, partialsComp_, contextKeys_)
 // PREPARE FOR EXPORT.
 
 function Feplet(context, partials, partialsComp, contextKeys) {
-  this.context = context || {}; 
+  this.context = context || {};
   this.partials = partials || {};
   this.partialsComp = partialsComp || {};
   this.contextKeys = contextKeys || preprocessContextKeys(context);
