@@ -1017,8 +1017,14 @@ Feplet.prototype.unregisterPartial = unregisterPartial;
 
 Feplet.prototype.render = render;
 
-if (typeof window === 'object') {
+if (typeof define === 'function') {
+  define(function () {
+    return Feplet;
+  });
+}
+else if (typeof window === 'object') {
   window.Feplet = Feplet;
 }
-
-module.exports = Feplet;
+else if (module && module.exports) {
+  module.exports = Feplet;
+}
