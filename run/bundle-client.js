@@ -57,5 +57,8 @@ browserify(src6)
       throw uglified.error;
     }
 
-    fs.writeFileSync(bld6, uglified.code + 'export default window.Feplet;');
+    fs.writeFileSync(
+      bld6,
+      `${uglified.code}const Feplet=window.Feplet;delete window.Feplet;export default Feplet;`
+    );
   });
