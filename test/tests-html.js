@@ -1,6 +1,5 @@
 var i = 0;
 var main = document.getElementById('main');
-
 var templates = {
   'templates/00-base.fpt': '{{ title }}\n' +
 '{{ message }}\n',
@@ -126,62 +125,63 @@ Object.keys(templates).forEach(function (template) {
       partials
     );
     contentParagraph = document.createElement('p');
+    contentParagraph.className = 'assert';
   }
 
   switch (template) {
     case 'templates/00-base.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with variables:<br>';
-      contentParagraph.innerHTML += 'expect to equal "foo\\nbar\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with variables:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
     case 'templates/00-nested.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with nested variables:<br>';
-      contentParagraph.innerHTML += 'expect to equal "\\nYes\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with nested variables:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
     case 'templates/00-array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with an array of variables:<br>';
-      contentParagraph.innerHTML += 'expect to equal "\\nYes\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with an array of variables:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
     case 'templates/01-dotted.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate variables written in dot.notation:<br>';
-      contentParagraph.innerHTML += 'expect to equal "foo\\nbar\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate variables written in dot.notation:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
     case 'templates/01-dotted_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate variables within an array written in dot.notation:<br>';
-      contentParagraph.innerHTML += 'expect to equal "foo\\nbar\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate variables within an array written in dot.notation:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
     case 'templates/00_base.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with variables:<br>';
-      contentParagraph.innerHTML += 'expect to equal "foo\\nbar\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with variables:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
     case 'templates/00_nested.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with nested variables:<br>';
-      contentParagraph.innerHTML += 'expect to equal "\\nYes\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with nested variables:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
     case 'templates/00_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with an array of variables:<br>';
-      contentParagraph.innerHTML += 'expect to equal "\\nYes\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with an array of variables:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
     case 'templates/01_dotted.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate variables written in dot.notation:<br>';
-      contentParagraph.innerHTML += 'expect to equal "foo\\nbar\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate variables written in dot.notation:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
     case 'templates/01_dotted_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate variables within an array written in dot.notation:<br>';
-      contentParagraph.innerHTML += 'expect to equal "foo\\nbar\\n"<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate variables within an array written in dot.notation:<br>';
+      contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
   }
 
   if (render) {
-    contentParagraph.innerHTML += 'actually equals "' + render.replace(/\n/g, '\\n') + '"';
+    contentParagraph.innerHTML += 'actually equals "<span class="actual">' + render.replace(/\n/g, '\\n') + '</span>"';
     main.appendChild(contentParagraph);
   }
 });
@@ -653,132 +653,148 @@ Object.keys(templates1).forEach(function (template) {
     render = feplet.render(templates1[template]);
     render = render.replace(/\n/g, '\\n').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     contentParagraph = document.createElement('p');
+    contentParagraph.className = 'assert';
   }
 
   switch (template) {
     case 'templates/02-stylemod-molecule.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with variables passed per the Pattern Lab styleModifier convention:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base test_1"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with variables passed per the Pattern Lab styleModifier convention:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base test_1"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02-stylemod-organism.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with variables passed per the Pattern Lab styleModifier convention:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base test_1"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with variables passed per the Pattern Lab styleModifier convention:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base test_1"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02_stylemod-multiple-classes.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with multiple classes passed per Pattern Lab styleModifier:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base foo1 foo2"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with multiple classes passed per Pattern Lab styleModifier:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base foo1 foo2"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02_stylemod-param.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with both data parameters and a Pattern Lab styleModifier:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base test_2"&gt;\\n    1\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with both data parameters and a Pattern Lab styleModifier:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base test_2"&gt;\\n    1\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02_stylemod-param_multiple-classes.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should hydrate templates with both data parameters and a styleModifier with multiple classes:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base foo1 foo2"&gt;\\n    2\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should hydrate templates with both data parameters and a styleModifier with multiple classes:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base foo1 foo2"&gt;\\n    2\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02~stylemod-multiple-classes-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with multiple classes passed per Pattern Lab styleModifier:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base foo1 foo2"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with multiple classes passed per Pattern Lab styleModifier:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base foo1 foo2"&gt;\\n    MESSAGE\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02~stylemod-param-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with both data parameters and a Pattern Lab styleModifier:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base test_2"&gt;\\n    1\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with both data parameters and a Pattern Lab styleModifier:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base test_2"&gt;\\n    1\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/02~stylemod-param_multiple-classes-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should recursively hydrate templates with both data parameters and a styleModifier with multiple classes:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'&lt;span class="test_base foo1 foo2"&gt;\\n    2\\n    DESCRIPTION\\n&lt;/span&gt;\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with both data parameters and a styleModifier with multiple classes:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">&lt;span class="test_base foo1 foo2"&gt;\\n    2\\n    DESCRIPTION\\n&lt;/span&gt;\\n</span>\'<br>';
       break;
 
     case 'templates/03-include-self-w-condition.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should shut off otherwise infinite recursion paths with default false conditions:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'No\\n\\nfoo\\nMESSAGE\\n  bar\\n  MESSAGE\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should shut off otherwise infinite recursion paths with default false conditions:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">No\\n\\nfoo\\nMESSAGE\\n  bar\\n  MESSAGE\\n</span>\'<br>';
       break;
 
     case 'templates/03_include-self-w-condition-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should shut off otherwise infinite recursion paths when flagged to do so by parameters:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'No\\n\\nfoo\\nMESSAGE\\n  No\\n\\nfoo\\nMESSAGE\\n  bar\\n  MESSAGE\\n  bar\\n  MESSAGE\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should shut off otherwise infinite recursion paths when flagged to do so by parameters:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">No\\n\\nfoo\\nMESSAGE\\n  No\\n\\nfoo\\nMESSAGE\\n  bar\\n  MESSAGE\\n  bar\\n  MESSAGE\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a nested parameter variable differently than a non-parameter variable of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'hack heck\\n  hick hock\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a nested parameter variable differently than a non-parameter variable of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack heck\\n  hick hock\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render an array of nested parameter variables differently from non-parameter variables of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'hack heck\\n  hick hock\\n  huck hyck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render an array of nested parameter variables differently from non-parameter variables of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack heck\\n  hick hock\\n  huck hyck\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a more deeply nested parameter variable differently then a non-parameter variable of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'hack heck\\n  hick hock\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a more deeply nested parameter variable differently then a non-parameter variable of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack heck\\n  hick hock\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a deeply nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'hack\\n    heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a deeply nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack\\n    heck\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a deeply nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'hack\\n    heck\\n    hick\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a deeply nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack\\n    heck\\n    hick\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a moderately nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  hack\\n    heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a moderately nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n    heck\\n</span>\'<br>';
       break;
 
     case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a moderately nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  hack\\n  heck\\n    hick\\n    hock\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a moderately nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n  heck\\n    hick\\n    hock\\n</span>\'<br>';
       break;
 
     case 'templates/05_dotted-param-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a top-level dot.notation parameter that nests more tags:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  hack\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a top-level dot.notation parameter that nests more tags:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n</span>\'<br>';
       break;
 
     case 'templates/05_dotted-param-includer_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render an array of top-level dot.notation parameters that nest more tags:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  hack\\n  heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render an array of top-level dot.notation parameters that nest more tags:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n  heck\\n</span>\'<br>';
       break;
 
     case 'templates/05_dotted-param-includer_nested-in-non-param.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a dot.notation parameter nested within a non-parameter:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  hack\\n    heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a dot.notation parameter nested within a non-parameter:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n    heck\\n</span>\'<br>';
       break;
 
     case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render an array of dot.notation parameters nested within a non-parameter:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  hack\\n    heck\\n    hick\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render an array of dot.notation parameters nested within a non-parameter:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n    heck\\n    hick\\n</span>\'<br>';
       break;
 
     case 'templates/06_dotted-array-param-inner-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a deeply nested dot.notation parameter containing an array:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'    heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a deeply nested dot.notation parameter containing an array:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">    heck\\n</span>\'<br>';
       break;
 
     case 'templates/06_dotted-array-param-middle-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a moderately nested dot.notation parameter containing an array:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'    heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a moderately nested dot.notation parameter containing an array:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">    heck\\n</span>\'<br>';
       break;
 
     case 'templates/06_dotted-array-param-outer-includer.fpt':
-      contentParagraph.innerHTML = '' + ++i + '. Should render a top-level dot.notation parameter containing an array:<br>';
-      contentParagraph.innerHTML += 'expect to equal \'  heck\\n\'<br>';
+      contentParagraph.innerHTML = ++i + '. Should render a top-level dot.notation parameter containing an array:<br>';
+      contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  heck\\n</span>\'<br>';
       break;
   }
 
   if (render) {
-    contentParagraph.innerHTML += 'actually equals \'' + render + '\'';
+    contentParagraph.innerHTML += 'actually equals \'<span class="actual">' + render + '</span>\'';
     main.appendChild(contentParagraph);
+  }
+});
+
+var assertions = document.querySelectorAll('.assert');
+Array.prototype.filter.call(assertions, function (assertion) {
+  var expect = assertion.querySelector('.expect');
+  var actual = assertion.querySelector('.actual');
+
+  if (expect.innerHTML === actual.innerHTML) {
+    expect.setAttribute('style', 'color: #0a0;');
+    actual.setAttribute('style', 'color: #0a0;');
+  }
+  else {
+    expect.setAttribute('style', 'color: #f00;');
+    actual.setAttribute('style', 'color: #f00;');
   }
 });
