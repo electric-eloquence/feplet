@@ -49,9 +49,9 @@ const generation = Feplet.generate(parsed, text, options);
 const output1 = generation.render(data); // Hello World
 
 // This is a Feplet implementation:
-const partialTemplate = '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}';
+const partialText = '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}';
 const partials = {
-  partial_template: partialTemplate
+  partial_template: partialText
 };
 const includer = '{{> partial_template(nest: { egg: { yolk: "Yellow" } }) }}';
 const output2 = Feplet.render(
@@ -65,7 +65,7 @@ const output2 = Feplet.render(
 // performance gains (only applicable to an instantiated class). Definitely
 // register your partials if they receive a parameterized data context.
 const feplet = new Feplet(data);
-feplet.registerPartial('partial_template', partialTemplate);
+feplet.registerPartial('partial_template', partialText);
 const output3 = feplet.render(includer); // Yellow World
 ```
 

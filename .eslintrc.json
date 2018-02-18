@@ -9,6 +9,9 @@
   "parserOptions": {
     "ecmaVersion": 8
   },
+  "globals": {
+    "define": true
+  },
   "rules": {
     // Errors.
     "array-bracket-spacing": [2, "never"],

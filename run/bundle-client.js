@@ -59,6 +59,6 @@ browserify(src6)
 
     fs.writeFileSync(
       bld6,
-      `${uglified.code}const Feplet=window.Feplet;delete window.Feplet;export default Feplet;`
+      `${uglified.code}var F=window.Feplet;delete window.Feplet;export default F;`
     );
   });

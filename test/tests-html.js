@@ -202,7 +202,7 @@ var templates1 = {
   'templates/02-stylemod-molecule.fpt': '{{> templates/02-stylemod-atom:test_1 }}\n',
   'templates/02-stylemod-organism.fpt': '{{> templates/02-stylemod-molecule }}\n',
   'templates/02_stylemod-multiple-classes.fpt': '{{> templates/02-stylemod-atom:foo1|foo2 }}\n',
-  'templates/02_stylemod-param.fpt': '{{> templates/02-stylemod-atom:test_2(message: "1") }}\n',
+  'templates/02_stylemod-param.fpt': '{{> templates/02-stylemod-atom:test_2(message: \'1\') }}\n',
   'templates/02_stylemod-param_multiple-classes.fpt': '{{> templates/02-stylemod-atom:foo1|foo2(message: "2") }}\n',
   'templates/02~stylemod-multiple-classes-includer.fpt': '{{> templates/02_stylemod-multiple-classes }}\n',
   'templates/02~stylemod-param-includer.fpt': '{{> templates/02_stylemod-param }}\n',

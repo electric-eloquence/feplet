@@ -7,7 +7,7 @@
     "bundle": "npx babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
     "devel": "npm run watch & npm run serve",
     "lint": "npx eslint run && npx eslint src && npx eslint test",
-    "prepush": "npm test",
+    "prepush": "npm run lint && npm test",
     "serve": "npx http-server .",
     "test": "npx mocha test/tests.js",
     "watch": "npx nodemon --watch src -e js --exec 'npm run bundle'"
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/electric-eloquence/feplet#readme",
   "dependencies": {
-    "json-eval": "^0.2.0",
+    "json-eval": "^0.2.1",
     "mkdirp": "0.3.0",
     "nopt": "1.0.10"
   },

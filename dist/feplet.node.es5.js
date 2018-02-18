@@ -714,7 +714,7 @@ function paramsApply(args) {
 
 // REFERENCES FOR STATIC AND INSTANCE METHODS
 
-function preprocessPartialParams(template, compilation_, partials_, partialsComp_, contextKeys_) {
+function preprocessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_) {
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
   var contextKeys = contextKeys_ || this.contextKeys || [];
@@ -723,7 +723,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
   var styleModClasses = void 0;
   var styleModifierMatch = void 0;
 
-  var compilation = compilation_ || hogan.compile(template);
+  var compilation = compilation_ || hogan.compile(text);
 
   for (var i in compilation.partials) {
     if (!compilation.partials.hasOwnProperty(i)) {
@@ -756,6 +756,8 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
         try {
           paramsObj = jsonEval('{' + paramsStr.slice(1, -1).trim() + '}');
         } catch (err) {
+          console.error(err); // eslint-disable-line no-console
+
           continue;
         }
 
@@ -924,7 +926,7 @@ function unregisterPartial(name, partials_, partialsComp_) {
 }
 
 function render() {
-  var template = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
   var context_ = arguments[1];
   var partials_ = arguments[2];
   var partialsComp_ = arguments[3];
@@ -952,9 +954,9 @@ function render() {
   var compilation = void 0;
 
   if (Object.keys(partialsComp).length) {
-    compilation = compile(template, null, partials, partialsComp, contextKeys);
+    compilation = compile(text, null, partials, partialsComp, contextKeys);
   } else {
-    compilation = hogan.compile(template);
+    compilation = hogan.compile(text);
   }
 
   return compilation.render(context, partials, null, partialsComp);
@@ -1003,6 +1005,6 @@ if (typeof define === 'function') {
   });
 } else if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object') {
   window.Feplet = Feplet;
-} else if (module && module.exports) {
-  module.exports = Feplet;
 }
+
+module.exports = Feplet;

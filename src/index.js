@@ -743,7 +743,7 @@ function paramsApply(args) {
 
 // REFERENCES FOR STATIC AND INSTANCE METHODS
 
-function preprocessPartialParams(template, compilation_, partials_, partialsComp_, contextKeys_) {
+function preprocessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_) {
   const partials = partials_ || this.partials || {};
   const partialsComp = partialsComp_ || this.partialsComp || {};
   const contextKeys = contextKeys_ || this.contextKeys || [];
@@ -752,7 +752,7 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
   let styleModClasses;
   let styleModifierMatch;
 
-  const compilation = compilation_ || hogan.compile(template);
+  const compilation = compilation_ || hogan.compile(text);
 
   for (let i in compilation.partials) {
     if (!compilation.partials.hasOwnProperty(i)) {
@@ -785,6 +785,8 @@ function preprocessPartialParams(template, compilation_, partials_, partialsComp
           paramsObj = jsonEval(`{${paramsStr.slice(1, -1).trim()}}`);
         }
         catch (err) {
+          console.error(err); // eslint-disable-line no-console
+
           continue;
         }
 
@@ -948,7 +950,7 @@ function unregisterPartial(name, partials_, partialsComp_) {
   };
 }
 
-function render(template = '', context_, partials_, partialsComp_, contextKeys_) {
+function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   const context = context_ || this.context || {};
   const contextKeys = contextKeys_ || this.contextKeys || [];
 
@@ -971,10 +973,10 @@ function render(template = '', context_, partials_, partialsComp_, contextKeys_)
   let compilation;
 
   if (Object.keys(partialsComp).length) {
-    compilation = compile(template, null, partials, partialsComp, contextKeys);
+    compilation = compile(text, null, partials, partialsComp, contextKeys);
   }
   else {
-    compilation = hogan.compile(template);
+    compilation = hogan.compile(text);
   }
 
   return compilation.render(context, partials, null, partialsComp);
@@ -1025,6 +1027,5 @@ if (typeof define === 'function') {
 else if (typeof window === 'object') {
   window.Feplet = Feplet;
 }
-else if (module && module.exports) {
-  module.exports = Feplet;
-}
+
+module.exports = Feplet;
