@@ -10,13 +10,14 @@ var paramRegex = /\([\S\s]*\)/;
 // HELPER FUNCTIONS.
 
 function contextKeysPreprocess(args) {
-  var contextKeys_ = args.contextKeys_;
+  var contextKeys = args.contextKeys;
 
 
-  var contextKeys = contextKeys_.slice();
+  for (var contextKey in contextKeys) {
+    if (!contextKeys.hasOwnProperty(contextKey) || !contextKeys[contextKey]) {
+      continue;
+    }
 
-  for (var i = 0, l = contextKeys_.length; i < l; i++) {
-    var contextKey = contextKeys_[i];
     var contextKeySplit = contextKey.split('.');
 
     while (contextKeySplit.length > 1) {
@@ -24,9 +25,7 @@ function contextKeysPreprocess(args) {
 
       var contextKeyNew = contextKeySplit.join('.');
 
-      if (contextKeys.indexOf(contextKeyNew) === -1) {
-        contextKeys.push(contextKeyNew);
-      }
+      contextKeys[contextKeyNew] = true;
     }
   }
 
@@ -298,16 +297,13 @@ function dataKeysWithDotNotation(args) {
   while (itemNext = parentObjSplit[++i]) {
     // eslint-disable-line no-cond-assign
     dataKey += '.' + itemNext;
-
-    if (dataKeys.indexOf(dataKey) === -1) {
-      dataKeys.push(dataKey);
-    }
+    dataKeys[dataKey] = true;
   }
 
   return { dataKeys: dataKeys };
 }
 
-function dataObjToDataKeysArr(args) {
+function dataObjToDataKeysObj(args) {
   var dataKeys_ = args.dataKeys_,
       dataKeysShallowItrn = args.dataKeysShallowItrn,
       dataObj = args.dataObj,
@@ -324,9 +320,8 @@ function dataObjToDataKeysArr(args) {
 
   var dataKeys = dataKeys_;
 
-  // dataKeys_ should only contain unique keys.
-  if (!parentObjAsStr && !dataKeys.includes(key)) {
-    dataKeys.push(key);
+  if (!parentObjAsStr) {
+    dataKeys[key] = true;
   }
 
   // Recurse deeper into dataObj if this property is of type object.
@@ -364,9 +359,9 @@ function dataObjToDataKeysArr(args) {
             partialShort: args.partialShort
           };
 
-          var _dataObjToDataKeysArr = dataObjToDataKeysArr(argsDeeper);
+          var _dataObjToDataKeysObj = dataObjToDataKeysObj(argsDeeper);
 
-          dataKeys = _dataObjToDataKeysArr.dataKeys;
+          dataKeys = _dataObjToDataKeysObj.dataKeys;
         }
       }
     }
@@ -397,9 +392,9 @@ function dataObjToDataKeysArr(args) {
           partialShort: args.partialShort
         };
 
-        var _dataObjToDataKeysArr2 = dataObjToDataKeysArr(_argsDeeper);
+        var _dataObjToDataKeysObj2 = dataObjToDataKeysObj(_argsDeeper);
 
-        dataKeys = _dataObjToDataKeysArr2.dataKeys;
+        dataKeys = _dataObjToDataKeysObj2.dataKeys;
       }
   } else {
     var _parentObjSplit2 = parentObjAsStr ? parentObjAsStr.split('.') : [];
@@ -414,7 +409,7 @@ function dataObjToDataKeysArr(args) {
   args.dataKeys_ = dataKeys;
   args.dataKeysShallowItrn = args.dataKeysShallowItr.next();
 
-  return dataObjToDataKeysArr(args);
+  return dataObjToDataKeysObj(args);
 }
 
 function styleModifierExtract(args) {
@@ -516,17 +511,15 @@ function paramsApplyByKeyArrays(args) {
   var ctag = void 0;
   var partialText = void 0;
 
-  if (parseObjKey === 'n') {
-    if (paramKeys.indexOf(tagParseVal) > -1 || contextKeys.indexOf(tagParseVal) === -1) {
-      var _tagReplace = tagReplace({
-        parseObj: parseObj,
-        partialText_: partialText_
-      });
+  if (parseObjKey === 'n' && (paramKeys[tagParseVal] || !contextKeys[tagParseVal])) {
+    var _tagReplace = tagReplace({
+      parseObj: parseObj,
+      partialText_: partialText_
+    });
 
-      otag = _tagReplace.otag;
-      ctag = _tagReplace.ctag;
-      partialText = _tagReplace.partialText;
-    }
+    otag = _tagReplace.otag;
+    ctag = _tagReplace.ctag;
+    partialText = _tagReplace.partialText;
   } else if (parseObjKey === 'tag' && !delimiters_) {
     otag = parseObj.otag;
     ctag = parseObj.ctag;
@@ -599,17 +592,17 @@ function paramsApplyToParseObj(args) {
           var paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
           var paramKeysShallowItrn = paramKeysShallowItr.next();
 
-          var _dataObjToDataKeysArr3 = dataObjToDataKeysArr({
-            dataKeys_: [],
+          var _dataObjToDataKeysObj3 = dataObjToDataKeysObj({
+            dataKeys_: {},
             dataKeysShallowItr: paramKeysShallowItr,
             dataKeysShallowItrn: paramKeysShallowItrn,
             dataObj: paramsObjNew,
             parentObjAsStr: ''
             //partialShort // For debugging.
           }),
-              dataKeys = _dataObjToDataKeysArr3.dataKeys;
+              dataKeys = _dataObjToDataKeysObj3.dataKeys;
 
-          paramKeysNew = paramKeysNew.concat(dataKeys);
+          Object.assign(paramKeysNew, dataKeys);
         }
       } else {
         paramsObjNew = paramsObjNested;
@@ -617,17 +610,17 @@ function paramsApplyToParseObj(args) {
         var _paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
         var _paramKeysShallowItrn = _paramKeysShallowItr.next();
 
-        var _dataObjToDataKeysArr4 = dataObjToDataKeysArr({
-          dataKeys_: [],
+        var _dataObjToDataKeysObj4 = dataObjToDataKeysObj({
+          dataKeys_: {},
           dataKeysShallowItr: _paramKeysShallowItr,
           dataKeysShallowItrn: _paramKeysShallowItrn,
           dataObj: paramsObjNew,
           parentObjAsStr: ''
           //partialShort // For debugging.
         }),
-            _dataKeys = _dataObjToDataKeysArr4.dataKeys;
+            _dataKeys = _dataObjToDataKeysObj4.dataKeys;
 
-        paramKeysNew = paramKeys.concat(_dataKeys);
+        paramKeysNew = Object.assign(paramKeys, _dataKeys);
       }
     } else {
       paramKeysNew = paramKeys;
@@ -789,7 +782,7 @@ function preprocessPartialParams(text, compilation_, partials_, partialsComp_, c
     var paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
     var paramKeysShallowItrn = paramKeysShallowItr.next();
 
-    var _dataObjToDataKeysArr5 = dataObjToDataKeysArr({
+    var _dataObjToDataKeysObj5 = dataObjToDataKeysObj({
       dataKeys_: [],
       dataKeysShallowItr: paramKeysShallowItr,
       dataKeysShallowItrn: paramKeysShallowItrn,
@@ -797,7 +790,7 @@ function preprocessPartialParams(text, compilation_, partials_, partialsComp_, c
       parentObjAsStr: ''
       //partialShort // For debugging.
     }),
-        dataKeys = _dataObjToDataKeysArr5.dataKeys;
+        dataKeys = _dataObjToDataKeysObj5.dataKeys;
 
     var paramKeys = dataKeys;
 
@@ -871,22 +864,22 @@ function compile(text, options, partials_, partialsComp_, contextKeys_) {
 
 function preprocessContextKeys(context) {
   if (!context) {
-    return [];
+    return {};
   }
 
   var dataKeysShallowItr = Object.keys(context)[Symbol.iterator]();
   var dataKeysShallowItrn = dataKeysShallowItr.next();
 
-  var _dataObjToDataKeysArr6 = dataObjToDataKeysArr({
-    dataKeys_: [],
+  var _dataObjToDataKeysObj6 = dataObjToDataKeysObj({
+    dataKeys_: {},
     dataKeysShallowItr: dataKeysShallowItr,
     dataKeysShallowItrn: dataKeysShallowItrn,
     dataObj: context,
     parentObjAsStr: ''
   }),
-      dataKeys = _dataObjToDataKeysArr6.dataKeys;
+      dataKeys = _dataObjToDataKeysObj6.dataKeys;
 
-  var _contextKeysPreproces = contextKeysPreprocess({ contextKeys_: dataKeys }),
+  var _contextKeysPreproces = contextKeysPreprocess({ contextKeys: dataKeys }),
       contextKeys = _contextKeysPreproces.contextKeys;
 
   return contextKeys;

@@ -61,9 +61,8 @@ const output2 = Feplet.render(
 ); // Yellow World
 
 // Better yet, instantiate the Feplet class to cache the data if you need to use
-// them more than once. Registering partials before rendering should also net
-// performance gains (only applicable to an instantiated class). Definitely
-// register your partials if they receive a parameterized data context.
+// them more than once. Then, register partials before rendering so they are 
+// preprocessed with the data and context cached within the feplet object.
 const feplet = new Feplet(data);
 feplet.registerPartial('partial_template', partialText);
 const output3 = feplet.render(includer); // Yellow World
