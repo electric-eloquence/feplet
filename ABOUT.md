@@ -6,8 +6,8 @@ This project arose from the needs of
 <a href="http://fepper.io" target="blank">Fepper</a> and its implementation of 
 Pattern Lab. Fepper requires the simplicity of Mustache (and not the complexity 
 of Handlebars), the flexible tag-to-data matching of Mustache (and not the rigid 
-tag-to-data nesting hierarchy of Handlebars), and the speed of Mustache 
-(specifically the Hogan.js library) when compiling large template sets.
+tag-to-data nesting hierarchy of Handlebars), and plain old raw speed when 
+compiling large template sets.
 
 ### Why functional programming?
 
@@ -28,8 +28,9 @@ structures.
 
 ### Object-oriented programming?
 
-Feplet is only minimally object-oriented. Any class it inherits is from an 
-underlying library, and is abstracted away from users.
+Feplet exposes a class which can be instantiated for the purpose of caching 
+data if the data need to be used for more than once. It also exposes static 
+methods by which instantiation can be skipped entirely.
 
 ### Procedural programming?
 
