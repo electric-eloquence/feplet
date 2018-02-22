@@ -4,10 +4,9 @@
 
 This project arose from the needs of 
 <a href="http://fepper.io" target="blank">Fepper</a> and its implementation of 
-Pattern Lab. Fepper requires the simplicity of Mustache (and not the complexity 
-of Handlebars), the flexible tag-to-data matching of Mustache (and not the rigid 
-tag-to-data nesting hierarchy of Handlebars), and plain old raw speed when 
-compiling large template sets.
+Pattern Lab. Fepper requires the simplicity of Mustache's tag-to-data matching 
+scheme, as well as the flexibility that comes with that simplicity. Fepper also 
+requires plain old raw speed for the purpose of compiling large template sets.
 
 ### Why functional programming?
 
