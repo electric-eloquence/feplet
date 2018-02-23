@@ -1,13 +1,12 @@
-# A Mustache-compatible templating engine.
+# Feplet: a Mustache-compatible templating engine.
 
 ## Powerful under the hood. Simple behind the wheel.
 
 ### How is this different from Mustache (and Hogan.js)?
 
 Feplet implements Hogan.js and is therefore, 100% compatible with it. The 
-difference is that it allows the passing of data parameters per template, a la 
-Handlebars. The syntax for passing parameters follows the Pattern Lab 
-convention:
+difference is that it allows the passing of data parameters per template. The 
+syntax for passing parameters follows the Pattern Lab convention:
 
 ```handlebars
 {{> partial_template(place: 'World') }}
@@ -31,13 +30,13 @@ within.
 ```javascript
 const Feplet = require('feplet');
 
-const data = {
+const context = {
   place: 'World'
 };
 
 // These are references to Hogan.js methods:
 const template = Feplet.compile('Hello {{place}}');
-const output = template.render(data); // Hello World
+const output = template.render(context); // Hello World
 
 // These are also references to Hogan.js methods:
 const text = 'Hello <%place%>';
@@ -46,7 +45,7 @@ const options = {delimiters};
 const scanned = Feplet.scan(text, delimiters);
 const parsed = Feplet.parse(scanned, text, options);
 const generation = Feplet.generate(parsed, text, options);
-const output1 = generation.render(data); // Hello World
+const output1 = generation.render(context); // Hello World
 
 // This is a Feplet implementation:
 const partialText = '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}';
@@ -56,14 +55,14 @@ const partials = {
 const includer = '{{> partial_template(nest: { egg: { yolk: "Yellow" } }) }}';
 const output2 = Feplet.render(
   includer,
-  data,
+  context,
   partials
 ); // Yellow World
 
-// Better yet, instantiate the Feplet class to cache the data if you need to use
-// them more than once. Then, register partials before rendering so they get
-// preprocessed with the data and context cached within the feplet object.
-const feplet = new Feplet(data);
+// Better yet, instantiate the Feplet class to cache the context data if you
+// need to use them more than once. Then, register partials so they get
+// preprocessed with the context data cached within the feplet object.
+const feplet = new Feplet(context);
 feplet.registerPartial('partial_template', partialText);
 const output3 = feplet.render(includer); // Yellow World
 ```
@@ -83,7 +82,7 @@ var Feplet = require('feplet/dist/feplet.node.es5.js')
 For browsers (ES5):
 
 ```html
-<script src="dist/feplet.browser.min.js"></script>
+<script src="feplet/dist/feplet.browser.min.js"></script>
 <script>
   var Feplet = window.Feplet;
 </script>
@@ -98,7 +97,7 @@ Also for browsers (ES6):
 
 ```html
 <script type="module">
-  import Feplet from 'dist/feplet.browser.es6.min.js';
+  import Feplet from 'feplet/dist/feplet.browser.es6.min.js';
 </script>
 ```
 

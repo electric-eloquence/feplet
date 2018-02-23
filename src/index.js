@@ -653,7 +653,7 @@ function paramsApplyToParseObj(args) {
     ({
       delimiters,
       partialText
-    } = paramsApply({
+    } = paramsApply({ // eslint-disable-line no-use-before-define
       contextKeys,
       paramKeys: paramKeysNew,
       paramsObj: paramsObjNew,
