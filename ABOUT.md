@@ -59,4 +59,4 @@ Feplet is the spelled-out sound of a contraction of "Fepper template." (Fepper
 is a contraction of "front end prototyper.") It could also be the diminutive of 
 "Fepper." It is very much the engine that drives Fepper.
 
-<h4><a href="https://github.com/electric-eloquence/template-engine-comparison#readme" target="_blank">Template Engine Comparison &raquo;</a></h4>
+<h4><a href="https://github.com/electric-eloquence/template-engine-benchoff" target="_blank">Template Engine Benchoff &raquo;</a></h4>

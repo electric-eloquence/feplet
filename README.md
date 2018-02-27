@@ -101,4 +101,4 @@ Also for browsers (ES6):
 </script>
 ```
 
-<h3><a href="https://github.com/electric-eloquence/feplet/blob/master/ABOUT.md">More &raquo;</a></h3>
+<h4><a href="https://github.com/electric-eloquence/feplet/blob/master/ABOUT.md">More &raquo;</a></h4>
