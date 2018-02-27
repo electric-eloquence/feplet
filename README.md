@@ -27,6 +27,14 @@ within.
 
 ### Use
 
+CLI:
+
+```bash
+npm install feplet
+```
+
+JS:
+
 ```javascript
 const Feplet = require('feplet');
 
