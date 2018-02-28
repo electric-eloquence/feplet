@@ -2,7 +2,7 @@
 
 ## Powerful under the hood. Simple behind the wheel.
 
-### How is this different from Mustache (and Hogan.js)?
+### How is this different from <a href="https://mustache.github.io/mustache.5.html" target="_blank">Mustache</a> (and <a href="https://github.com/twitter/hogan.js#readme" target="_blank">Hogan.js</a>)?
 
 Feplet implements Hogan.js and is therefore, 100% compatible with it. The 
 difference is that it allows the passing of data parameters per template. The 
