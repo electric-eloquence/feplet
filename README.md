@@ -1,4 +1,4 @@
-# Feplet: a Mustache-compatible templating engine.
+# Feplet: a Mustache-compatible template engine.
 
 ## Powerful under the hood. Simple behind the wheel.
 

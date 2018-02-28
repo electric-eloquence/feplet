@@ -1,6 +1,6 @@
 # About Feplet
 
-### Why another Mustache-compatible templating engine?
+### Why another Mustache-compatible template engine?
 
 This project arose from the needs of 
 <a href="http://fepper.io" target="blank">Fepper</a> and its implementation of 
@@ -40,7 +40,7 @@ rhetorical question.
 We've all heard developers evangelize their way of doing things because of a 
 performance gain of literally milliseconds. But when compiling and rendering 
 megabtyes of templates, performance actually matters to people with other things 
-to do. The choice of templating engine can yield performance gains (or losses) 
+to do. The choice of template engine can yield performance gains (or losses) 
 of minutes per build.
 
 ### How is this functional programming?
