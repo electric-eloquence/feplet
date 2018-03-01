@@ -46,13 +46,11 @@ of minutes per build.
 ### How is this functional programming?
 
 We are primarily concerned with the evaluation of expressions, not the execution 
-of commands. This leads to the extensive use of recursion. As we recurse, we 
-don't concern ourselves with side-effects or state. Data are transmitted through 
-functions, but we don't mutate or do horrible things to them. Data structures 
-are generally treated as stacks. They are added to, but the older parts are 
-never changed. They are certainly never knocked down and substituted with a 
-different stack, the public none-the-wiser that the original stack is buried 
-somewhere never to be seen again.
+of commands. All function expressions receive input and return output. This 
+being the case, we don't concern ourselves with side-effects or state. Data are 
+transmitted through functions, but we don't mutate or do horrible things to 
+them. Data structures are generally treated as stacks. They are added to, but 
+the older parts are never changed.
 
 ### Where does the name come from?
 
