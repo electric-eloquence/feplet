@@ -95,7 +95,7 @@ describe('Feplet', function () {
       partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_base.fpt'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_base-includer.fpt'), enc);
     const render = Feplet.render(
       templateText,
       {
@@ -118,7 +118,7 @@ describe('Feplet', function () {
       partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_nested.fpt'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_nested-includer.fpt'), enc);
     const render = Feplet.render(
       templateText,
       {
@@ -142,7 +142,7 @@ describe('Feplet', function () {
       partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_nested.fpt'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/00_nested-includer.fpt'), enc);
     const render = Feplet.render(
       templateText,
       {
@@ -168,7 +168,7 @@ describe('Feplet', function () {
       partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted.fpt'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted-includer.fpt'), enc);
     const render = Feplet.render(
       templateText,
       {},
@@ -188,7 +188,7 @@ describe('Feplet', function () {
       partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted_array.fpt'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted_array-includer.fpt'), enc);
     const render = Feplet.render(
       templateText,
       {},
@@ -393,7 +393,7 @@ describe('Feplet', function () {
     const files = [
       'templates/00-base.fpt',
       'templates/00-nested.fpt',
-      'templates/00_nested.fpt',
+      'templates/00_nested-includer.fpt',
       'templates/03-include-self-w-condition.fpt'
     ];
 
@@ -421,7 +421,7 @@ describe('Feplet', function () {
     const files = [
       'templates/00-base.fpt',
       'templates/00-nested.fpt',
-      'templates/00_nested.fpt',
+      'templates/00_nested-includer.fpt',
       'templates/03-include-self-w-condition.fpt'
     ];
 
