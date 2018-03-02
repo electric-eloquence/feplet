@@ -188,7 +188,7 @@ describe('Feplet', function () {
       partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
     });
 
-    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted_array-includer.fpt'), enc);
+    const templateText = fs.readFileSync(path.resolve(__dirname, 'templates/01_dotted-includer_array.fpt'), enc);
     const render = Feplet.render(
       templateText,
       {},

@@ -14,11 +14,11 @@ var templates = {
 '{{ dot.message }}\n',
   'templates/01-dotted_array.fpt': '{{ dot.0.title }}\n' +
 '{{ dot.0.message }}\n',
-  'templates/00_base.fpt': '{{> templates/00-base }}\n',
-  'templates/00_nested.fpt': '{{> templates/00-nested }}\n',
+  'templates/00_base-includer.fpt': '{{> templates/00-base }}\n',
+  'templates/00_nested-includer.fpt': '{{> templates/00-nested }}\n',
   'templates/00_array.fpt': '{{> templates/00-nested }}\n',
-  'templates/01_dotted.fpt': '{{> templates/01-dotted(dot: { title: "foo", message: "bar" }) }}\n',
-  'templates/01_dotted_array.fpt': '{{> templates/01-dotted_array(dot: [{ title: "foo", message: "bar" }]) }}'
+  'templates/01_dotted-includer.fpt': '{{> templates/01-dotted(dot: { title: "foo", message: "bar" }) }}\n',
+  'templates/01_dotted-includer_array.fpt': '{{> templates/01-dotted_array(dot: [{ title: "foo", message: "bar" }]) }}'
 };
 
 Object.keys(templates).forEach(function (template) {
@@ -71,7 +71,7 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/00_base.fpt':
+    case 'templates/00_base-includer.fpt':
       context = {
         title: 'foo',
         message: 'bar'
@@ -81,7 +81,7 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/00_nested.fpt':
+    case 'templates/00_nested-includer.fpt':
       context = {
         check: {
           i18n: true
@@ -105,13 +105,13 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/01_dotted.fpt':
+    case 'templates/01_dotted-includer.fpt':
       partials = {
         'templates/01-dotted': templates['templates/01-dotted.fpt']
       };
       break;
 
-    case 'templates/01_dotted_array.fpt':
+    case 'templates/01_dotted-includer_array.fpt':
       partials = {
         'templates/01-dotted_array': templates['templates/01-dotted_array.fpt']
       };
@@ -157,12 +157,12 @@ Object.keys(templates).forEach(function (template) {
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/00_base.fpt':
+    case 'templates/00_base-includer.fpt':
       contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with variables:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/00_nested.fpt':
+    case 'templates/00_nested-includer.fpt':
       contentParagraph.innerHTML = ++i + '. Should recursively hydrate templates with nested variables:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
@@ -172,12 +172,12 @@ Object.keys(templates).forEach(function (template) {
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
-    case 'templates/01_dotted.fpt':
+    case 'templates/01_dotted-includer.fpt':
       contentParagraph.innerHTML = ++i + '. Should recursively hydrate variables written in dot.notation:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/01_dotted_array.fpt':
+    case 'templates/01_dotted-includer_array.fpt':
       contentParagraph.innerHTML = ++i + '. Should recursively hydrate variables within an array written in dot.notation:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
@@ -194,7 +194,7 @@ var templates1 = {
 '{{ message }}\n',
   'templates/00-nested.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n' +
 '{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n',
-  'templates/00_nested.fpt': '{{> templates/00-nested }}\n',
+  'templates/00_nested-includer.fpt': '{{> templates/00-nested }}\n',
   'templates/02-stylemod-atom.fpt': '<span class="test_base {{ styleModifier }}">\n' +
 '    {{ message }}\n' +
 '    {{ description }}\n' +
@@ -207,7 +207,7 @@ var templates1 = {
   'templates/02~stylemod-multiple-classes-includer.fpt': '{{> templates/02_stylemod-multiple-classes }}\n',
   'templates/02~stylemod-param-includer.fpt': '{{> templates/02_stylemod-param }}\n',
   'templates/02~stylemod-param_multiple-classes-includer.fpt': '{{> templates/02_stylemod-param_multiple-classes }}\n',
-  'templates/03-include-self-w-condition.fpt': '{{> templates/00_nested }}\n' +
+  'templates/03-include-self-w-condition.fpt': '{{> templates/00_nested-includer }}\n' +
 '{{> templates/00-base(title: "foo") }}\n' +
 '{{# foo }}\n' +
 '  {{> templates/03-include-self-w-condition(bar: true) }}\n' +
@@ -497,7 +497,7 @@ Object.keys(templates1).forEach(function (template) {
       );
       feplet.registerPartial('templates/00-base', templates1['templates/00-base.fpt']);
       feplet.registerPartial('templates/00-nested', templates1['templates/00-nested.fpt']);
-      feplet.registerPartial('templates/00_nested', templates1['templates/00_nested.fpt']);
+      feplet.registerPartial('templates/00_nested-includer', templates1['templates/00_nested-includer.fpt']);
       feplet.registerPartial('templates/03-include-self-w-condition', templates1['templates/03-include-self-w-condition.fpt']);
       break;
 
@@ -514,7 +514,7 @@ Object.keys(templates1).forEach(function (template) {
       );
       feplet.registerPartial('templates/00-base', templates1['templates/00-base.fpt']);
       feplet.registerPartial('templates/00-nested', templates1['templates/00-nested.fpt']);
-      feplet.registerPartial('templates/00_nested', templates1['templates/00_nested.fpt']);
+      feplet.registerPartial('templates/00_nested-includer', templates1['templates/00_nested-includer.fpt']);
       feplet.registerPartial('templates/03-include-self-w-condition', templates1['templates/03-include-self-w-condition.fpt']);
       break;
 
