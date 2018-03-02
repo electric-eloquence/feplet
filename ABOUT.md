@@ -47,8 +47,8 @@ of minutes per build.
 
 We are primarily concerned with the evaluation of expressions, not the execution 
 of commands. All function expressions receive input and return output. This 
-being the case, we don't concern ourselves with side-effects or state. Data are 
-transmitted through functions, but we don't mutate or do horrible things to 
+being the case, we don't concern ourselves with side-effects or state. We 
+transmit data through functions, but we don't mutate or do horrible things to 
 them. Data structures are generally treated as stacks. They are added to, but 
 the older parts are never changed.
 
