@@ -15,10 +15,10 @@ syntax for passing parameters follows the Pattern Lab convention:
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
 Any valid <a href="http://json5.org" target="_blank">JSON5</a> string (minus the 
 wrapping curly braces) can be passed. Be sure that consecutive JSON5 curly 
-braces are spaced to avoid being parsed as a stash `}}`. Additionally, if 
-stashes need to be submitted as parameter values, insert a space between them if 
-they need to be submitted literally (to be printed as JavaScript or CSS code), 
-or encode them as HTML entities (`&lcub;` or `&rcub;`).
+braces are spaced to avoid being parsed as a stash `}}`. Similarly, space curly 
+braces if they need to be submitted literally as parameter values (to be printed 
+as JavaScript or CSS code), or else, encode them as HTML entities (`&lcub;` or 
+`&rcub;`).
 
 ```handlebars
 {{> partial_template(nest: { egg: { yolk: 'Yellow' } }) }}
