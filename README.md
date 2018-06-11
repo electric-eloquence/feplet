@@ -4,9 +4,16 @@
 
 ### How is this different from <a href="https://mustache.github.io/mustache.5.html" target="_blank">Mustache</a> (and <a href="https://github.com/twitter/hogan.js#readme" target="_blank">Hogan.js</a>)?
 
-Feplet implements Hogan.js and is therefore, 100% compatible with it. The 
-difference is that it allows the passing of data parameters per template. The 
-syntax for passing parameters follows the Pattern Lab convention:
+Feplet implements Hogan.js and is mostly compatible with it. These are the 
+main differences:
+
+* Feplet does not allow space between an opening delimiter and a command 
+  character, such as `#`, `/`, or `>`. The command character must immediately 
+  follow the delimiter, so for example, `{{> partial }}` is allowed but 
+  `{{ > partial }}` is not.
+* Feplet allows the passing of data parameters per template.
+
+The syntax for passing data parameters follows the Pattern Lab convention:
 
 ```handlebars
 {{> partial_template(place: 'World') }}
@@ -15,10 +22,10 @@ syntax for passing parameters follows the Pattern Lab convention:
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
 Any valid <a href="http://json5.org" target="_blank">JSON5</a> string (minus the 
 wrapping curly braces) can be passed. Be sure that consecutive JSON5 curly 
-braces are spaced to avoid being parsed as a stash `}}`. Similarly, space curly 
-braces if they need to be submitted literally as parameter values (to be printed 
-as JavaScript or CSS code), or else, encode them as HTML entities (`&lcub;` or 
-`&rcub;`).
+braces are separated with space to avoid being parsed as a stash `}}`. Similarly, 
+space curly braces if they need to be submitted literally as parameter values 
+(to be printed as JavaScript or CSS code), or else, encode them as HTML entities 
+(`&lcub;` or `&rcub;`).
 
 ```handlebars
 {{> partial_template(nest: { egg: { yolk: 'Yellow' } }) }}
