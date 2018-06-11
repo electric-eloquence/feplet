@@ -4,13 +4,13 @@
 
 ### How is this different from <a href="https://mustache.github.io/mustache.5.html" target="_blank">Mustache</a> (and <a href="https://github.com/twitter/hogan.js#readme" target="_blank">Hogan.js</a>)?
 
-Feplet implements Hogan.js and is mostly compatible with it. These are the 
-main differences:
+Feplet implements Hogan.js and is mostly compatible with it, and is therefore 
+mostly compatible with Mustache. These are the main differences:
 
 * Feplet does not allow space between an opening delimiter and a command 
-  character, such as `#`, `/`, or `>`. The command character must immediately 
-  follow the delimiter, so for example, `{{> partial }}` is allowed but 
-  `{{ > partial }}` is not.
+  character, such as `#`, `/`, or `>`. For example:
+  * `{{> partial }}` is allowed.
+  * `{{ > partial }}` is not allowed.
 * Feplet allows the passing of data parameters per template.
 
 The syntax for passing data parameters follows the Pattern Lab convention:
