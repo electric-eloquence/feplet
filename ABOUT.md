@@ -37,20 +37,24 @@ Would it make sense to emulate inexperienced programmers (or even experienced
 COBOL programmers) and just program procedurally? Let's just leave that as a 
 rhetorical question.
 
-We've all heard developers evangelize their way of doing things because of a 
+We've all heard programmers evangelize their way of doing things because of a 
 performance gain of literally milliseconds. But when compiling and rendering 
 megabtyes of templates, performance actually matters to people with other things 
 to do. The choice of template engine can yield performance gains (or losses) 
 of minutes per build.
+
+The argument here is that even focused, experience-guided procedural programming 
+is the wrong tool for the job of recursing through nested, branching, fractal 
+structures. Functional programming is the right tool for the job, and the 
+performance difference will be noticeable by humans with work to do.
 
 ### How is this functional programming?
 
 We are primarily concerned with the evaluation of expressions, not the execution 
 of commands. All function expressions receive input and return output. This 
 being the case, we don't concern ourselves with side-effects or state. We 
-transmit data through functions, but we don't mutate or do horrible things to 
-them. Data structures are generally treated as stacks. They are added to, but 
-the older parts are never changed.
+transmit data through functions, but we don't mutate them. Data structures are 
+treated as stacks. They are added to, but the older parts are never changed.
 
 ### Where does the name come from?
 
