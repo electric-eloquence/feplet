@@ -30,8 +30,8 @@
   "homepage": "https://github.com/electric-eloquence/feplet#readme",
   "dependencies": {
     "json-eval": "^1.0.1",
-    "mkdirp": "^0.5.1",
-    "nopt": "^3.0.6"
+    "mkdirp": "0.5.1",
+    "nopt": "3.0.6"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
