@@ -627,7 +627,7 @@ function paramsApplyToParseObj(args) {
       paramsObjNew = paramsObj;
     }
 
-    var _paramsApply = paramsApply({
+    var _paramsApply = paramsApply({ // eslint-disable-line no-use-before-define
       contextKeys: contextKeys,
       paramKeys: paramKeysNew,
       paramsObj: paramsObjNew,
