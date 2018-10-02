@@ -926,7 +926,7 @@ function render() {
   var contextKeys_ = arguments[4];
 
   var context = context_ || this.context || {};
-  var contextKeys = contextKeys_ || this.contextKeys || [];
+  var contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
 
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
@@ -961,7 +961,7 @@ function Feplet(context, partials, partialsComp, contextKeys) {
   this.context = context || {};
   this.partials = partials || {};
   this.partialsComp = partialsComp || {};
-  this.contextKeys = contextKeys || preprocessContextKeys(context);
+  this.contextKeys = contextKeys || preprocessContextKeys(this.context);
 }
 
 // STATIC METHODS.

@@ -943,7 +943,7 @@ function unregisterPartial(name, partials_, partialsComp_) {
 
 function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   const context = context_ || this.context || {};
-  const contextKeys = contextKeys_ || this.contextKeys || [];
+  const contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
 
   let partials = partials_ || this.partials || {};
   let partialsComp = partialsComp_ || this.partialsComp || {};
@@ -979,7 +979,7 @@ function Feplet(context, partials, partialsComp, contextKeys) {
   this.context = context || {};
   this.partials = partials || {};
   this.partialsComp = partialsComp || {};
-  this.contextKeys = contextKeys || preprocessContextKeys(context);
+  this.contextKeys = contextKeys || preprocessContextKeys(this.context);
 }
 
 // STATIC METHODS.
