@@ -252,8 +252,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/06_dotted-array-param-inner-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/06_dotted-array-param-inner-includer.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {},
@@ -273,8 +275,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/06_dotted-array-param-middle-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/06_dotted-array-param-middle-includer.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {},
@@ -294,8 +298,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/06_dotted-array-param-outer-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/06_dotted-array-param-outer-includer.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {},
@@ -411,8 +417,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/02_stylemod-param_multiple-classes.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/02_stylemod-param_multiple-classes.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {
@@ -436,8 +444,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-multiple-classes-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/02~stylemod-multiple-classes-includer.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {
@@ -487,8 +497,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-param_multiple-classes-includer.fpt'), enc);
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/02~stylemod-param_multiple-classes-includer.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -545,8 +557,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/03_include-self-w-condition-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/03_include-self-w-condition-includer.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {
@@ -575,11 +589,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -606,7 +619,9 @@ describe('Feplet', function () {
         });
 
         const templateText = fs.readFileSync(
-          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt'), enc);
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -621,6 +636,7 @@ describe('Feplet', function () {
     );
 
     it(
+      // eslint-disable-next-line max-len
       'should render a more deeply nested parameter variable differently then a non-parameter variable of the same name',
       function () {
         const files = [
@@ -632,11 +648,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -662,11 +677,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -694,11 +708,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -726,11 +739,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -760,11 +772,10 @@ describe('Feplet', function () {
           partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
+          enc
+        );
         const render = Feplet.render(
           templateText,
           {
@@ -796,8 +807,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {
@@ -821,11 +834,10 @@ describe('Feplet', function () {
         partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(path.resolve(__dirname, file), enc);
       });
 
-      const templateText =
-        fs.readFileSync(
-          path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt'),
-          enc
-        );
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt'),
+        enc
+      );
       const render = Feplet.render(
         templateText,
         {
@@ -944,8 +956,10 @@ describe('Feplet', function () {
         feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/02_stylemod-param_multiple-classes.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/02_stylemod-param_multiple-classes.fpt'),
+        enc
+      );
       const render = feplet.render(templateText);
 
       expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
@@ -967,8 +981,10 @@ describe('Feplet', function () {
         feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-multiple-classes-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/02~stylemod-multiple-classes-includer.fpt'),
+        enc
+      );
       const render = feplet.render(templateText);
 
       expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
@@ -1014,8 +1030,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(path.resolve(__dirname, 'templates/02~stylemod-param_multiple-classes-includer.fpt'), enc);
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/02~stylemod-param_multiple-classes-includer.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
@@ -1072,8 +1090,10 @@ describe('Feplet', function () {
         feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/03_include-self-w-condition-includer.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/03_include-self-w-condition-includer.fpt'),
+        enc
+      );
       const render = feplet.render(templateText);
 
       expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
@@ -1096,11 +1116,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('hack heck\n  hick hock\n');
@@ -1125,7 +1144,9 @@ describe('Feplet', function () {
         });
 
         const templateText = fs.readFileSync(
-          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt'), enc);
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
@@ -1133,6 +1154,7 @@ describe('Feplet', function () {
     );
 
     it(
+      // eslint-disable-next-line max-len
       'should render a more deeply nested parameter variable differently then a non-parameter variable of the same name',
       function () {
         const feplet = new Feplet(
@@ -1149,11 +1171,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('hack heck\n  hick hock\n');
@@ -1178,11 +1199,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('hack\n    heck\n');
@@ -1208,11 +1228,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('hack\n    heck\n    hick\n');
@@ -1240,11 +1259,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('  hack\n    heck\n');
@@ -1277,11 +1295,10 @@ describe('Feplet', function () {
           feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
         });
 
-        const templateText =
-          fs.readFileSync(
-            path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
-            enc
-          );
+        const templateText = fs.readFileSync(
+          path.resolve(__dirname, 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
+          enc
+        );
         const render = feplet.render(templateText);
 
         expect(render).to.equal('  hack\n  heck\n    hick\n    hock\n');
@@ -1304,8 +1321,10 @@ describe('Feplet', function () {
         feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
       });
 
-      const templateText =
-        fs.readFileSync(path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param.fpt'), enc);
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param.fpt'),
+        enc
+      );
       const render = feplet.render(templateText);
 
       expect(render).to.equal('  hack\n    heck\n');
@@ -1327,11 +1346,10 @@ describe('Feplet', function () {
         feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(path.resolve(__dirname, file), enc));
       });
 
-      const templateText =
-        fs.readFileSync(
-          path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt'),
-          enc
-        );
+      const templateText = fs.readFileSync(
+        path.resolve(__dirname, 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt'),
+        enc
+      );
       const render = feplet.render(templateText);
 
       expect(render).to.equal('  hack\n    heck\n    hick\n');
