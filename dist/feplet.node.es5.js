@@ -707,7 +707,7 @@ function paramsApply(args) {
 
 // REFERENCES FOR STATIC AND INSTANCE METHODS
 
-function preprocessContextKeys(context) {
+function preProcessContextKeys(context) {
   if (!context) {
     return {};
   }
@@ -730,7 +730,7 @@ function preprocessContextKeys(context) {
   return contextKeys;
 }
 
-function preprocessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_, context) {
+function preProcessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_, context) {
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
   var contextKeys = contextKeys_ || this.contextKeys || [];
@@ -759,7 +759,7 @@ function preprocessPartialParams(text, compilation_, partials_, partialsComp_, c
     }
 
     if (hasParam) {
-      contextKeys = _contextKeys = preprocessContextKeys(context);
+      contextKeys = _contextKeys = preProcessContextKeys(context);
     }
   }
 
@@ -880,7 +880,7 @@ function preprocessPartialParams(text, compilation_, partials_, partialsComp_, c
   };
 }
 
-// Declared after preprocessPartialParams because compile is dependent on it.
+// Declared after preProcessPartialParams because compile is dependent on it.
 function compile(text, options, partials_, partialsComp_, contextKeys_, context) {
   var compilation = hogan.compile(text, options);
   var contextKeys = contextKeys_ || this.contextKeys;
@@ -895,18 +895,18 @@ function compile(text, options, partials_, partialsComp_, contextKeys_, context)
   for (var i = 0, l = partialsArr.length; i < l; i++) {
     var partialText = partialsArr[i];
 
-    var _preprocessPartialPar = preprocessPartialParams(partialText, partialsComp[i], partials, partialsComp, contextKeys, context);
+    var _preProcessPartialPar = preProcessPartialParams(partialText, partialsComp[i], partials, partialsComp, contextKeys, context);
 
-    _contextKeys = _preprocessPartialPar._contextKeys;
+    _contextKeys = _preProcessPartialPar._contextKeys;
   }
 
   if (_contextKeys) {
     contextKeys = _contextKeys;
   }
 
-  var _preprocessPartialPar2 = preprocessPartialParams(text, compilation, partials, partialsComp, contextKeys, context);
+  var _preProcessPartialPar2 = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context);
 
-  compilation = _preprocessPartialPar2.compilation;
+  compilation = _preProcessPartialPar2.compilation;
 
 
   return compilation;
@@ -988,7 +988,7 @@ function Feplet(context, partials, partialsComp, contextKeys) {
   this.context = context || {};
   this.partials = partials || {};
   this.partialsComp = partialsComp || {};
-  this.contextKeys = contextKeys || preprocessContextKeys(this.context);
+  this.contextKeys = contextKeys || preProcessContextKeys(this.context);
 }
 
 // STATIC METHODS.
@@ -997,9 +997,9 @@ Object.assign(Feplet, hogan); // hogan is not a class so the constructor does no
 
 Feplet.compile = compile;
 
-Feplet.preprocessContextKeys = preprocessContextKeys;
+Feplet.preProcessContextKeys = preProcessContextKeys;
 
-Feplet.preprocessPartialParams = preprocessPartialParams;
+Feplet.preProcessPartialParams = preProcessPartialParams;
 
 Feplet.registerPartial = registerPartial;
 
@@ -1011,7 +1011,7 @@ Feplet.unregisterPartial = unregisterPartial;
 
 Feplet.prototype.compile = compile;
 
-Feplet.prototype.preprocessPartialParams = preprocessPartialParams;
+Feplet.prototype.preProcessPartialParams = preProcessPartialParams;
 
 Feplet.prototype.registerPartial = registerPartial;
 
