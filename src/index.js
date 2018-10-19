@@ -734,16 +734,58 @@ function paramsApply(args) {
 
 // REFERENCES FOR STATIC AND INSTANCE METHODS
 
-function preprocessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_) {
+function preprocessContextKeys(context) {
+  if (!context) {
+    return {};
+  }
+
+  const dataKeysShallowItr = Object.keys(context)[Symbol.iterator]();
+  const dataKeysShallowItrn = dataKeysShallowItr.next();
+  const {dataKeys} = dataObjToDataKeysObj({
+    dataKeys_: {},
+    dataKeysShallowItr,
+    dataKeysShallowItrn,
+    dataObj: context,
+    parentObjAsStr: '',
+  });
+
+  const {contextKeys} = contextKeysPreprocess({contextKeys: dataKeys});
+
+  return contextKeys;
+}
+
+function preprocessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_, context) {
   const partials = partials_ || this.partials || {};
   const partialsComp = partialsComp_ || this.partialsComp || {};
-  const contextKeys = contextKeys_ || this.contextKeys || [];
+  let contextKeys = contextKeys_ || this.contextKeys || [];
+  let _contextKeys;
 
-  let paramsMatch;
+  let hasParam = false;
   let styleModClasses;
   let styleModifierMatch;
 
   const compilation = compilation_ || hogan.compile(text);
+
+  // First, check if we still need to preprocess contextKeys because .render() was called statically.
+  if (contextKeys.length === 0) {
+    for (let i in compilation.partials) {
+
+      if (!compilation.partials.hasOwnProperty(i)) {
+        continue;
+      }
+
+      const partialFull = compilation.partials[i].name;
+      hasParam = paramRegex.test(partialFull) || partialFull.indexOf(':') > -1;
+
+      if (hasParam) {
+        break;
+      }
+    }
+
+    if (hasParam) {
+      contextKeys = _contextKeys = preprocessContextKeys(context);
+    }
+  }
 
   for (let i in compilation.partials) {
     if (!compilation.partials.hasOwnProperty(i)) {
@@ -756,7 +798,7 @@ function preprocessPartialParams(text, compilation_, partials_, partialsComp_, c
       continue;
     }
 
-    paramsMatch = partialFull.match(paramRegex);
+    const paramsMatch = partialFull.match(paramRegex);
 
     let paramsObj;
     let partialShort = partialFull;
@@ -856,15 +898,17 @@ function preprocessPartialParams(text, compilation_, partials_, partialsComp_, c
 
   return {
     compilation,
+    _contextKeys,
     partials,
     partialsComp
   };
 }
 
-function compile(text, options, partials_, partialsComp_, contextKeys_) {
-  const contextKeys = contextKeys_ || this.contextKeys;
-  const compilation = hogan.compile(text, options);
-
+// Declared after preprocessPartialParams because compile is dependent on it.
+function compile(text, options, partials_, partialsComp_, contextKeys_, context) {
+  let compilation = hogan.compile(text, options);
+  let contextKeys = contextKeys_ || this.contextKeys;
+  let _contextKeys;
   let partials = partials_ || this.partials || {};
   let partialsComp = partialsComp_ || this.partialsComp || {};
 
@@ -876,36 +920,19 @@ function compile(text, options, partials_, partialsComp_, contextKeys_) {
     const partialText = partialsArr[i];
 
     ({
-      partials
-    } = preprocessPartialParams(partialText, partialsComp[i], partials, partialsComp, contextKeys));
+      _contextKeys
+    } = preprocessPartialParams(partialText, partialsComp[i], partials, partialsComp, contextKeys, context));
+  }
+
+  if (_contextKeys) {
+    contextKeys = _contextKeys;
   }
 
   ({
-    partials,
-    partialsComp
-  } = preprocessPartialParams(text, compilation, partials, partialsComp, contextKeys));
+    compilation
+  } = preprocessPartialParams(text, compilation, partials, partialsComp, contextKeys, context));
 
   return compilation;
-}
-
-function preprocessContextKeys(context) {
-  if (!context) {
-    return {};
-  }
-
-  const dataKeysShallowItr = Object.keys(context)[Symbol.iterator]();
-  const dataKeysShallowItrn = dataKeysShallowItr.next();
-  const {dataKeys} = dataObjToDataKeysObj({
-    dataKeys_: {},
-    dataKeysShallowItr,
-    dataKeysShallowItrn,
-    dataObj: context,
-    parentObjAsStr: '',
-  });
-
-  const {contextKeys} = contextKeysPreprocess({contextKeys: dataKeys});
-
-  return contextKeys;
 }
 
 function registerPartial(name, partialTemplate, partialComp_, partials_, partialsComp_) {
@@ -928,6 +955,38 @@ function registerPartial(name, partialTemplate, partialComp_, partials_, partial
   };
 }
 
+function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
+  const context = context_ || this.context || {};
+  const contextKeys = contextKeys_ || this.contextKeys || [];
+
+  let partials = partials_ || this.partials || {};
+  let partialsComp = partialsComp_ || this.partialsComp || {};
+
+  for (let i in partials) {
+    if (!partials.hasOwnProperty(i)) {
+      continue;
+    }
+
+    if (!partialsComp[i]) {
+      ({
+        partials,
+        partialsComp
+      } = registerPartial(i, partials[i], null, partials, partialsComp));
+    }
+  }
+
+  let compilation;
+
+  if (Object.keys(partialsComp).length) {
+    compilation = compile(text, null, partials, partialsComp, contextKeys, context);
+  }
+  else {
+    compilation = hogan.compile(text);
+  }
+
+  return compilation.render(context, partials, null, partialsComp);
+}
+
 function unregisterPartial(name, partials_, partialsComp_) {
   const partials = partials_ || this.partials || {};
   const partialsComp = partialsComp_ || this.partialsComp || {};
@@ -939,50 +998,6 @@ function unregisterPartial(name, partials_, partialsComp_) {
     partials,
     partialsComp
   };
-}
-
-function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
-  const context = context_ || this.context || {};
-
-  let contextKeys;
-  let hasPartial = false;
-  let partials = partials_ || this.partials || {};
-  let partialsComp = partialsComp_ || this.partialsComp || {};
-
-  for (let i in partials) {
-    if (!partials.hasOwnProperty(i)) {
-      continue;
-    }
-
-    if (!hasPartial) {
-      hasPartial = true;
-    }
-
-    if (!partialsComp[i]) {
-      ({
-        partials,
-        partialsComp
-      } = registerPartial(i, partials[i], null, partials, partialsComp));
-    }
-  }
-
-  if (hasPartial) {
-    contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
-  }
-  else {
-    contextKeys = contextKeys_ || this.contextKeys || [];
-  }
-
-  let compilation;
-
-  if (Object.keys(partialsComp).length) {
-    compilation = compile(text, null, partials, partialsComp, contextKeys);
-  }
-  else {
-    compilation = hogan.compile(text);
-  }
-
-  return compilation.render(context, partials, null, partialsComp);
 }
 
 // PREPARE FOR EXPORT.
@@ -1006,9 +1021,9 @@ Feplet.preprocessPartialParams = preprocessPartialParams;
 
 Feplet.registerPartial = registerPartial;
 
-Feplet.unregisterPartial = unregisterPartial;
-
 Feplet.render = render;
+
+Feplet.unregisterPartial = unregisterPartial;
 
 // INSTANCE METHODS.
 
@@ -1018,9 +1033,9 @@ Feplet.prototype.preprocessPartialParams = preprocessPartialParams;
 
 Feplet.prototype.registerPartial = registerPartial;
 
-Feplet.prototype.unregisterPartial = unregisterPartial;
-
 Feplet.prototype.render = render;
+
+Feplet.prototype.unregisterPartial = unregisterPartial;
 
 if (typeof define === 'function') {
   define(function () {
