@@ -926,8 +926,9 @@ function render() {
   var contextKeys_ = arguments[4];
 
   var context = context_ || this.context || {};
-  var contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
 
+  var contextKeys = void 0;
+  var hasPartial = false;
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
 
@@ -936,12 +937,22 @@ function render() {
       continue;
     }
 
+    if (!hasPartial) {
+      hasPartial = true;
+    }
+
     if (!partialsComp[i]) {
       var _registerPartial = registerPartial(i, partials[i], null, partials, partialsComp);
 
       partials = _registerPartial.partials;
       partialsComp = _registerPartial.partialsComp;
     }
+  }
+
+  if (hasPartial) {
+    contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
+  } else {
+    contextKeys = contextKeys_ || this.contextKeys || [];
   }
 
   var compilation = void 0;

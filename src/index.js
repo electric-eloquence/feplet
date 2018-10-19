@@ -943,8 +943,9 @@ function unregisterPartial(name, partials_, partialsComp_) {
 
 function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   const context = context_ || this.context || {};
-  const contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
 
+  let contextKeys;
+  let hasPartial = false;
   let partials = partials_ || this.partials || {};
   let partialsComp = partialsComp_ || this.partialsComp || {};
 
@@ -953,12 +954,23 @@ function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
       continue;
     }
 
+    if (!hasPartial) {
+      hasPartial = true;
+    }
+
     if (!partialsComp[i]) {
       ({
         partials,
         partialsComp
       } = registerPartial(i, partials[i], null, partials, partialsComp));
     }
+  }
+
+  if (hasPartial) {
+    contextKeys = contextKeys_ || this.contextKeys || preprocessContextKeys(context);
+  }
+  else {
+    contextKeys = contextKeys_ || this.contextKeys || [];
   }
 
   let compilation;
