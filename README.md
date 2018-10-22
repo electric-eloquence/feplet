@@ -77,12 +77,13 @@ const output2 = Feplet.render(
   partials
 ); // Yellow World
 
-// Feplet.render() does not require the `partials` argument. You can just submit 
+// Feplet.render() does not require the `partials` argument. You can just submit
 // Feplet.render(templateText, context) if you have no partials to render.
 
-// Better yet, instantiate the Feplet class to cache the context data if you
-// need to use them more than once. Then, register partials so they get
-// preprocessed with the context data cached within the feplet object.
+// If you do have partials, you might want to instantiate the Feplet class to
+// cache the context data if you need to use them more than once. Then, register
+// partials so they get preprocessed with the context data cached within the
+// feplet object. Then, render accordingly:
 const feplet = new Feplet(context);
 feplet.registerPartial('partial_template', partialText);
 const output3 = feplet.render(includer); // Yellow World
