@@ -6,11 +6,16 @@
   "scripts": {
     "bundle": "babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
     "lint": "eslint run && eslint src && eslint test",
-    "prepush": "npm run lint && npm test",
     "serve": "http-server",
     "start": "npm run watch & npm run serve",
     "test": "mocha test/tests.js",
     "watch": "nodemon --watch src -e js --exec 'npm run bundle'"
+  },
+  "husky": {
+    "hooks": {
+      "post-commit": "npm run bundle",
+      "pre-push": "npm run lint && npm test"
+    }
   },
   "repository": {
     "type": "git",
@@ -40,7 +45,7 @@
     "chai": "4.x",
     "eslint": "3.x",
     "http-server": "^0.11.1",
-    "husky": "^0.14.3",
+    "husky": "^1.2.0",
     "mocha": "5.x",
     "nodemon": "^1.14.12",
     "uglify-es": "3.3.9"
