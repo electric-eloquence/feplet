@@ -4,13 +4,13 @@
   "description": "A Mustache-compatible templating engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
-    "bundle": "npx babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
-    "devel": "npm run watch & npm run serve",
-    "lint": "npx eslint run && npx eslint src && npx eslint test",
+    "bundle": "babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
+    "lint": "eslint run && eslint src && eslint test",
     "prepush": "npm run lint && npm test",
-    "serve": "npx http-server .",
-    "test": "npx mocha test/tests.js",
-    "watch": "npx nodemon --watch src -e js --exec 'npm run bundle'"
+    "serve": "http-server",
+    "start": "npm run watch & npm run serve",
+    "test": "mocha test/tests.js",
+    "watch": "nodemon --watch src -e js --exec 'npm run bundle'"
   },
   "repository": {
     "type": "git",
