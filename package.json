@@ -1,6 +1,6 @@
 {
   "name": "feplet",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "A Mustache-compatible templating engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/electric-eloquence/feplet#readme",
   "dependencies": {
-    "json-eval": "^1.0.4",
+    "json-eval": "^1.0.5",
     "mkdirp": "0.5.1",
     "nopt": "3.0.6"
   },
