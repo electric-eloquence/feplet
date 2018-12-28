@@ -21,7 +21,7 @@ The syntax for passing data parameters follows the Pattern Lab convention:
 
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
 Any valid <a href="http://json5.org" target="_blank">JSON5</a> string (minus the 
-wrapping curly braces) can be passed. Be sure that consecutive JSON5 curly 
+outermost curly braces) can be passed. Be sure that consecutive JSON5 curly 
 braces are separated with space to avoid being parsed as a stash `}}`. Similarly, 
 space curly braces if they need to be submitted literally as parameter values 
 (to be printed as JavaScript or CSS code), or else, encode them as HTML entities 
