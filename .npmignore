@@ -1,4 +1,3 @@
-.babelrc
-.eslintrc.json
-/run/
+.*
+run/
 test/
