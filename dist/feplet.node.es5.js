@@ -46,7 +46,7 @@ function getDotDelimitedProp(args) {
   if (obj.hasOwnProperty(prop0)) {
     var _value = obj[prop0];
 
-    if (_value && _value instanceof Object && prop.length) {
+    if ((typeof _value === 'undefined' ? 'undefined' : _typeof(_value)) === 'object' && _value instanceof Object && prop.length) {
       value = getDotDelimitedProp({
         obj: _value,
         prop_: prop
