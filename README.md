@@ -143,5 +143,7 @@ Also for browsers (ES6):
 [coveralls-image]: https://img.shields.io/coveralls/electric-eloquence/feplet/master.svg
 [coveralls-url]: https://coveralls.io/r/electric-eloquence/feplet
 
+[version-image]: https://img.shields.io/node/v/feplet.svg
+
 [license-image]: https://img.shields.io/github/license/electric-eloquence/feplet.svg
 [license-url]: https://raw.githubusercontent.com/electric-eloquence/feplet/master/LICENSE
