@@ -4,6 +4,7 @@
 [![Mac/Linux Build Status][travis-image]][travis-url]
 [![Windows Build Status][appveyor-image]][appveyor-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
+![Node Version][version-image]
 [![License][license-image]][license-url]
 
 ## Powerful under the hood. Simple behind the wheel.
