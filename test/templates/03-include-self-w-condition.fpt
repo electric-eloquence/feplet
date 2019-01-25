@@ -1,8 +1,0 @@
-{{> templates/00_nested-includer }}
-{{> templates/00-base(title: 'foo') }}
-{{# foo }}
-  {{> templates/03-include-self-w-condition(bar: true) }}
-{{/ foo }}
-{{# bar }}
-  {{> templates/00-base(title: 'bar') }}
-{{/ bar }}

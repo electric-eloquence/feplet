@@ -1,0 +1,1 @@
+{{> 05-dotted-param_nested-in-non-param(biz: { boz: { buz: 'heck' } }) }}

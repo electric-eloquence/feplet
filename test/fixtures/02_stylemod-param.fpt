@@ -1,0 +1,1 @@
+{{> 02-stylemod-atom:test_2(message: '1') }}

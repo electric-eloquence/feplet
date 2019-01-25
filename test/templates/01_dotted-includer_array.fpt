@@ -1,1 +1,0 @@
-{{> templates/01-dotted_array(dot: [{ title: 'foo', message: 'bar' }]) }}

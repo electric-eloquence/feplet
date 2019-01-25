@@ -1,0 +1,19 @@
+{{> 06-dotted-array-param-outer(
+  baz: [
+    {
+      bez: {
+        biz: 'hack'
+      }
+    },
+    {
+      bez: {
+        biz: 'heck'
+      }
+    },
+    {
+      bez: {
+        biz: 'hick'
+      }
+    }
+  ]
+) }}

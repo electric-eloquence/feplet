@@ -1,0 +1,16 @@
+{{> 04-nested-param-same-name-as-non-param_dotted-inner(
+  baz: {
+    bez: [
+      {
+        biz: {
+          boz: 'heck'
+        }
+      },
+      {
+        biz: {
+          boz: 'hick'
+        }
+      }
+    ]
+  }
+) }}

@@ -1,5 +1,11 @@
 # Feplet: a Mustache-compatible template engine.
 
+[![Known Vulnerabilities][snyk-image]][snyk-url]
+[![Mac/Linux Build Status][travis-image]][travis-url]
+[![Windows Build Status][appveyor-image]][appveyor-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
+[![License][license-image]][license-url]
+
 ## Powerful under the hood. Simple behind the wheel.
 
 ### How is this different from <a href="https://mustache.github.io/mustache.5.html" target="_blank">Mustache</a> (and <a href="https://github.com/twitter/hogan.js#readme" target="_blank">Hogan.js</a>)?
@@ -124,3 +130,18 @@ Also for browsers (ES6):
 ```
 
 <h4><a href="https://github.com/electric-eloquence/feplet/blob/master/ABOUT.md">More &raquo;</a></h4>
+
+[snyk-image]: https://snyk.io/test/github/electric-eloquence/feplet/master/badge.svg
+[snyk-url]: https://snyk.io/test/github/electric-eloquence/feplet/master
+
+[travis-image]: https://img.shields.io/travis/electric-eloquence/feplet.svg?label=mac%20%26%20linux
+[travis-url]: https://travis-ci.org/electric-eloquence/feplet
+
+[appveyor-image]: https://img.shields.io/appveyor/ci/e2tha-e/feplet.svg?label=windows
+[appveyor-url]: https://ci.appveyor.com/project/e2tha-e/feplet
+
+[coveralls-image]: https://img.shields.io/coveralls/electric-eloquence/feplet/master.svg
+[coveralls-url]: https://coveralls.io/r/electric-eloquence/feplet
+
+[license-image]: https://img.shields.io/github/license/electric-eloquence/feplet.svg
+[license-url]: https://raw.githubusercontent.com/electric-eloquence/feplet/master/LICENSE

@@ -13,6 +13,7 @@ function contextKeysPreprocess(args) {
   } = args;
 
   for (let contextKey in contextKeys) {
+    /* istanbul ignore if */
     if (!contextKeys.hasOwnProperty(contextKey) || !contextKeys[contextKey]) {
       continue;
     }
@@ -433,6 +434,7 @@ function styleModifierExtract(args) {
   if (styleModifierMatch && styleModifierMatch[1]) {
     styleModClasses = styleModifierMatch[1].replace(/\|/g, ' ').trim();
 
+    /* istanbul ignore if */
     if (!styleModClasses) {
       styleModifierMatch = null;
     }
@@ -735,6 +737,7 @@ function paramsApply(args) {
 // REFERENCES FOR STATIC AND INSTANCE METHODS
 
 function preProcessContextKeys(context) {
+  /* istanbul ignore if */
   if (!context) {
     return {};
   }
@@ -769,7 +772,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
   // First, check if we still need to preprocess contextKeys because .render() was called statically.
   if (contextKeys.length === 0) {
     for (let i in compilation.partials) {
-
+      /* istanbul ignore if */
       if (!compilation.partials.hasOwnProperty(i)) {
         continue;
       }
@@ -788,6 +791,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
   }
 
   for (let i in compilation.partials) {
+    /* istanbul ignore if */
     if (!compilation.partials.hasOwnProperty(i)) {
       continue;
     }
@@ -818,11 +822,13 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
           paramsObj = jsonEval(`{${paramsStr.slice(1, -1).trim()}}`);
         }
         catch (err) {
+          /* istanbul ignore next */
           console.error(err); // eslint-disable-line no-console
-
+          /* istanbul ignore next */
           continue;
         }
 
+        /* istanbul ignore if */
         if (!paramsObj || paramsObj.constructor !== Object) {
           continue;
         }
@@ -839,6 +845,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
       partialShort = partialShort.replace(styleModifierMatch[0], '');
     }
 
+    /* istanbul ignore if */
     if (partialShort === partialFull) {
       continue;
     }
@@ -891,6 +898,8 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
       partialsComp[partialFull] = hogan.compile(partials[partialFull]);
     }
     else {
+      // Do not have nyc/istanbul ignore this.
+      // Stay open to the possibility of testing this.
       partials[partialFull] = partialText;
       partialsComp[partialFull] = hogan.generate(partialParseArr, partialText, {});
     }
@@ -963,6 +972,7 @@ function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   let partialsComp = partialsComp_ || this.partialsComp || {};
 
   for (let i in partials) {
+    /* istanbul ignore if */
     if (!partials.hasOwnProperty(i)) {
       continue;
     }
@@ -1042,6 +1052,7 @@ if (typeof define === 'function') {
     return Feplet;
   });
 }
+/* istanbul ignore next */
 else if (typeof window === 'object') {
   window.Feplet = Feplet;
 }

@@ -5,10 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "bundle": "babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint run && eslint src && eslint test",
     "serve": "http-server",
     "start": "npm run watch & npm run serve",
-    "test": "mocha test/tests.js",
+    "test": "nyc --exclude lib --exclude test mocha test/*.js",
     "watch": "nodemon --watch src -e js --exec 'npm run bundle'"
   },
   "husky": {
@@ -43,11 +44,13 @@
     "babel-preset-env": "^1.6.1",
     "browserify": "^14.4.0",
     "chai": "4.x",
+    "coveralls": "^3.0.2",
     "eslint": "3.x",
     "http-server": "^0.11.1",
     "husky": "^1.3.1",
     "mocha": "5.x",
     "nodemon": "^1.14.12",
+    "nyc": "^13.1.0",
     "uglify-es": "3.3.9"
   },
   "bin": {

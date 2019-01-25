@@ -1,1 +1,0 @@
-{{> templates/04-nested-param-same-name-as-non-param_deep(baz: { bez: { biz: 'hick', boz: 'hock' } }) }}

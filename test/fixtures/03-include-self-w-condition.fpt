@@ -1,0 +1,8 @@
+{{> 00_nested-includer }}
+{{> 00-base(title: 'foo') }}
+{{# foo }}
+  {{> 03-include-self-w-condition(bar: true) }}
+{{/ foo }}
+{{# bar }}
+  {{> 00-base(title: 'bar') }}
+{{/ bar }}

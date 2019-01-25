@@ -1,6 +1,0 @@
-{{#baz}}
-  {{bez}}
-  {{#biz.boz}}
-    {{buz}}
-  {{/biz.boz}}
-{{/baz}}
