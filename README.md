@@ -22,7 +22,7 @@ mostly compatible with Mustache. These are the main differences:
 The syntax for passing data parameters follows the Pattern Lab convention:
 
 ```handlebars
-{{> partial_template(place: 'World') }}
+{{> partial_tpl(place: 'World') }}
 ```
 
 Feplet accepts data parameters far more complex than what Pattern Lab documents. 
@@ -34,12 +34,11 @@ space curly braces if they need to be submitted literally as parameter values
 (`&lcub;` or `&rcub;`).
 
 ```handlebars
-{{> partial_template(nest: { egg: { yolk: 'Yellow' } }) }}
+{{> partial_tpl(nest: { egg: { yolk: 'Yellow' } }) }}
 ```
 
 One thing to note is that the data passed in this example will apply only to the 
-partial named "partial\_template", and not to any partials nested further 
-within.
+partial named "partial\_tpl", and not to any partials nested further within.
 
 ### Use
 
@@ -72,26 +71,27 @@ const generation = Feplet.generate(parsed, text, options);
 const output1 = generation.render(context); // Hello World
 
 // This is a Feplet implementation:
-const partialText = '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}';
+const partialTxt = '{{#nest}}{{#egg}}{{yolk}} {{place}}{{/egg}}{{/nest}}';
 const partials = {
-  partial_template: partialText
+  partial_tpl: partialTxt
 };
-const includer = '{{> partial_template(nest: { egg: { yolk: "Yellow" } }) }}';
+const includer = '{{> partial_tpl(nest: { egg: { yolk: "Yellow" } }) }}';
 const output2 = Feplet.render(
   includer,
   context,
   partials
 ); // Yellow World
 
-// Feplet.render() does not require the `partials` argument. You can just submit
-// Feplet.render(templateText, context) if you have no partials to render.
+// Feplet.render() does not require the `partials` argument. You can just
+// submit Feplet.render(templateText, context) if you have no partials to
+// render.
 
-// If you do have partials, you might want to instantiate the Feplet class to
-// cache the context data if you need to use them more than once. Then, register
-// partials so they get preprocessed with the context data cached within the
-// feplet object. Then, render accordingly:
+// If you do have partials, you might want to instantiate the Feplet class
+// to cache the context data if you need to use them more than once. Then,
+// register partials so they get preprocessed with the context data cached
+// within the feplet object. Then, render accordingly:
 const feplet = new Feplet(context);
-feplet.registerPartial('partial_template', partialText);
+feplet.registerPartial('partial_tpl', partialTxt);
 const output3 = feplet.render(includer); // Yellow World
 ```
 
