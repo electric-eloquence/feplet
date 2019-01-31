@@ -1,7 +1,7 @@
 {
   "name": "feplet",
   "version": "0.2.3",
-  "description": "A Mustache-compatible templating engine. Powerful under the hood. Simple behind the wheel.",
+  "description": "A Mustache-compatible template engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
     "bundle": "babel src -o dist/feplet.node.es5.js && node run/bundle-client.js",
