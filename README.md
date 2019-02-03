@@ -44,7 +44,7 @@ partial named "partial\_tpl", and not to any partials nested further within.
 
 CLI:
 
-```bash
+```shell
 npm install feplet
 ```
 
