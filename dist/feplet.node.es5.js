@@ -416,6 +416,7 @@ function dataObjToDataKeysObj(args) {
 function styleModifierExtract(args) {
   var partialName = args.partialName;
 
+  // eslint-disable-next-line no-useless-escape
 
   var styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
   var styleModClasses = '';
@@ -456,8 +457,8 @@ function tagReplace(args) {
     case '^':
     case '_v':
     case '{':
-      // eslint-disable-line no-case-declarations
 
+      /* eslint-disable no-case-declarations */
       var openStartStop = openStartStopGet({ parseObj: parseObj, partialText_: partialText_ });
       var openStart = openStartStop.openStart;
 
@@ -466,6 +467,7 @@ function tagReplace(args) {
       partialText += openTagBuild({ openStartStop: openStartStop, parseObj: parseObj, partialText_: partialText_ }).partialText;
 
       var closeStartStop = void 0;
+      /* eslint-enable no-case-declarations */
 
       switch (parseObj.tag) {
         case '#':

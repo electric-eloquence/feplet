@@ -428,6 +428,7 @@ function styleModifierExtract(args) {
     partialName
   } = args;
 
+  // eslint-disable-next-line no-useless-escape
   let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
   let styleModClasses = '';
 
@@ -467,8 +468,9 @@ function tagReplace(args) {
     case '<':
     case '^':
     case '_v':
-    case '{': // eslint-disable-line no-case-declarations
+    case '{':
 
+      /* eslint-disable no-case-declarations */
       let openStartStop = openStartStopGet({parseObj, partialText_});
       let {
         openStart,
@@ -483,6 +485,7 @@ function tagReplace(args) {
       partialText += openTagBuild({openStartStop, parseObj, partialText_}).partialText;
 
       let closeStartStop;
+      /* eslint-enable no-case-declarations */
 
       switch (parseObj.tag) {
         case '#':

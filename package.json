@@ -45,7 +45,7 @@
     "browserify": "^16.2.3",
     "chai": "4.x",
     "coveralls": "3.x",
-    "eslint": "3.x",
+    "eslint": "5.x",
     "http-server": "^0.11.1",
     "husky": "1.x",
     "mocha": "6.x",
