@@ -83,7 +83,7 @@ const output2 = Feplet.render(
 ); // Yellow World
 
 // Feplet.render() does not require the `partials` argument. You can just
-// submit Feplet.render(templateText, context) if you have no partials to
+// submit Feplet.render(templateTxt, context) if you have no partials to
 // render.
 
 // If you do have partials, you might want to instantiate the Feplet class
