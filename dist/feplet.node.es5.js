@@ -1,3 +1,7 @@
+// The \u0002 and \u0003 unicodes could be replaced with variables, but it is more clear what they are and what their
+// intent is if left as unicode. They are respectively Start of Text and End of Text characters. Their purpose is to be
+// temporary alternate tag delimiters.
+
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
