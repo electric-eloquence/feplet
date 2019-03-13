@@ -862,7 +862,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
     const paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
     const paramKeysShallowItrn = paramKeysShallowItr.next();
     const {dataKeys} = dataObjToDataKeysObj({
-      dataKeys_: [],
+      dataKeys_: {},
       dataKeysShallowItr: paramKeysShallowItr,
       dataKeysShallowItrn: paramKeysShallowItrn,
       dataObj: paramsObj,

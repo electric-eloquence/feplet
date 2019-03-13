@@ -837,7 +837,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
     var paramKeysShallowItrn = paramKeysShallowItr.next();
 
     var _dataObjToDataKeysObj6 = dataObjToDataKeysObj({
-      dataKeys_: [],
+      dataKeys_: {},
       dataKeysShallowItr: paramKeysShallowItr,
       dataKeysShallowItrn: paramKeysShallowItrn,
       dataObj: paramsObj,
