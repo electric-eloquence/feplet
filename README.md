@@ -19,13 +19,10 @@ mostly compatible with Mustache. These are the main differences:
   * `{{ > partial }}` is not allowed.
 * Feplet allows the passing of data parameters per template.
 
-The syntax for passing data parameters follows the Pattern Lab convention:
-
 ```handlebars
 {{> partial_tpl(place: 'World') }}
 ```
 
-Feplet accepts data parameters far more complex than what Pattern Lab documents. 
 Any valid <a href="http://json5.org" target="_blank">JSON5</a> string (minus the 
 outermost curly braces) can be passed. Be sure that consecutive JSON5 curly 
 braces are separated with space to avoid being parsed as a stash `}}`. Similarly, 
