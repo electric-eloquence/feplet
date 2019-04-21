@@ -50,7 +50,7 @@
     "husky": "1.x",
     "mocha": "6.x",
     "nodemon": "^1.18.10",
-    "nyc": "13.x",
+    "nyc": "14.x",
     "uglify-es": "3.3.9"
   },
   "bin": {
