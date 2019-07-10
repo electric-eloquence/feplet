@@ -1,4 +1,5 @@
 .*
 appveyor.yml
+lib/hogan.js/test/
 run/
 test/
