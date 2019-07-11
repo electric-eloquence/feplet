@@ -45,7 +45,7 @@ http.createServer((req, res) => {
     }
     else {
       res.writeHead(200, {'Content-Type': contentType});
-      res.end(data, 'utf8');
+      res.end(data);
     }
   });
 }).listen(port, () => {
