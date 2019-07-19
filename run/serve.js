@@ -48,7 +48,8 @@ http.createServer((req, res) => {
       res.end(data);
     }
   });
-}).listen(port, () => {
+})
+.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`Listening on port ${port}`);
 });
