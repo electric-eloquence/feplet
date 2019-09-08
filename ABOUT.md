@@ -3,7 +3,7 @@
 ### Why another Mustache-compatible template engine?
 
 This project arose from the needs of 
-<a href="http://fepper.io" target="blank">Fepper</a> and its implementation of 
+<a href="https://fepper.io" target="blank">Fepper</a> and its implementation of 
 Pattern Lab. Fepper requires the simplicity of Mustache's tag-to-data matching 
 scheme, and the flexibility that comes with that simplicity. Fepper also 
 requires raw brute processing speed for the purpose of compiling and rendering 
