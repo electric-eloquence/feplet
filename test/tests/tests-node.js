@@ -434,8 +434,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
       });
 
-      it('recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier\
-', function () {
+      it('recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
         const files = [
           '02-stylemod-atom.fpt',
           '02_stylemod-multiple-classes.fpt'
@@ -577,8 +576,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
       });
 
-      it('renders a nested parameter variable differently than a non-parameter variable of the same name\
-', function () {
+      it('renders a nested parameter variable differently than a non-parameter variable of the same name', function () {
         const files = [
           '04-nested-param-same-name-as-non-param.fpt'
         ];
@@ -604,8 +602,8 @@ module.exports = function (Feplet) {
         expect(render).to.equal('hack heck\n  hick hock\n');
       });
 
-      it('renders an array of nested parameter variables differently from non-parameter variables of the same \
-name', function () {
+      it('renders an array of nested parameter variables differently from non-parameter variables of the same name\
+', function () {
         const files = [
           '04-nested-param-same-name-as-non-param.fpt'
         ];
@@ -631,8 +629,8 @@ name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
       });
 
-      it('renders a more deeply nested parameter variable differently then a non-parameter variable of the same \
-name', function () {
+      it('renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
+', function () {
         const files = [
           '04-nested-param-same-name-as-non-param_deep.fpt'
         ];
@@ -658,8 +656,8 @@ name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n');
       });
 
-      it('renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same \
-name', function () {
+      it('renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
+', function () {
         const files = [
           '04-nested-param-same-name-as-non-param_dotted-inner.fpt'
         ];
@@ -686,8 +684,8 @@ name', function () {
         expect(render).to.equal('hack\n    heck\n');
       });
 
-      it('renders a deeply nested array of dot.notation parameters differently than non-parameter variables of \
-the same name', function () {
+      it('renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
+same name', function () {
         const files = [
           '04-nested-param-same-name-as-non-param_dotted-inner.fpt'
         ];
@@ -714,8 +712,8 @@ the same name', function () {
         expect(render).to.equal('hack\n    heck\n    hick\n');
       });
 
-      it('renders a moderately nested dot.notation parameter differently than a non-parameter variable of the \
-same name', function () {
+      it('renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same name\
+', function () {
         const files = [
           '04-nested-param-same-name-as-non-param_dotted-middle.fpt'
         ];
@@ -744,8 +742,8 @@ same name', function () {
         expect(render).to.equal('  hack\n    heck\n');
       });
 
-      it('renders a moderately nested array of dot.notation parameters differently than non-parameter variables \
-of the same name', function () {
+      it('renders a moderately nested array of dot.notation parameters differently than non-parameter variables of the \
+same name', function () {
         const files = [
           '04-nested-param-same-name-as-non-param_dotted-middle.fpt'
         ];
@@ -945,8 +943,7 @@ of the same name', function () {
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
       });
 
-      it('recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier\
-', function () {
+      it('recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
         const feplet = new Feplet(
           {
             message: 'MESSAGE',
@@ -1078,8 +1075,7 @@ of the same name', function () {
         expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
       });
 
-      it('renders a nested parameter variable differently than a non-parameter variable of the same name\
-', function () {
+      it('renders a nested parameter variable differently than a non-parameter variable of the same name', function () {
         const feplet = new Feplet(
           {
             bez: 'hack',
@@ -1103,8 +1099,8 @@ of the same name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n');
       });
 
-      it('renders an array of nested parameter variables differently from non-parameter variables of the same \
-name', function () {
+      it('renders an array of nested parameter variables differently from non-parameter variables of the same name\
+', function () {
         const feplet = new Feplet(
           {
             bez: 'hack',
@@ -1128,8 +1124,8 @@ name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
       });
 
-      it('renders a more deeply nested parameter variable differently then a non-parameter variable of the same \
-name', function () {
+      it('renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
+', function () {
         const feplet = new Feplet(
           {
             biz: 'hack',
@@ -1153,8 +1149,8 @@ name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n');
       });
 
-      it('renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same \
-name', function () {
+      it('renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
+', function () {
         const feplet = new Feplet(
           {
             biz: {
@@ -1179,8 +1175,8 @@ name', function () {
         expect(render).to.equal('hack\n    heck\n');
       });
 
-      it('renders a deeply nested array of dot.notation parameters differently than non-parameter variables of \
-the same name', function () {
+      it('renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
+same name', function () {
         const feplet = new Feplet(
           {
             biz: {
@@ -1205,8 +1201,8 @@ the same name', function () {
         expect(render).to.equal('hack\n    heck\n    hick\n');
       });
 
-      it('renders a moderately nested dot.notation parameter differently than a non-parameter variable of the \
-same name', function () {
+      it('renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same name\
+', function () {
         const feplet = new Feplet(
           {
             bez: {
@@ -1233,8 +1229,8 @@ same name', function () {
         expect(render).to.equal('  hack\n    heck\n');
       });
 
-      it('renders a moderately nested array of dot.notation parameters differently than non-parameter variables \
-of the same name', function () {
+      it('renders a moderately nested array of dot.notation parameters differently than non-parameter variables of the \
+same name', function () {
         const feplet = new Feplet(
           {
             bez: {
