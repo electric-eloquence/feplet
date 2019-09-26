@@ -46,7 +46,7 @@
     "browserify": "^16.2.3",
     "chai": "4.x",
     "coveralls": "3.x",
-    "eslint": "5.x",
+    "eslint": "6.x",
     "husky": "1.x",
     "mocha": "6.x",
     "nodemon": "^1.18.10",
