@@ -11,12 +11,14 @@ var jsonEval = require('json-eval');
 
 var paramRegex = /\([\S\s]*\)/; // HELPER FUNCTIONS.
 
-function contextKeysPreprocess(args) {
+function contextKeysPreProcess(args) {
   var contextKeys = args.contextKeys;
 
-  for (var contextKey in contextKeys) {
+  for (var _i = 0, _Object$keys = Object.keys(contextKeys); _i < _Object$keys.length; _i++) {
+    var contextKey = _Object$keys[_i];
+
     /* istanbul ignore if */
-    if (!contextKeys.hasOwnProperty(contextKey) || !contextKeys[contextKey]) {
+    if (!contextKeys[contextKey]) {
       continue;
     }
 
@@ -40,12 +42,12 @@ function getDotDelimitedProp(args) {
   var propSplit = prop_.split('.');
   var prop0 = propSplit.shift();
   var prop = propSplit.join('.');
-  var value;
+  var value; // eslint-disable-next-line no-prototype-builtins
 
   if (obj.hasOwnProperty(prop0)) {
     var _value = obj[prop0];
 
-    if (_typeof(_value) === 'object' && _value instanceof Object && prop.length) {
+    if (_value instanceof Object && prop.length) {
       value = getDotDelimitedProp({
         obj: _value,
         prop_: prop
@@ -537,7 +539,7 @@ function paramsApplyByKeyArrays(args) {
 
     delimiters += ' ';
 
-    for (var _i = 0, _l = ctag.length; _i < _l; _i++) {
+    for (var _i2 = 0, _l = ctag.length; _i2 < _l; _i2++) {
       delimiters += "\x03"; //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
     }
   }
@@ -720,10 +722,10 @@ function preProcessContextKeys(context) {
   }),
       dataKeys = _dataObjToDataKeysObj5.dataKeys;
 
-  var _contextKeysPreproces = contextKeysPreprocess({
+  var _contextKeysPreProces = contextKeysPreProcess({
     contextKeys: dataKeys
   }),
-      contextKeys = _contextKeysPreproces.contextKeys;
+      contextKeys = _contextKeysPreProces.contextKeys;
 
   return contextKeys;
 }
@@ -741,12 +743,8 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
   var compilation = compilation_ || hogan.compile(text); // First, check if we still need to preprocess contextKeys because .render() was called statically.
 
   if (contextKeys.length === 0) {
-    for (var i in compilation.partials) {
-      /* istanbul ignore if */
-      if (!compilation.partials.hasOwnProperty(i)) {
-        continue;
-      }
-
+    for (var _i3 = 0, _Object$keys2 = Object.keys(compilation.partials); _i3 < _Object$keys2.length; _i3++) {
+      var i = _Object$keys2[_i3];
       var partialFull = compilation.partials[i].name;
       hasParam = paramRegex.test(partialFull) || partialFull.indexOf(':') > -1;
 
@@ -760,13 +758,9 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
     }
   }
 
-  for (var _i2 in compilation.partials) {
-    /* istanbul ignore if */
-    if (!compilation.partials.hasOwnProperty(_i2)) {
-      continue;
-    }
-
-    var _partialFull = compilation.partials[_i2].name;
+  for (var _i4 = 0, _Object$keys3 = Object.keys(compilation.partials); _i4 < _Object$keys3.length; _i4++) {
+    var _i5 = _Object$keys3[_i4];
+    var _partialFull = compilation.partials[_i5].name;
 
     if (partials[_partialFull]) {
       continue;
@@ -949,11 +943,8 @@ function render() {
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
 
-  for (var i in partials) {
-    /* istanbul ignore if */
-    if (!partials.hasOwnProperty(i)) {
-      continue;
-    }
+  for (var _i6 = 0, _Object$keys4 = Object.keys(partials); _i6 < _Object$keys4.length; _i6++) {
+    var i = _Object$keys4[_i6];
 
     if (!partialsComp[i]) {
       var _registerPartial = registerPartial(i, partials[i], null, partials, partialsComp);

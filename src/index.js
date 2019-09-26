@@ -11,14 +11,14 @@ const paramRegex = /\([\S\s]*\)/;
 
 // HELPER FUNCTIONS.
 
-function contextKeysPreprocess(args) {
+function contextKeysPreProcess(args) {
   const {
     contextKeys
   } = args;
 
-  for (let contextKey in contextKeys) {
+  for (let contextKey of Object.keys(contextKeys)) {
     /* istanbul ignore if */
-    if (!contextKeys.hasOwnProperty(contextKey) || !contextKeys[contextKey]) {
+    if (!contextKeys[contextKey]) {
       continue;
     }
 
@@ -48,10 +48,11 @@ function getDotDelimitedProp(args) {
 
   let value;
 
+  // eslint-disable-next-line no-prototype-builtins
   if (obj.hasOwnProperty(prop0)) {
     const _value = obj[prop0];
 
-    if (typeof _value === 'object' && _value instanceof Object && prop.length) {
+    if (_value instanceof Object && prop.length) {
       value = getDotDelimitedProp({
         obj: _value,
         prop_: prop
@@ -759,7 +760,7 @@ function preProcessContextKeys(context) {
     parentObjAsStr: '',
   });
 
-  const {contextKeys} = contextKeysPreprocess({contextKeys: dataKeys});
+  const {contextKeys} = contextKeysPreProcess({contextKeys: dataKeys});
 
   return contextKeys;
 }
@@ -778,12 +779,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
 
   // First, check if we still need to preprocess contextKeys because .render() was called statically.
   if (contextKeys.length === 0) {
-    for (let i in compilation.partials) {
-      /* istanbul ignore if */
-      if (!compilation.partials.hasOwnProperty(i)) {
-        continue;
-      }
-
+    for (let i of Object.keys(compilation.partials)) {
       const partialFull = compilation.partials[i].name;
       hasParam = paramRegex.test(partialFull) || partialFull.indexOf(':') > -1;
 
@@ -797,12 +793,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
     }
   }
 
-  for (let i in compilation.partials) {
-    /* istanbul ignore if */
-    if (!compilation.partials.hasOwnProperty(i)) {
-      continue;
-    }
-
+  for (let i of Object.keys(compilation.partials)) {
     const partialFull = compilation.partials[i].name;
 
     if (partials[partialFull]) {
@@ -978,12 +969,7 @@ function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   let partials = partials_ || this.partials || {};
   let partialsComp = partialsComp_ || this.partialsComp || {};
 
-  for (let i in partials) {
-    /* istanbul ignore if */
-    if (!partials.hasOwnProperty(i)) {
-      continue;
-    }
-
+  for (let i of Object.keys(partials)) {
     if (!partialsComp[i]) {
       ({
         partials,
