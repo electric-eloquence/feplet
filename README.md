@@ -84,9 +84,10 @@ const output2 = Feplet.render(
 // render.
 
 // If you do have partials, you might want to instantiate the Feplet class
-// to cache the context data if you need to use them more than once. Then,
-// register partials so they get preprocessed with the context data cached
-// within the feplet object. Then, render accordingly:
+// to cache the context data if you need to use them more than once.
+// Then, register partials so they get preprocessed with the context data
+// cached within the feplet object.
+// Then, render accordingly:
 const feplet = new Feplet(context);
 feplet.registerPartial('partial_tpl', partialTxt);
 const output3 = feplet.render(includer); // Yellow World
