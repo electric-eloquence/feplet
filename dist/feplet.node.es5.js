@@ -618,9 +618,9 @@ function paramsApplyToParseObj(args) {
           parentObjAsStr: '' //partialShort // For debugging.
 
         }),
-            dataKeys = _dataObjToDataKeysObj4.dataKeys;
+            _dataKeys = _dataObjToDataKeysObj4.dataKeys;
 
-        paramKeysNew = Object.assign(paramKeys, dataKeys);
+        paramKeysNew = Object.assign(paramKeys, _dataKeys);
       }
     } else {
       paramKeysNew = paramKeys;
@@ -733,7 +733,7 @@ function preProcessContextKeys(context) {
 function preProcessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_, context) {
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
-  var contextKeys = contextKeys_ || this.contextKeys || [];
+  var contextKeys = contextKeys_ || this && this.contextKeys;
 
   var _contextKeys;
 
@@ -742,7 +742,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
   var styleModifierMatch;
   var compilation = compilation_ || hogan.compile(text); // First, check if we still need to preprocess contextKeys because .render() was called statically.
 
-  if (contextKeys.length === 0) {
+  if (typeof contextKeys === 'undefined') {
     for (var _i3 = 0, _Object$keys2 = Object.keys(compilation.partials); _i3 < _Object$keys2.length; _i3++) {
       var i = _Object$keys2[_i3];
       var partialFull = compilation.partials[i].name;
@@ -755,6 +755,8 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
 
     if (hasParam) {
       contextKeys = _contextKeys = preProcessContextKeys(context);
+    } else {
+      contextKeys = {};
     }
   }
 
@@ -885,7 +887,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
 
 function compile(text, options, partials_, partialsComp_, contextKeys_, context) {
   var compilation = hogan.compile(text, options);
-  var contextKeys = contextKeys_ || this.contextKeys;
+  var contextKeys = contextKeys_ || this && this.contextKeys;
 
   var _contextKeys;
 
@@ -939,7 +941,7 @@ function render() {
   var partialsComp_ = arguments.length > 3 ? arguments[3] : undefined;
   var contextKeys_ = arguments.length > 4 ? arguments[4] : undefined;
   var context = context_ || this.context || {};
-  var contextKeys = contextKeys_ || this.contextKeys || [];
+  var contextKeys = contextKeys_ || this && this.contextKeys;
   var partials = partials_ || this.partials || {};
   var partialsComp = partialsComp_ || this.partialsComp || {};
 
