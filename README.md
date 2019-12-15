@@ -92,37 +92,26 @@ feplet.registerPartial('partial_tpl', partialTxt);
 const output3 = feplet.render(includer); // Yellow World
 ```
 
-For recent versions of Node.js:
+For Node.js:
 
 ```javascript
 const Feplet = require('feplet')
 ```
 
-For older versions of Node.js, not so supportive of ES6:
+For browsers (ES6):
 
-```javascript
-var Feplet = require('feplet/dist/feplet.node.es5.js')
+```html
+<script type="module">
+  import Feplet from 'feplet/dist/feplet.browser.es6.min.js';
+</script>
 ```
 
-For browsers (ES5):
+Also for browsers (ES5):
 
 ```html
 <script src="feplet/dist/feplet.browser.min.js"></script>
 <script>
   var Feplet = window.Feplet;
-</script>
-```
-
-This browser implementation uses a minified ES5 bundle, which is slightly 
-(_very_ slightly) slower than its ES6 counterpart. If you do not support 
-older browsers, consider bundling the ES6 script directly for browser 
-consumption.
-
-Also for browsers (ES6):
-
-```html
-<script type="module">
-  import Feplet from 'feplet/dist/feplet.browser.es6.min.js';
 </script>
 ```
 
