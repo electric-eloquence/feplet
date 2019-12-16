@@ -53,14 +53,15 @@ performance difference will be noticeable by humans with work to do.
 We are primarily concerned with the evaluation of expressions, not the execution 
 of commands. Once past the object-oriented initialization, all function 
 expressions receive input and return output, and do not render side-effects or 
-log state. Functions (recursively) express new data but never mutate old data 
-returned by previous expressions. As a disclaimer, neither Feplet nor JavaScript 
-are _purely_ functional. Entire data structures should not be considered 
+log state. Functions return new data but never mutate old data returned by 
+previous functions. As a disclaimer, neither Feplet nor JavaScript are _purely_ 
+functional. In our case, entire data structures should not be considered 
 immutable by virtue of being atomic units of data. Rather, they are 
 _collections_ of immutable data. Purely functional languages provide the syntax 
-and optimizations to add to data structures in a purely functional, as well as 
-readable and performant, manner. With JavaScript, we'll have to make do with 
-data structures providing just that: structure to data.
+and optimizations to allow additions to data structures in a purely functional, 
+as well as readable and performant, manner. With JavaScript Feplet, we'll have 
+to make do with data structures providing just what their name states: structure 
+to data.
 
 ### Where does the name come from?
 
