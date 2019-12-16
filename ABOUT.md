@@ -51,10 +51,16 @@ performance difference will be noticeable by humans with work to do.
 ### How is this functional programming?
 
 We are primarily concerned with the evaluation of expressions, not the execution 
-of commands. All function expressions receive input and return output. This 
-being the case, we don't concern ourselves with side-effects or state. We 
-transmit data through functions, but we don't mutate them. Data structures are 
-treated as stacks. They are added to, but the older parts are never changed.
+of commands. Once past the object-oriented initialization, all function 
+expressions receive input and return output, and do not render side-effects or 
+log state. Functions (recursively) express new data but never mutate old data 
+returned by previous expressions. As a disclaimer, neither Feplet nor JavaScript 
+are _purely_ functional. Entire data structures should not be considered 
+immutable by virtue of being atomic units of data. Rather, they are 
+_collections_ of immutable data. Purely functional languages provide the syntax 
+and optimizations to add to data structures in a purely functional, as well as 
+readable and performant, manner. With JavaScript, we'll have to make do with 
+data structures providing just that: structure to data.
 
 ### Where does the name come from?
 
