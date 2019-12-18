@@ -61,7 +61,7 @@ data. Rather, they are _collections_ of immutable data. Purely functional
 languages provide the syntax and optimizations to allow additions to data 
 structures in a purely functional, as well as readable and performant, manner. 
 With JavaScript Feplet, we'll have to make do with data structures providing 
-just what their name states: structure to data.
+just that: structure to data.
 
 ### Where does the name come from?
 
