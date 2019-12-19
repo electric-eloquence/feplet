@@ -36,7 +36,7 @@ function contextKeysPreProcess(args) {
   return {contextKeys};
 }
 
-function getDotDelimitedProp(args) {
+function dotDelimitedPropGet(args) {
   const {
     obj,
     prop_
@@ -53,7 +53,7 @@ function getDotDelimitedProp(args) {
     const _value = obj[prop0];
 
     if (_value instanceof Object && prop.length) {
-      value = getDotDelimitedProp({
+      value = dotDelimitedPropGet({
         obj: _value,
         prop_: prop
       });
@@ -92,78 +92,78 @@ function spacesCount(args) {
   };
 }
 
-function openStartStopGet(args) {
+function openTagParse(args) {
   const {
     parseObj,
     partialText_
   } = args;
 
-  let openStart;
-  let openSpace0Start;
-  let openSpace0Stop;
-  let openSpace1Start;
-  let openSpace1Stop;
-  let openStop;
+  let startPos;
+  let space0StartPos;
+  let space0StopPos;
+  let space1StartPos;
+  let space1StopPos;
+  let stopPos;
 
-  openStop = parseObj.i;
-
-  switch (parseObj.tag) {
-    case '{':
-      openStop++;
-  }
-
-  openStart = openStop - 1;
-  openStart -= parseObj.ctag.length;
+  stopPos = parseObj.i;
 
   switch (parseObj.tag) {
     case '{':
-      openStart--;
+      stopPos++;
   }
 
-  openSpace1Stop = openStart;
-  openStart -= spacesCount({count_: openStart, inc: -1, partialText_}).count;
-  openSpace1Start = openStart;
-  openStart -= parseObj.n.length;
-  openSpace0Stop = openStart;
-  openStart -= spacesCount({count_: openStart, inc: -1, partialText_}).count;
-  openSpace0Start = openStart;
+  startPos = stopPos - 1;
+  startPos -= parseObj.ctag.length;
+
+  switch (parseObj.tag) {
+    case '{':
+      startPos--;
+  }
+
+  space1StopPos = startPos;
+  startPos -= spacesCount({count_: startPos, inc: -1, partialText_}).count;
+  space1StartPos = startPos;
+  startPos -= parseObj.n.length;
+  space0StopPos = startPos;
+  startPos -= spacesCount({count_: startPos, inc: -1, partialText_}).count;
+  space0StartPos = startPos;
 
   switch (parseObj.tag) {
     case '#':
     case '&':
     case '^':
     case '{':
-      openStart -= parseObj.tag.length;
+      startPos -= parseObj.tag.length;
   }
 
-  openStart -= parseObj.otag.length;
-  openStart++;
+  startPos -= parseObj.otag.length;
+  startPos++;
 
   return {
-    openStart,
-    openSpace0Start,
-    openSpace0Stop,
-    openSpace1Start,
-    openSpace1Stop,
-    openStop
+    startPos,
+    space0StartPos,
+    space0StopPos,
+    space1StartPos,
+    space1StopPos,
+    stopPos
   };
 }
 
-function openTagBuild(args) {
+function startOfTextEncode(args) {
   const {
-    openStartStop,
+    openTagData,
     parseObj,
     partialText_
   } = args;
 
   let {
-    //openStart, // For debugging.
-    openSpace0Start,
-    openSpace0Stop,
-    openSpace1Start,
-    openSpace1Stop,
-    //openStop // For debugging.
-  } = openStartStop;
+    //startPos, // For debugging.
+    space0StartPos,
+    space0StopPos,
+    space1StartPos,
+    space1StopPos,
+    //stopPos // For debugging.
+  } = openTagData;
   let i;
   let partialText = '';
 
@@ -185,17 +185,17 @@ function openTagBuild(args) {
       break;
   }
 
-  i = openSpace0Start;
+  i = space0StartPos;
 
-  while (i < openSpace0Stop) {
+  while (i < space0StopPos) {
     i++;
     partialText += partialText_[i];
   }
 
   partialText += parseObj.n;
-  i = openSpace1Start;
+  i = space1StartPos;
 
-  while (i < openSpace1Stop) {
+  while (i < space1StopPos) {
     i++;
     partialText += partialText_[i];
   }
@@ -217,57 +217,57 @@ function openTagBuild(args) {
   };
 }
 
-function closeStartStopGet(args) {
+function closeTagParse(args) {
   const {
     parseObj,
     partialText_
   } = args;
 
-  let closeStart;
-  let closeSpace0Start;
-  let closeSpace0Stop;
-  let closeSpace1Start;
-  let closeSpace1Stop;
-  let closeStop;
+  let startPos;
+  let space0StartPos;
+  let space0StopPos;
+  let space1StartPos;
+  let space1StopPos;
+  let stopPos;
 
-  closeStart = parseObj.end;
-  closeStop = closeStart;
-  closeStop += parseObj.otag.length;
-  closeStop += parseObj.tag.length;
-  closeSpace0Start = closeStop;
-  closeStop += spacesCount({count_: closeStop, inc: +1, partialText_}).count;
-  closeSpace0Stop = closeStop;
-  closeStop += parseObj.n.length;
-  closeSpace1Start = closeStop;
-  closeStop += spacesCount({count_: closeStop, inc: +1, partialText_}).count;
-  closeSpace1Stop = closeStop;
-  closeStop += parseObj.otag.length;
+  startPos = parseObj.end;
+  stopPos = startPos;
+  stopPos += parseObj.otag.length;
+  stopPos += parseObj.tag.length;
+  space0StartPos = stopPos;
+  stopPos += spacesCount({count_: stopPos, inc: +1, partialText_}).count;
+  space0StopPos = stopPos;
+  stopPos += parseObj.n.length;
+  space1StartPos = stopPos;
+  stopPos += spacesCount({count_: stopPos, inc: +1, partialText_}).count;
+  space1StopPos = stopPos;
+  stopPos += parseObj.otag.length;
 
   return {
-    closeStart,
-    closeSpace0Start,
-    closeSpace0Stop,
-    closeSpace1Start,
-    closeSpace1Stop,
-    closeStop
+    startPos,
+    space0StartPos,
+    space0StopPos,
+    space1StartPos,
+    space1StopPos,
+    stopPos
   };
 }
 
-function closeTagBuild(args) {
+function endOfTextEncode(args) {
   const {
-    closeStartStop,
+    closeTagData,
     parseObj,
     partialText_
   } = args;
 
   let {
-    //closeStart, // For debugging.
-    closeSpace0Start,
-    closeSpace0Stop,
-    closeSpace1Start,
-    closeSpace1Stop,
-    //closeStop // For debugging.
-  } = closeStartStop;
+    //startPos, // For debugging.
+    space0StartPos,
+    space0StopPos,
+    space1StartPos,
+    space1StopPos,
+    //stopPos // For debugging.
+  } = closeTagData;
   let i;
   let partialText = '';
 
@@ -279,17 +279,17 @@ function closeTagBuild(args) {
   }
 
   partialText += '/';
-  i = closeSpace0Start;
+  i = space0StartPos;
 
-  while (i < closeSpace0Stop) {
+  while (i < space0StopPos) {
     partialText += partialText_[i];
     i++;
   }
 
   partialText += parseObj.n;
-  i = closeSpace1Start;
+  i = space1StartPos;
 
-  while (i < closeSpace1Stop) {
+  while (i < space1StopPos) {
     partialText += partialText_[i];
     i++;
   }
@@ -476,20 +476,20 @@ function tagReplace(args) {
     case '{':
 
       /* eslint-disable no-case-declarations */
-      let openStartStop = openStartStopGet({parseObj, partialText_});
+      let openTagData = openTagParse({parseObj, partialText_});
       let {
-        openStart,
-        //openSpace0Start, // For debugging.
-        //openSpace0Stop, // For debugging.
-        //openSpace1Start, // For debugging.
-        //openSpace1Stop, // For debugging.
-        //openStop // For debugging.
-      } = openStartStop;
+        startPos,
+        //space0StartPos, // For debugging.
+        //space0StopPos, // For debugging.
+        //space1StartPos, // For debugging.
+        //space1StopPos, // For debugging.
+        //stopPos // For debugging.
+      } = openTagData;
 
-      partialText += partialText_.substring(0, openStart);
-      partialText += openTagBuild({openStartStop, parseObj, partialText_}).partialText;
+      partialText += partialText_.substring(0, startPos);
+      partialText += startOfTextEncode({openTagData, parseObj, partialText_}).partialText;
 
-      let closeStartStop;
+      let closeTagData;
       /* eslint-enable no-case-declarations */
 
       switch (parseObj.tag) {
@@ -498,18 +498,18 @@ function tagReplace(args) {
         case '&':
         case '<':
         case '^':
-          closeStartStop = closeStartStopGet({parseObj, partialText_});
+          closeTagData = closeTagParse({parseObj, partialText_});
       }
 
-      if (!closeStartStop) {
-        partialText += partialText_.slice(openStartStop.openStop);
+      if (!closeTagData) {
+        partialText += partialText_.slice(openTagData.stopPos);
 
         break;
       }
 
-      partialText += partialText_.substring(openStartStop.openStop, closeStartStop.closeStart);
-      partialText += closeTagBuild({closeStartStop, parseObj, partialText_}).partialText;
-      partialText += partialText_.slice(closeStartStop.closeStop);
+      partialText += partialText_.substring(openTagData.stopPos, closeTagData.startPos);
+      partialText += endOfTextEncode({closeTagData, parseObj, partialText_}).partialText;
+      partialText += partialText_.slice(closeTagData.stopPos);
 
       break;
   }
@@ -607,7 +607,7 @@ function paramsApplyToParseObj(args) {
   if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
     const tagParseItr = tagParse[Symbol.iterator]();
     const tagParseItrn = tagParseItr.next();
-    const paramsObjNested = getDotDelimitedProp({
+    const paramsObjNested = dotDelimitedPropGet({
       obj: paramsObj,
       prop_: parseObj.n
     });
@@ -765,22 +765,18 @@ function preProcessContextKeys(context) {
 }
 
 function preProcessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_, context) {
-  const partials = partials_ || this.partials || {};
-  const partialsComp = partialsComp_ || this.partialsComp || {};
+  const compilation = compilation_ || hogan.compile(text);
+  const partialsKeys = Object.keys(compilation.partials);
   let contextKeys = contextKeys_ || (this && this.contextKeys);
   let _contextKeys;
 
-  let hasParam = false;
-  let styleModClasses;
-  let styleModifierMatch;
-
-  const compilation = compilation_ || hogan.compile(text);
-
   // First, check if we still need to preprocess contextKeys because .render() was called statically.
   if (typeof contextKeys === 'undefined') {
-    for (let i of Object.keys(compilation.partials)) {
+    let hasParam = false;
+
+    for (let i of partialsKeys) {
       const partialFull = compilation.partials[i].name;
-      hasParam = paramRegex.test(partialFull) || partialFull.indexOf(':') > -1;
+      hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
 
       if (hasParam) {
         break;
@@ -795,7 +791,12 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
     }
   }
 
-  for (let i of Object.keys(compilation.partials)) {
+  const partials = partials_ || this.partials || {};
+  const partialsComp = partialsComp_ || this.partialsComp || {};
+  let styleModClasses;
+  let styleModifierMatch;
+
+  for (let i of partialsKeys) {
     const partialFull = compilation.partials[i].name;
 
     if (partials[partialFull]) {
@@ -926,11 +927,11 @@ function compile(text, options, partials_, partialsComp_, contextKeys_, context)
   const partialsArr = Object.values(partials);
 
   for (let i = 0, l = partialsArr.length; i < l; i++) {
-    const partialText = partialsArr[i];
-
     ({
-      _contextKeys
-    } = preProcessPartialParams(partialText, partialsComp[i], partials, partialsComp, contextKeys, context));
+      _contextKeys,
+      partials,
+      partialsComp
+    } = preProcessPartialParams(partialsArr[i], partialsComp[i], partials, partialsComp, contextKeys, context));
   }
 
   if (_contextKeys) {
