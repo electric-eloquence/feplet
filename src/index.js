@@ -36,7 +36,7 @@ function contextKeysPreProcess(args) {
   return {contextKeys};
 }
 
-function dotDelimitedPropGet(args) {
+function parseObjDotDelimitedPropToParamsObj(args) {
   const {
     obj,
     prop_
@@ -53,7 +53,7 @@ function dotDelimitedPropGet(args) {
     const _value = obj[prop0];
 
     if (_value instanceof Object && prop.length) {
-      value = dotDelimitedPropGet({
+      value = parseObjDotDelimitedPropToParamsObj({
         obj: _value,
         prop_: prop
       });
@@ -306,7 +306,7 @@ function endOfTextEncode(args) {
   };
 }
 
-function dataKeysWithDotNotation(args) {
+function dataKeysWithDotNotationAdd(args) {
   const {
     dataKeys,
     parentObjSplit
@@ -326,7 +326,7 @@ function dataKeysWithDotNotation(args) {
   return {dataKeys};
 }
 
-function dataObjToDataKeysObj(args) {
+function dataKeysExtract(args) {
   const {
     dataKeys_,
     //dataKeysShallowItr, // For debugging.
@@ -371,7 +371,7 @@ function dataObjToDataKeysObj(args) {
 
             const parentObjSplit = parentObjAsStrNew.split('.');
 
-            ({dataKeys} = dataKeysWithDotNotation({dataKeys, parentObjSplit}));
+            ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
           }
 
           const argsDeeper = {
@@ -383,7 +383,7 @@ function dataObjToDataKeysObj(args) {
             partialShort: args.partialShort
           };
 
-          ({dataKeys} = dataObjToDataKeysObj(argsDeeper));
+          ({dataKeys} = dataKeysExtract(argsDeeper));
         }
       }
     }
@@ -400,7 +400,7 @@ function dataObjToDataKeysObj(args) {
 
         const parentObjSplit = parentObjAsStrNew.split('.');
 
-        ({dataKeys} = dataKeysWithDotNotation({dataKeys, parentObjSplit}));
+        ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
       }
 
       const argsDeeper = {
@@ -412,20 +412,20 @@ function dataObjToDataKeysObj(args) {
         partialShort: args.partialShort
       };
 
-      ({dataKeys} = dataObjToDataKeysObj(argsDeeper));
+      ({dataKeys} = dataKeysExtract(argsDeeper));
     }
   }
   else {
     const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
     parentObjSplit.push(key);
-    ({dataKeys} = dataKeysWithDotNotation({dataKeys, parentObjSplit}));
+    ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
   }
 
   args.dataKeys_ = dataKeys;
   args.dataKeysShallowItrn = args.dataKeysShallowItr.next();
 
-  return dataObjToDataKeysObj(args);
+  return dataKeysExtract(args);
 }
 
 function styleModifierExtract(args) {
@@ -607,7 +607,7 @@ function paramsApplyToParseObj(args) {
   if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
     const tagParseItr = tagParse[Symbol.iterator]();
     const tagParseItrn = tagParseItr.next();
-    const paramsObjNested = dotDelimitedPropGet({
+    const paramsObjNested = parseObjDotDelimitedPropToParamsObj({
       obj: paramsObj,
       prop_: parseObj.n
     });
@@ -624,7 +624,7 @@ function paramsApplyToParseObj(args) {
 
           const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
           const paramKeysShallowItrn = paramKeysShallowItr.next();
-          const {dataKeys} = dataObjToDataKeysObj({
+          const {dataKeys} = dataKeysExtract({
             dataKeys_: {},
             dataKeysShallowItr: paramKeysShallowItr,
             dataKeysShallowItrn: paramKeysShallowItrn,
@@ -642,7 +642,7 @@ function paramsApplyToParseObj(args) {
 
         const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
         const paramKeysShallowItrn = paramKeysShallowItr.next();
-        const {dataKeys} = dataObjToDataKeysObj({
+        const {dataKeys} = dataKeysExtract({
           dataKeys_: {},
           dataKeysShallowItr: paramKeysShallowItr,
           dataKeysShallowItrn: paramKeysShallowItrn,
@@ -751,7 +751,7 @@ function preProcessContextKeys(context) {
 
   const dataKeysShallowItr = Object.keys(context)[Symbol.iterator]();
   const dataKeysShallowItrn = dataKeysShallowItr.next();
-  const {dataKeys} = dataObjToDataKeysObj({
+  const {dataKeys} = dataKeysExtract({
     dataKeys_: {},
     dataKeysShallowItr,
     dataKeysShallowItrn,
@@ -859,7 +859,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
 
     const paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
     const paramKeysShallowItrn = paramKeysShallowItr.next();
-    const {dataKeys} = dataObjToDataKeysObj({
+    const {dataKeys} = dataKeysExtract({
       dataKeys_: {},
       dataKeysShallowItr: paramKeysShallowItr,
       dataKeysShallowItrn: paramKeysShallowItrn,
