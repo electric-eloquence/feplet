@@ -18,7 +18,7 @@ const paramRegex = /\([\S\s]*\)/;
 
 // HELPER FUNCTIONS.
 
-function contextKeysPreProcess(args) {
+function contextKeysCollect(args) {
   const {
     contextKeys_,
     contextKeysItr,
@@ -44,7 +44,7 @@ function contextKeysPreProcess(args) {
 
   args.contextKeysItrn = contextKeysItr.next();
 
-  return contextKeysPreProcess(args);
+  return contextKeysCollect(args);
 }
 
 function parseObjDotDelimitedPropToParamsObj(args) {
@@ -749,7 +749,7 @@ function preProcessContextKeys(context) {
   });
   const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute on added values.
   const contextKeysItrn = contextKeysItr.next();
-  const {contextKeys} = contextKeysPreProcess({
+  const {contextKeys} = contextKeysCollect({
     contextKeys_: dataKeys,
     contextKeysItr,
     contextKeysItrn
@@ -917,6 +917,7 @@ function compile(text, options, partials_, partialsComp_, contextKeys_, context)
   // We therefore do not want to iterate on the partials object itself.
   const partialsArr = Object.values(partials);
 
+  // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
   for (let i = 0, l = partialsArr.length; i < l; i++) {
     ({
       _contextKeys,
@@ -962,6 +963,7 @@ function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   let partials = partials_ || this.partials || {};
   let partialsComp = partialsComp_ || this.partialsComp || {};
 
+  // Using for..of because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
   for (let i of Object.keys(partials)) {
     if (!partialsComp[i]) {
       ({
