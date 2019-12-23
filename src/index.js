@@ -47,7 +47,7 @@ function contextKeysCollect(args) {
   return contextKeysCollect(args);
 }
 
-function parseObjDotDelimitedPropToParamsObj(args) {
+function dotNotationParse(args) {
   const {
     obj,
     prop_
@@ -62,7 +62,7 @@ function parseObjDotDelimitedPropToParamsObj(args) {
     const _value = obj[prop0];
 
     if (_value instanceof Object && prop.length) {
-      value = parseObjDotDelimitedPropToParamsObj({
+      value = dotNotationParse({
         obj: _value,
         prop_: prop
       });
@@ -602,7 +602,7 @@ function paramsApplyToParseObj(args) {
   if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
     const tagParseItr = tagParse[Symbol.iterator]();
     const tagParseItrn = tagParseItr.next();
-    const paramsObjNested = parseObjDotDelimitedPropToParamsObj({
+    const paramsWithDotNotationParsed = dotNotationParse({
       obj: paramsObj,
       prop_: parseObj.n
     });
@@ -610,10 +610,10 @@ function paramsApplyToParseObj(args) {
     let paramKeysNew;
     let paramsObjNew;
 
-    if (paramsObjNested) {
-      if (Array.isArray(paramsObjNested)) {
-        for (let i = 0, l = paramsObjNested.length; i < l; i++) {
-          paramsObjNew = paramsObjNested[i];
+    if (paramsWithDotNotationParsed) {
+      if (Array.isArray(paramsWithDotNotationParsed)) {
+        for (let i = 0, l = paramsWithDotNotationParsed.length; i < l; i++) {
+          paramsObjNew = paramsWithDotNotationParsed[i];
 
           const paramsObjShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
           const paramsObjShallowItrn = paramsObjShallowItr.next();
@@ -628,7 +628,7 @@ function paramsApplyToParseObj(args) {
         }
       }
       else {
-        paramsObjNew = paramsObjNested;
+        paramsObjNew = paramsWithDotNotationParsed;
 
         const paramsObjShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
         const paramsObjShallowItrn = paramsObjShallowItr.next();
