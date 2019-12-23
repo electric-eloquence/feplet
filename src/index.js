@@ -1,3 +1,10 @@
+// For loops are generally replaced by recursion through iterators. This is more verbose, and more difficult to read for
+// the uninitiated, but the idea of recursing on .next() values and terminating on .done values should be easy to grasp.
+// In accordance with the "functional progamming" paradigm, this sort of recursion is useful for traversing nested data
+// structures. In addition, since many of the functions herein add to data structures while recursing through them, we
+// can avoid ambiguity as to whether added values are recomputed as .next() values. (They are.) Plain for, for..of,
+// for..in, and forEach loops all do this differently.
+
 // The \u0002 and \u0003 unicodes could be replaced with variables, but it is more clear what they are and what their
 // intent is if left as unicode. They are respectively Start of Text and End of Text characters. Their purpose is to be
 // temporary alternate tag delimiters.
@@ -13,27 +20,31 @@ const paramRegex = /\([\S\s]*\)/;
 
 function contextKeysPreProcess(args) {
   const {
-    contextKeys
+    contextKeys_,
+    contextKeysItr,
+    contextKeysItrn
   } = args;
 
-  for (let contextKey of Object.keys(contextKeys)) {
-    /* istanbul ignore if */
-    if (!contextKeys[contextKey]) {
-      continue;
-    }
-
-    const contextKeySplit = contextKey.split('.');
-
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-
-      const contextKeyNew = contextKeySplit.join('.');
-
-      contextKeys[contextKeyNew] = true;
-    }
+  if (contextKeysItrn.done) {
+    return {
+      contextKeys: contextKeys_
+    };
   }
 
-  return {contextKeys};
+  const contextKey = contextKeysItrn.value;
+  const contextKeySplit = contextKey.split('.');
+
+  while (contextKeySplit.length > 1) {
+    contextKeySplit.shift();
+
+    const contextKeyNew = contextKeySplit.join('.');
+
+    contextKeys_.push(contextKeyNew);
+  }
+
+  args.contextKeysItrn = contextKeysItr.next();
+
+  return contextKeysPreProcess(args);
 }
 
 function parseObjDotDelimitedPropToParamsObj(args) {
@@ -41,11 +52,9 @@ function parseObjDotDelimitedPropToParamsObj(args) {
     obj,
     prop_
   } = args;
-
   const propSplit = prop_.split('.');
   const prop0 = propSplit.shift();
   const prop = propSplit.join('.');
-
   let value;
 
   // eslint-disable-next-line no-prototype-builtins
@@ -72,7 +81,6 @@ function spacesCount(args) {
     inc,
     partialText_
   } = args;
-
   let count;
   let counter = count_;
 
@@ -97,7 +105,6 @@ function openTagParse(args) {
     parseObj,
     partialText_
   } = args;
-
   let startPos;
   let space0StartPos;
   let space0StopPos;
@@ -155,7 +162,6 @@ function startOfTextEncode(args) {
     parseObj,
     partialText_
   } = args;
-
   let {
     //startPos, // For debugging.
     space0StartPos,
@@ -222,7 +228,6 @@ function closeTagParse(args) {
     parseObj,
     partialText_
   } = args;
-
   let startPos;
   let space0StartPos;
   let space0StopPos;
@@ -259,7 +264,6 @@ function endOfTextEncode(args) {
     parseObj,
     partialText_
   } = args;
-
   let {
     //startPos, // For debugging.
     space0StartPos,
@@ -311,7 +315,6 @@ function dataKeysWithDotNotationAdd(args) {
     dataKeys,
     parentObjSplit
   } = args;
-
   let i = 0;
   let itemNext;
   let dataKey = parentObjSplit[i];
@@ -320,34 +323,31 @@ function dataKeysWithDotNotationAdd(args) {
   // loop at index 1.
   while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
     dataKey += `.${itemNext}`;
-    dataKeys[dataKey] = true;
+    dataKeys.push(dataKey);
   }
 
   return {dataKeys};
 }
 
-function dataKeysExtract(args) {
+function dataKeysCollect(args) {
   const {
     dataKeys_,
-    //dataKeysShallowItr, // For debugging.
-    dataKeysShallowItrn,
+    //dataObjShallowItr, // For debugging.
+    dataObjShallowItrn,
     dataObj,
     parentObjAsStr,
     //partialShort // For debugging.
   } = args;
-
-  if (dataKeysShallowItrn.done) {
-    return {
-      dataKeys: dataKeys_
-    };
-  }
-
-  const key = dataKeysShallowItrn.value;
-
   let dataKeys = dataKeys_;
 
+  if (dataObjShallowItrn.done) {
+    return {dataKeys};
+  }
+
+  const key = dataObjShallowItrn.value;
+
   if (!parentObjAsStr) {
-    dataKeys[key] = true;
+    dataKeys.push(key);
   }
 
   // Recurse deeper into dataObj if this property is of type object.
@@ -361,12 +361,12 @@ function dataKeysExtract(args) {
 
         if (dataObjArrayItem && dataObjArrayItem.constructor === Object) {
           // Clone args object for recursion deeper into dataObj.
-          const dataKeysDeeperItr = Object.keys(dataObjArrayItem)[Symbol.iterator]();
-          const dataKeysDeeperItrn = dataKeysDeeperItr.next();
+          const dataObjDeeperItr = Object.keys(dataObjArrayItem)[Symbol.iterator]();
+          const dataObjDeeperItrn = dataObjDeeperItr.next();
 
           let parentObjAsStrNew = parentObjAsStr;
 
-          if (dataKeysDeeperItrn.value) {
+          if (dataObjDeeperItrn.value) {
             parentObjAsStrNew += parentObjAsStr ? `.${key}.${i}` : `${key}.${i}`;
 
             const parentObjSplit = parentObjAsStrNew.split('.');
@@ -376,26 +376,26 @@ function dataKeysExtract(args) {
 
           const argsDeeper = {
             dataKeys_: dataKeys,
-            dataKeysShallowItr: dataKeysDeeperItr,
-            dataKeysShallowItrn: dataKeysDeeperItrn,
+            dataObjShallowItr: dataObjDeeperItr,
+            dataObjShallowItrn: dataObjDeeperItrn,
             dataObj: dataObjArrayItem,
             parentObjAsStr: parentObjAsStrNew,
             partialShort: args.partialShort
           };
 
-          ({dataKeys} = dataKeysExtract(argsDeeper));
+          ({dataKeys} = dataKeysCollect(argsDeeper));
         }
       }
     }
     // Recursion into a plain Object.
     else {
       // Clone args object for recursion deeper into dataObj.
-      const dataKeysDeeperItr = Object.keys(dataObjNestedObj)[Symbol.iterator]();
-      const dataKeysDeeperItrn = dataKeysDeeperItr.next();
+      const dataObjDeeperItr = Object.keys(dataObjNestedObj)[Symbol.iterator]();
+      const dataObjDeeperItrn = dataObjDeeperItr.next();
 
       let parentObjAsStrNew = parentObjAsStr;
 
-      if (dataKeysDeeperItrn.value) {
+      if (dataObjDeeperItrn.value) {
         parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
 
         const parentObjSplit = parentObjAsStrNew.split('.');
@@ -405,14 +405,14 @@ function dataKeysExtract(args) {
 
       const argsDeeper = {
         dataKeys_: dataKeys,
-        dataKeysShallowItr: dataKeysDeeperItr,
-        dataKeysShallowItrn: dataKeysDeeperItrn,
+        dataObjShallowItr: dataObjDeeperItr,
+        dataObjShallowItrn: dataObjDeeperItrn,
         dataObj: dataObjNestedObj,
         parentObjAsStr: parentObjAsStrNew,
         partialShort: args.partialShort
       };
 
-      ({dataKeys} = dataKeysExtract(argsDeeper));
+      ({dataKeys} = dataKeysCollect(argsDeeper));
     }
   }
   else {
@@ -423,16 +423,15 @@ function dataKeysExtract(args) {
   }
 
   args.dataKeys_ = dataKeys;
-  args.dataKeysShallowItrn = args.dataKeysShallowItr.next();
+  args.dataObjShallowItrn = args.dataObjShallowItr.next();
 
-  return dataKeysExtract(args);
+  return dataKeysCollect(args);
 }
 
 function styleModifierExtract(args) {
   const {
     partialName
   } = args;
-
   // eslint-disable-next-line no-useless-escape
   let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
   let styleModClasses = '';
@@ -460,10 +459,8 @@ function tagReplace(args) {
     parseObj,
     partialText_
   } = args;
-
   const otag = parseObj.otag;
   const ctag = parseObj.ctag;
-
   let partialText = '';
 
   switch (parseObj.tag) {
@@ -535,13 +532,12 @@ function paramsApplyByKeyArrays(args) {
     //partialShort, // For debugging.
     partialText_
   } = args;
-
   let delimiters;
   let otag;
   let ctag;
   let partialText;
 
-  if (parseObjKey === 'n' && (paramKeys[tagParseVal] || !contextKeys[tagParseVal])) {
+  if (parseObjKey === 'n' && (paramKeys.includes(tagParseVal) || !contextKeys.includes(tagParseVal))) {
     ({
       otag,
       ctag,
@@ -600,7 +596,6 @@ function paramsApplyToParseObj(args) {
 
   const parseObjKey = parseObjKeysItrn.value;
   const tagParse = parseObj[parseObjKey];
-
   let partialText;
   let delimiters;
 
@@ -611,48 +606,43 @@ function paramsApplyToParseObj(args) {
       obj: paramsObj,
       prop_: parseObj.n
     });
-
+    let dataKeys = [];
     let paramKeysNew;
     let paramsObjNew;
 
     if (paramsObjNested) {
       if (Array.isArray(paramsObjNested)) {
-        paramKeysNew = paramKeys;
-
         for (let i = 0, l = paramsObjNested.length; i < l; i++) {
           paramsObjNew = paramsObjNested[i];
 
-          const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
-          const paramKeysShallowItrn = paramKeysShallowItr.next();
-          const {dataKeys} = dataKeysExtract({
-            dataKeys_: {},
-            dataKeysShallowItr: paramKeysShallowItr,
-            dataKeysShallowItrn: paramKeysShallowItrn,
+          const paramsObjShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+          const paramsObjShallowItrn = paramsObjShallowItr.next();
+          ({dataKeys} = dataKeysCollect({
+            dataKeys_: [],
+            dataObjShallowItr: paramsObjShallowItr,
+            dataObjShallowItrn: paramsObjShallowItrn,
             dataObj: paramsObjNew,
             parentObjAsStr: '',
             //partialShort // For debugging.
-          });
-
-          Object.assign(paramKeysNew, dataKeys);
+          }));
         }
       }
-
       else {
         paramsObjNew = paramsObjNested;
 
-        const paramKeysShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
-        const paramKeysShallowItrn = paramKeysShallowItr.next();
-        const {dataKeys} = dataKeysExtract({
-          dataKeys_: {},
-          dataKeysShallowItr: paramKeysShallowItr,
-          dataKeysShallowItrn: paramKeysShallowItrn,
+        const paramsObjShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+        const paramsObjShallowItrn = paramsObjShallowItr.next();
+        ({dataKeys} = dataKeysCollect({
+          dataKeys_: [],
+          dataObjShallowItr: paramsObjShallowItr,
+          dataObjShallowItrn: paramsObjShallowItrn,
           dataObj: paramsObjNew,
           parentObjAsStr: '',
           //partialShort // For debugging.
-        });
-
-        paramKeysNew = Object.assign(paramKeys, dataKeys);
+        }));
       }
+
+      paramKeysNew = paramKeys.concat(dataKeys);
     }
     else {
       paramKeysNew = paramKeys;
@@ -718,7 +708,6 @@ function paramsApply(args) {
   const parseObj = partialParseItrn.value;
   const parseObjKeysItr = Object.keys(parseObj)[Symbol.iterator]();
   const parseObjKeysItrn = parseObjKeysItr.next();
-
   let {
     delimiters,
     partialText
@@ -749,17 +738,22 @@ function preProcessContextKeys(context) {
     return {};
   }
 
-  const dataKeysShallowItr = Object.keys(context)[Symbol.iterator]();
-  const dataKeysShallowItrn = dataKeysShallowItr.next();
-  const {dataKeys} = dataKeysExtract({
-    dataKeys_: {},
-    dataKeysShallowItr,
-    dataKeysShallowItrn,
+  const dataObjShallowItr = Object.keys(context)[Symbol.iterator]();
+  const dataObjShallowItrn = dataObjShallowItr.next();
+  const {dataKeys} = dataKeysCollect({
+    dataKeys_: [],
+    dataObjShallowItr,
+    dataObjShallowItrn,
     dataObj: context,
     parentObjAsStr: '',
   });
-
-  const {contextKeys} = contextKeysPreProcess({contextKeys: dataKeys});
+  const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute on added values.
+  const contextKeysItrn = contextKeysItr.next();
+  const {contextKeys} = contextKeysPreProcess({
+    contextKeys_: dataKeys,
+    contextKeysItr,
+    contextKeysItrn
+  });
 
   return contextKeys;
 }
@@ -787,7 +781,7 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
       contextKeys = _contextKeys = preProcessContextKeys(context);
     }
     else {
-      contextKeys = {};
+      contextKeys = [];
     }
   }
 
@@ -804,7 +798,6 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
     }
 
     const paramsMatch = partialFull.match(paramRegex);
-
     let paramsObj;
     let partialShort = partialFull;
 
@@ -857,25 +850,23 @@ function preProcessPartialParams(text, compilation_, partials_, partialsComp_, c
       paramsObj.styleModifier = styleModClasses;
     }
 
-    const paramKeysShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
-    const paramKeysShallowItrn = paramKeysShallowItr.next();
-    const {dataKeys} = dataKeysExtract({
-      dataKeys_: {},
-      dataKeysShallowItr: paramKeysShallowItr,
-      dataKeysShallowItrn: paramKeysShallowItrn,
+    const paramsObjShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
+    const paramsObjShallowItrn = paramsObjShallowItr.next();
+    const {dataKeys} = dataKeysCollect({
+      dataKeys_: [],
+      dataObjShallowItr: paramsObjShallowItr,
+      dataObjShallowItrn: paramsObjShallowItrn,
       dataObj: paramsObj,
       parentObjAsStr: '',
       //partialShort // For debugging.
     });
     const paramKeys = dataKeys;
-
     let partialText_ = partials[partialShort] || '';
 
     const partialScan = hogan.scan(partialText_);
     const partialParseArr = hogan.parse(partialScan);
     const partialParseItr = partialParseArr[Symbol.iterator]();
     const partialParseItrn = partialParseItr.next();
-
     let {
       delimiters,
       partialText
@@ -968,7 +959,6 @@ function registerPartial(name, partialTemplate, partialComp_, partials_, partial
 function render(text = '', context_, partials_, partialsComp_, contextKeys_) {
   const context = context_ || this.context || {};
   const contextKeys = contextKeys_ || (this && this.contextKeys);
-
   let partials = partials_ || this.partials || {};
   let partialsComp = partialsComp_ || this.partialsComp || {};
 
