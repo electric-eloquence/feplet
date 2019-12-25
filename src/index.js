@@ -15,7 +15,7 @@
 const hogan = require('../lib/hogan.js/lib/hogan.js');
 const jsonEval = require('json-eval');
 
-HELPER_FUNCTIONS: {
+COLLECTORS: {
   var contextKeysCollect = function (args) {
     const {
       contextKeys_,
@@ -162,7 +162,9 @@ HELPER_FUNCTIONS: {
 
     return dataKeysCollect(args);
   };
+}
 
+HELPERS: {
   var paramsObjDotNotationParse = function (args) {
     const {
       obj,
@@ -195,9 +197,9 @@ HELPER_FUNCTIONS: {
     const {
       partialName
     } = args;
+    let styleModClasses = '';
     // eslint-disable-next-line no-useless-escape
     let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
-    let styleModClasses = '';
 
     if (styleModifierMatch && styleModifierMatch[1]) {
       styleModClasses = styleModifierMatch[1].replace(/\|/g, ' ').trim();
@@ -212,8 +214,8 @@ HELPER_FUNCTIONS: {
     // use "styleModifier" or other function substrings as structured object property names. "styleModifier" is also
     // reserved as a property name on paramsObj. Using "styleModClasses" instead.
     return {
-      styleModifierMatch,
-      styleModClasses
+      styleModClasses,
+      styleModifierMatch
     };
   };
 
@@ -221,7 +223,7 @@ HELPER_FUNCTIONS: {
   // intent is if left as unicode. They are respectively Start of Text and End of Text characters. Their purpose is to
   // be temporary alternate tag delimiters.
 
-  TAG_REPLACE: {
+  TAG_REPLACER: {
     var spacesCount = function (args) {
       const {
         count_,
@@ -523,7 +525,7 @@ HELPER_FUNCTIONS: {
   }
 }
 
-CORE_FUNCTIONS: {
+PARAMS_APPLIER: {
   var paramsApplyByKeyArrays = function (args) {
     const {
       contextKeys,
@@ -736,70 +738,33 @@ CORE_FUNCTIONS: {
 }
 
 METHODS: {
-  var preProcessContextKeys = function (context) {
-    /* istanbul ignore if */
-    if (!context) {
-      return {};
-    }
+  const paramRegex = /\([\S\s]*\)/;
 
-    const dataObjShallowItr = Object.keys(context)[Symbol.iterator]();
-    const dataObjShallowItrn = dataObjShallowItr.next();
-    const {dataKeys} = dataKeysCollect({
-      dataKeys_: [],
-      dataObjShallowItr,
-      dataObjShallowItrn,
-      dataObj: context,
-      parentObjAsStr: '',
-    });
-    const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute on added values.
-    const contextKeysItrn = contextKeysItr.next();
-    const {contextKeys} = contextKeysCollect({
-      contextKeys_: dataKeys,
-      contextKeysItr,
-      contextKeysItrn
-    });
+  PRE_PROCESSORS: {
+    var partialsCollect = function (args) {
+      const {
+        compilation,
+        contextKeys,
+        partials,
+        partialsComp,
+        partialsKeysItr,
+        partialsKeysItrn
+      } = args;
 
-    return contextKeys;
-  };
-
-  var preProcessPartialParams = function (text, compilation_, partials_, partialsComp_, contextKeys_, context) {
-    const compilation = compilation_ || hogan.compile(text);
-    const paramRegex = /\([\S\s]*\)/;
-    const partialsKeys = Object.keys(compilation.partials);
-    let contextKeys = contextKeys_ || (this && this.contextKeys);
-    let _contextKeys;
-
-    // First, check if we still need to preprocess contextKeys because .render() was called statically.
-    if (typeof contextKeys === 'undefined') {
-      let hasParam = false;
-
-      for (let i of partialsKeys) {
-        const partialFull = compilation.partials[i].name;
-        hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
-
-        if (hasParam) {
-          break;
-        }
+      if (partialsKeysItrn.done) {
+        return {
+          partials,
+          partialsComp
+        };
       }
 
-      if (hasParam) {
-        contextKeys = _contextKeys = preProcessContextKeys(context);
-      }
-      else {
-        contextKeys = [];
-      }
-    }
-
-    const partials = partials_ || this.partials || {};
-    const partialsComp = partialsComp_ || this.partialsComp || {};
-    let styleModClasses;
-    let styleModifierMatch;
-
-    for (let i of partialsKeys) {
-      const partialFull = compilation.partials[i].name;
+      const partialFull = compilation.partials[partialsKeysItrn.value].name;
+      let styleModClasses;
+      let styleModifierMatch;
+      args.partialsKeysItrn = partialsKeysItr.next();
 
       if (partials[partialFull]) {
-        continue;
+        return partialsCollect(args);
       }
 
       const paramsMatch = partialFull.match(paramRegex);
@@ -812,8 +777,8 @@ METHODS: {
         partialShort = partialFull.replace(paramsStr, '');
 
         ({
-          styleModifierMatch,
-          styleModClasses
+          styleModClasses,
+          styleModifierMatch
         } = styleModifierExtract({partialName: partialShort}));
 
         if (partialFull !== partialShort) {
@@ -824,19 +789,19 @@ METHODS: {
             /* istanbul ignore next */
             console.error(err); // eslint-disable-line no-console
             /* istanbul ignore next */
-            continue;
+            return partialsCollect(args);
           }
 
           /* istanbul ignore if */
           if (!paramsObj || paramsObj.constructor !== Object) {
-            continue;
+            return partialsCollect(args);
           }
         }
       }
       else {
         ({
-          styleModifierMatch,
-          styleModClasses
+          styleModClasses,
+          styleModifierMatch
         } = styleModifierExtract({partialName: partialFull}));
       }
 
@@ -846,7 +811,7 @@ METHODS: {
 
       /* istanbul ignore if */
       if (partialShort === partialFull) {
-        continue;
+        return partialsCollect(args);
       }
 
       paramsObj = paramsObj || {};
@@ -900,15 +865,88 @@ METHODS: {
         partials[partialFull] = partialText;
         partialsComp[partialFull] = hogan.generate(partialParseArr, partialText, {});
       }
-    }
 
-    return {
-      compilation,
-      _contextKeys,
-      partials,
-      partialsComp
+      return partialsCollect(args);
     };
-  };
+
+    var preProcessContextKeys = function (context) {
+      /* istanbul ignore if */
+      if (!context) {
+        return {};
+      }
+
+      const dataObjShallowItr = Object.keys(context)[Symbol.iterator]();
+      const dataObjShallowItrn = dataObjShallowItr.next();
+      const {dataKeys} = dataKeysCollect({
+        dataKeys_: [],
+        dataObjShallowItr,
+        dataObjShallowItrn,
+        dataObj: context,
+        parentObjAsStr: '',
+      });
+      const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute on added values
+      const contextKeysItrn = contextKeysItr.next();
+      const {contextKeys} = contextKeysCollect({
+        contextKeys_: dataKeys,
+        contextKeysItr,
+        contextKeysItrn
+      });
+
+      return contextKeys;
+    };
+
+    var preProcessPartialParams = function (text, compilation_, partials_, partialsComp_, contextKeys_, context) {
+      const compilation = compilation_ || hogan.compile(text);
+      const partialsKeys = Object.keys(compilation.partials);
+      let contextKeys = contextKeys_ || (this && this.contextKeys);
+      let _contextKeys;
+
+      // First, check if we still need to preprocess contextKeys because .render() was called statically.
+      if (typeof contextKeys === 'undefined') {
+        let hasParam = false;
+
+        for (let i of partialsKeys) {
+          const partialFull = compilation.partials[i].name;
+          hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
+
+          if (hasParam) {
+            break;
+          }
+        }
+
+        if (hasParam) {
+          contextKeys = _contextKeys = preProcessContextKeys(context);
+        }
+        else {
+          contextKeys = [];
+        }
+      }
+
+      const partialsKeysItr = partialsKeys[Symbol.iterator]();
+      const partialsKeysItrn = partialsKeysItr.next();
+      let partials = partials_ || this.partials || {};
+      let partialsComp = partialsComp_ || this.partialsComp || {};
+
+      ({
+        partials,
+        partialsComp
+      } = partialsCollect({
+        compilation,
+        contextKeys,
+        partials,
+        partialsComp,
+        partialsKeysItr,
+        partialsKeysItrn
+      }));
+
+      return {
+        compilation,
+        _contextKeys,
+        partials,
+        partialsComp
+      };
+    };
+  }
 
   var compile = function (text, options, partials_, partialsComp_, contextKeys_, context) {
     let compilation = hogan.compile(text, options);
