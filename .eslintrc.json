@@ -14,7 +14,6 @@
   "rules": {
     // error
     "array-bracket-spacing": [2, "never"],
-    "block-scoped-var": 2,
     "brace-style": [2, "stroustrup", {
       "allowSingleLine": true
     }],
@@ -57,10 +56,6 @@
     "no-implied-eval": 2,
     "no-iterator": 2,
     "no-label-var": 2,
-    "no-labels": [2, {
-      "allowLoop": true,
-      "allowSwitch": true
-    }],
     "no-lone-blocks": 2,
     "no-loop-func": 2,
     "no-multi-spaces": [2, {
@@ -125,8 +120,11 @@
       "requireReturn": false
     }],
     // off
+    "block-scoped-var": 0,
     "no-duplicate-case": 0,
     "no-fallthrough": 0,
+    "no-labels": 0,
+    "no-unused-labels": 0,
     "spaced-comment": 0
   }
 }
