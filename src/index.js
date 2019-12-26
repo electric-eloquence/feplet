@@ -608,8 +608,6 @@ PARAMS_APPLIER: {
     let delimiters;
 
     if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
-      const tagParseItr = tagParse[Symbol.iterator]();
-      const tagParseItrn = tagParseItr.next();
       const paramsWithDotNotation = paramsObjDotNotationParse({
         obj: paramsObj,
         prop_: parseObj.n
@@ -656,6 +654,9 @@ PARAMS_APPLIER: {
         paramKeysNew = paramKeys;
         paramsObjNew = paramsObj;
       }
+
+      const tagParseItr = tagParse[Symbol.iterator]();
+      const tagParseItrn = tagParseItr.next();
 
       ({
         delimiters,
@@ -883,7 +884,7 @@ METHODS: {
       dataObj: context,
       parentObjAsStr: '',
     });
-    const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute on added values
+    const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
     const contextKeysItrn = contextKeysItr.next();
     const {contextKeys} = contextKeysCollect({
       contextKeys_: dataKeys,

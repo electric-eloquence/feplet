@@ -588,8 +588,6 @@ PARAMS_APPLIER: {
     var delimiters;
 
     if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
-      var tagParseItr = tagParse[Symbol.iterator]();
-      var tagParseItrn = tagParseItr.next();
       var paramsWithDotNotation = paramsObjDotNotationParse({
         obj: paramsObj,
         prop_: parseObj.n
@@ -640,6 +638,9 @@ PARAMS_APPLIER: {
         paramKeysNew = paramKeys;
         paramsObjNew = paramsObj;
       }
+
+      var tagParseItr = tagParse[Symbol.iterator]();
+      var tagParseItrn = tagParseItr.next();
 
       var _paramsApply = paramsApply({
         // eslint-disable-line no-use-before-define
@@ -870,7 +871,7 @@ METHODS: {
     }),
         dataKeys = _dataKeysCollect6.dataKeys;
 
-    var contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute on added values
+    var contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
 
     var contextKeysItrn = contextKeysItr.next();
 
