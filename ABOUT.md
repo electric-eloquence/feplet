@@ -58,10 +58,10 @@ previous functions. As a disclaimer, neither Feplet nor JavaScript are _purely_
 functional. In our case, entire data structures should not be considered 
 immutable by virtue of being atomic units of data. They are not atomic units of 
 data. Rather, they are _collections_ of immutable data. Purely functional 
-languages provide the syntax and optimizations to allow additions to data 
+languages provide syntax and optimizations that enable additions to data 
 structures in a purely functional, as well as readable and performant, manner. 
-With JavaScript Feplet, we'll have to make do with data structures providing 
-just that: structure to data.
+With JavaScript Feplet, we must make do with data structures providing just 
+that: structure to data.
 
 ### Where does the name come from?
 
