@@ -3,8 +3,9 @@
 // In accordance with the "functional progamming" paradigm, this is useful for traversing nested data structures. In
 // addition, since many functions herein add to data structures while recursing through them, we can avoid ambiguity as
 // to whether added values are recomputed as .next() values. (They are.) Plain for, for..of, for..in, and forEach loops,
-// as well as the .map(), .filter(), and .reduce() Array methods, all do this differently. No hints from the loops or
-// Array methods imply whether or not recomputation occurs. .next() unambiguously expresses computation on each call.
+// as well as the .map(), .filter(), and .reduce() Array methods, all do this differently. Neither the loop statements
+// nor Array methods inherently imply whether or not recomputation occurs. On the other hand, iterators' .next()
+// unambiguously expresses computation on each call.
 
 // Labeled block statements are used to segregate functions into organizational units. We could also achieve this end by
 // breaking this file into multiple files. However, we need to compile our code into ES5 consumable by less modern
