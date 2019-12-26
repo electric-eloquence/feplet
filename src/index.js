@@ -53,6 +53,7 @@ COLLECTORS: {
       dataKeys,
       parentObjSplit
     } = args;
+
     let i = 0;
     let itemNext;
     let dataKey = parentObjSplit[i];
@@ -76,6 +77,7 @@ COLLECTORS: {
       parentObjAsStr,
       //partialShort // For debugging.
     } = args;
+
     let dataKeys = dataKeys_;
 
     if (dataObjShallowItrn.done) {
@@ -173,6 +175,7 @@ HELPERS: {
       obj,
       prop_
     } = args;
+
     const propSplit = prop_.split('.');
     const prop0 = propSplit.shift();
     const prop = propSplit.join('.');
@@ -200,6 +203,7 @@ HELPERS: {
     const {
       partialName
     } = args;
+
     let styleModClasses = '';
     // eslint-disable-next-line no-useless-escape
     let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
@@ -233,6 +237,7 @@ HELPERS: {
         inc,
         partialText_
       } = args;
+
       let count;
       let counter = count_;
 
@@ -257,6 +262,7 @@ HELPERS: {
         parseObj,
         partialText_
       } = args;
+
       let startPos;
       let space0StartPos;
       let space0StopPos;
@@ -314,6 +320,7 @@ HELPERS: {
         parseObj,
         partialText_
       } = args;
+
       let {
         //startPos, // For debugging.
         space0StartPos,
@@ -380,6 +387,7 @@ HELPERS: {
         parseObj,
         partialText_
       } = args;
+
       let startPos;
       let space0StartPos;
       let space0StopPos;
@@ -416,6 +424,7 @@ HELPERS: {
         parseObj,
         partialText_
       } = args;
+
       let {
         //startPos, // For debugging.
         space0StartPos,
@@ -467,6 +476,7 @@ HELPERS: {
         parseObj,
         partialText_
       } = args;
+
       const otag = parseObj.otag;
       const ctag = parseObj.ctag;
       let partialText = '';
@@ -541,6 +551,7 @@ PARAMS_APPLIER: {
       //partialShort, // For debugging.
       partialText_
     } = args;
+
     let delimiters;
     let otag;
     let ctag;
