@@ -97,7 +97,6 @@ COLLECTORS: {
           const dataObjArrayItem = dataObjNestedObj[i];
 
           if (dataObjArrayItem && dataObjArrayItem.constructor === Object) {
-            // Clone args object for recursion deeper into dataObj.
             const dataObjDeeperItr = Object.keys(dataObjArrayItem)[Symbol.iterator]();
             const dataObjDeeperItrn = dataObjDeeperItr.next();
 
@@ -111,6 +110,7 @@ COLLECTORS: {
               ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
             }
 
+            // Clone args object for recursion deeper into dataObj.
             const argsDeeper = {
               dataKeys_: dataKeys,
               dataObjShallowItr: dataObjDeeperItr,
@@ -126,7 +126,6 @@ COLLECTORS: {
       }
       // Recursion into a plain Object.
       else {
-        // Clone args object for recursion deeper into dataObj.
         const dataObjDeeperItr = Object.keys(dataObjNestedObj)[Symbol.iterator]();
         const dataObjDeeperItrn = dataObjDeeperItr.next();
 
@@ -140,6 +139,7 @@ COLLECTORS: {
           ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
         }
 
+        // Clone args object for recursion deeper into dataObj.
         const argsDeeper = {
           dataKeys_: dataKeys,
           dataObjShallowItr: dataObjDeeperItr,

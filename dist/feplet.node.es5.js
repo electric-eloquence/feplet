@@ -90,7 +90,6 @@ COLLECTORS: {
           var dataObjArrayItem = dataObjNestedObj[i];
 
           if (dataObjArrayItem && dataObjArrayItem.constructor === Object) {
-            // Clone args object for recursion deeper into dataObj.
             var dataObjDeeperItr = Object.keys(dataObjArrayItem)[Symbol.iterator]();
             var dataObjDeeperItrn = dataObjDeeperItr.next();
             var parentObjAsStrNew = parentObjAsStr;
@@ -105,7 +104,8 @@ COLLECTORS: {
               });
 
               dataKeys = _dataKeysWithDotNotat.dataKeys;
-            }
+            } // Clone args object for recursion deeper into dataObj.
+
 
             var argsDeeper = {
               dataKeys_: dataKeys,
@@ -123,7 +123,6 @@ COLLECTORS: {
         }
       } // Recursion into a plain Object.
       else {
-          // Clone args object for recursion deeper into dataObj.
           var _dataObjDeeperItr = Object.keys(dataObjNestedObj)[Symbol.iterator]();
 
           var _dataObjDeeperItrn = _dataObjDeeperItr.next();
@@ -141,7 +140,8 @@ COLLECTORS: {
             });
 
             dataKeys = _dataKeysWithDotNotat2.dataKeys;
-          }
+          } // Clone args object for recursion deeper into dataObj.
+
 
           var _argsDeeper = {
             dataKeys_: dataKeys,
