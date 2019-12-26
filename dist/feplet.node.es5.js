@@ -986,17 +986,17 @@ METHODS: {
     return compilation;
   };
 
-  var registerPartial = function registerPartial(name, partialTemplate, partialComp_, partials_, partialsComp_) {
+  var registerPartial = function registerPartial(partialName, partialTemplate, partialComp_, partials_, partialsComp_) {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    if (!partials[name]) {
-      partials[name] = partialTemplate;
+    if (!partials[partialName]) {
+      partials[partialName] = partialTemplate;
     }
 
-    if (!partialsComp[name]) {
+    if (!partialsComp[partialName]) {
       var partialComp = partialComp_ || hogan.compile(partialTemplate);
-      partialsComp[name] = partialComp;
+      partialsComp[partialName] = partialComp;
     }
 
     return {
@@ -1017,10 +1017,10 @@ METHODS: {
     var partialsComp = partialsComp_ || this.partialsComp || {}; // Using for..of because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
 
     for (var _i2 = 0, _Object$keys = Object.keys(partials); _i2 < _Object$keys.length; _i2++) {
-      var i = _Object$keys[_i2];
+      var partialName = _Object$keys[_i2];
 
-      if (!partialsComp[i]) {
-        var _registerPartial = registerPartial(i, partials[i], null, partials, partialsComp);
+      if (!partialsComp[partialName]) {
+        var _registerPartial = registerPartial(partialName, partials[partialName], null, partials, partialsComp);
 
         partials = _registerPartial.partials;
         partialsComp = _registerPartial.partialsComp;
@@ -1038,11 +1038,11 @@ METHODS: {
     return compilation.render(context, partials, null, partialsComp);
   };
 
-  var unregisterPartial = function unregisterPartial(name, partials_, partialsComp_) {
+  var unregisterPartial = function unregisterPartial(partialName, partials_, partialsComp_) {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    delete partials[name];
-    delete partialsComp[name];
+    delete partials[partialName];
+    delete partialsComp[partialName];
     return {
       partials: partials,
       partialsComp: partialsComp

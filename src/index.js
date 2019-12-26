@@ -979,18 +979,18 @@ METHODS: {
     return compilation;
   };
 
-  var registerPartial = function (name, partialTemplate, partialComp_, partials_, partialsComp_) {
+  var registerPartial = function (partialName, partialTemplate, partialComp_, partials_, partialsComp_) {
     const partials = partials_ || this.partials || {};
     const partialsComp = partialsComp_ || this.partialsComp || {};
 
-    if (!partials[name]) {
-      partials[name] = partialTemplate;
+    if (!partials[partialName]) {
+      partials[partialName] = partialTemplate;
     }
 
-    if (!partialsComp[name]) {
+    if (!partialsComp[partialName]) {
       const partialComp = partialComp_ || hogan.compile(partialTemplate);
 
-      partialsComp[name] = partialComp;
+      partialsComp[partialName] = partialComp;
     }
 
     return {
@@ -1006,12 +1006,12 @@ METHODS: {
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
     // Using for..of because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
-    for (let i of Object.keys(partials)) {
-      if (!partialsComp[i]) {
+    for (let partialName of Object.keys(partials)) {
+      if (!partialsComp[partialName]) {
         ({
           partials,
           partialsComp
-        } = registerPartial(i, partials[i], null, partials, partialsComp));
+        } = registerPartial(partialName, partials[partialName], null, partials, partialsComp));
       }
     }
 
@@ -1027,12 +1027,12 @@ METHODS: {
     return compilation.render(context, partials, null, partialsComp);
   };
 
-  var unregisterPartial = function (name, partials_, partialsComp_) {
+  var unregisterPartial = function (partialName, partials_, partialsComp_) {
     const partials = partials_ || this.partials || {};
     const partialsComp = partialsComp_ || this.partialsComp || {};
 
-    delete partials[name];
-    delete partialsComp[name];
+    delete partials[partialName];
+    delete partialsComp[partialName];
 
     return {
       partials,
