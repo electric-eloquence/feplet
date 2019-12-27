@@ -40,7 +40,9 @@ COLLECTORS: {
 
       const contextKeyNew = contextKeySplit.join('.');
 
-      contextKeys_.push(contextKeyNew);
+      if (!contextKeys_.includes(contextKeyNew)) {
+        contextKeys_.push(contextKeyNew);
+      }
     }
 
     args.contextKeysItrn = contextKeysItr.next();
@@ -62,7 +64,10 @@ COLLECTORS: {
     // loop at index 1.
     while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
       dataKey += `.${itemNext}`;
-      dataKeys.push(dataKey);
+
+      if (!dataKeys.includes(dataKey)) {
+        dataKeys.push(dataKey);
+      }
     }
 
     return {dataKeys};
@@ -86,7 +91,7 @@ COLLECTORS: {
 
     const key = dataObjShallowItrn.value;
 
-    if (!parentObjAsStr) {
+    if (!dataKeys.includes(key) && !parentObjAsStr) {
       dataKeys.push(key);
     }
 
@@ -158,7 +163,10 @@ COLLECTORS: {
     else {
       const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-      parentObjSplit.push(key);
+      if (!parentObjSplit.includes(key)) {
+        parentObjSplit.push(key);
+      }
+
       ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
     }
 

@@ -37,7 +37,10 @@ COLLECTORS: {
     while (contextKeySplit.length > 1) {
       contextKeySplit.shift();
       var contextKeyNew = contextKeySplit.join('.');
-      contextKeys_.push(contextKeyNew);
+
+      if (!contextKeys_.includes(contextKeyNew)) {
+        contextKeys_.push(contextKeyNew);
+      }
     }
 
     args.contextKeysItrn = contextKeysItr.next();
@@ -55,7 +58,10 @@ COLLECTORS: {
     while (itemNext = parentObjSplit[++i]) {
       // eslint-disable-line no-cond-assign
       dataKey += ".".concat(itemNext);
-      dataKeys.push(dataKey);
+
+      if (!dataKeys.includes(dataKey)) {
+        dataKeys.push(dataKey);
+      }
     }
 
     return {
@@ -78,7 +84,7 @@ COLLECTORS: {
 
     var key = dataObjShallowItrn.value;
 
-    if (!parentObjAsStr) {
+    if (!dataKeys.includes(key) && !parentObjAsStr) {
       dataKeys.push(key);
     } // Recurse deeper into dataObj if this property is of type object.
 
@@ -160,7 +166,9 @@ COLLECTORS: {
     } else {
       var _parentObjSplit2 = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-      _parentObjSplit2.push(key);
+      if (!_parentObjSplit2.includes(key)) {
+        _parentObjSplit2.push(key);
+      }
 
       var _dataKeysWithDotNotat3 = dataKeysWithDotNotationAdd({
         dataKeys: dataKeys,
