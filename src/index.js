@@ -925,8 +925,9 @@ METHODS: {
     if (typeof contextKeys === 'undefined') {
       let hasParam = false;
 
-      for (let i of partialsKeys) {
-        const partialFull = compilation.partials[i].name;
+      for (let i = 0, l = partialsKeys.length; i < l; i++) {
+        const key = partialsKey[i];
+        const partialFull = compilation.partials[key].name;
         hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
 
         if (hasParam) {

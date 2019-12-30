@@ -904,32 +904,14 @@ METHODS: {
 
     if (typeof contextKeys === 'undefined') {
       var hasParam = false;
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
 
-      try {
-        for (var _iterator = partialsKeys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var i = _step.value;
-          var partialFull = compilation.partials[i].name;
-          hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
+      for (var i = 0, l = partialsKeys.length; i < l; i++) {
+        var key = partialsKey[i];
+        var partialFull = compilation.partials[key].name;
+        hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
 
-          if (hasParam) {
-            break;
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-            _iterator["return"]();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
+        if (hasParam) {
+          break;
         }
       }
 
