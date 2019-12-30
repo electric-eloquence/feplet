@@ -906,8 +906,7 @@ METHODS: {
       var hasParam = false;
 
       for (var i = 0, l = partialsKeys.length; i < l; i++) {
-        var key = partialsKeys[i];
-        var partialFull = compilation.partials[key].name;
+        var partialFull = compilation.partials[partialsKeys[i]].name;
         hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
 
         if (hasParam) {

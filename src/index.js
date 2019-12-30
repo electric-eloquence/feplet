@@ -926,8 +926,7 @@ METHODS: {
       let hasParam = false;
 
       for (let i = 0, l = partialsKeys.length; i < l; i++) {
-        const key = partialsKeys[i];
-        const partialFull = compilation.partials[key].name;
+        const partialFull = compilation.partials[partialsKeys[i]].name;
         hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
 
         if (hasParam) {
