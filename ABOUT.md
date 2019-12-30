@@ -60,8 +60,8 @@ immutable by virtue of being atomic units of data. They are not atomic units of
 data. Rather, they are _collections_ of immutable data. Purely functional 
 languages provide syntax and optimizations that enable additions to data 
 structures in a purely functional, as well as readable and performant, manner. 
-With JavaScript Feplet, we must make do with data structures providing just 
-that: structure to data.
+With JavaScript Feplet, we'll make do with data structures providing just that: 
+structure to data.
 
 ### Where does the name come from?
 
