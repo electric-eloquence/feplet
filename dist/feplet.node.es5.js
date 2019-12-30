@@ -90,19 +90,39 @@ COLLECTORS: {
 
 
     if (dataObj[key] && _typeof(dataObj[key]) === 'object') {
-      var dataObjNestedObj = dataObj[key]; // Recursion into an Array.
+      var dataObjNestedObj = dataObj[key];
+      var l = 1;
 
       if (Array.isArray(dataObjNestedObj)) {
-        for (var i = 0, l = dataObjNestedObj.length; i < l; i++) {
-          var dataObjArrayItem = dataObjNestedObj[i];
+        l = dataObjNestedObj.length;
+      }
 
-          if (dataObjArrayItem && dataObjArrayItem.constructor === Object) {
-            var dataObjDeeperItr = Object.keys(dataObjArrayItem)[Symbol.iterator]();
+      for (var i = 0; i < l; i++) {
+        var dataObjItem = void 0;
+
+        if (Array.isArray(dataObjNestedObj)) {
+          // Recursion into an Array.
+          dataObjItem = dataObjNestedObj[i];
+        } else {
+          // Recursion into a plain Object.
+          dataObjItem = dataObjNestedObj;
+        }
+
+        if (dataObjItem && dataObjItem.constructor === Object) {
+          var dataObjItemKeys = Object.keys(dataObjItem);
+
+          if (dataObjItemKeys.length) {
+            var dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
             var dataObjDeeperItrn = dataObjDeeperItr.next();
             var parentObjAsStrNew = parentObjAsStr;
 
             if (dataObjDeeperItrn.value) {
-              parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(i) : "".concat(key, ".").concat(i);
+              if (Array.isArray(dataObjNestedObj)) {
+                parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(i) : "".concat(key, ".").concat(i);
+              } else {
+                parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key;
+              }
+
               var parentObjSplit = parentObjAsStrNew.split('.');
 
               var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
@@ -118,7 +138,7 @@ COLLECTORS: {
               dataKeys_: dataKeys,
               dataObjShallowItr: dataObjDeeperItr,
               dataObjShallowItrn: dataObjDeeperItrn,
-              dataObj: dataObjArrayItem,
+              dataObj: dataObjItem,
               parentObjAsStr: parentObjAsStrNew,
               partialShort: args.partialShort
             };
@@ -128,54 +148,20 @@ COLLECTORS: {
             dataKeys = _dataKeysCollect.dataKeys;
           }
         }
-      } // Recursion into a plain Object.
-      else {
-          var _dataObjDeeperItr = Object.keys(dataObjNestedObj)[Symbol.iterator]();
-
-          var _dataObjDeeperItrn = _dataObjDeeperItr.next();
-
-          var _parentObjAsStrNew = parentObjAsStr;
-
-          if (_dataObjDeeperItrn.value) {
-            _parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key;
-
-            var _parentObjSplit = _parentObjAsStrNew.split('.');
-
-            var _dataKeysWithDotNotat2 = dataKeysWithDotNotationAdd({
-              dataKeys: dataKeys,
-              parentObjSplit: _parentObjSplit
-            });
-
-            dataKeys = _dataKeysWithDotNotat2.dataKeys;
-          } // Clone args object for recursion deeper into dataObj.
-
-
-          var _argsDeeper = {
-            dataKeys_: dataKeys,
-            dataObjShallowItr: _dataObjDeeperItr,
-            dataObjShallowItrn: _dataObjDeeperItrn,
-            dataObj: dataObjNestedObj,
-            parentObjAsStr: _parentObjAsStrNew,
-            partialShort: args.partialShort
-          };
-
-          var _dataKeysCollect2 = dataKeysCollect(_argsDeeper);
-
-          dataKeys = _dataKeysCollect2.dataKeys;
-        }
+      }
     } else {
-      var _parentObjSplit2 = parentObjAsStr ? parentObjAsStr.split('.') : [];
+      var _parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-      if (!_parentObjSplit2.includes(key)) {
-        _parentObjSplit2.push(key);
+      if (!_parentObjSplit.includes(key)) {
+        _parentObjSplit.push(key);
       }
 
-      var _dataKeysWithDotNotat3 = dataKeysWithDotNotationAdd({
+      var _dataKeysWithDotNotat2 = dataKeysWithDotNotationAdd({
         dataKeys: dataKeys,
-        parentObjSplit: _parentObjSplit2
+        parentObjSplit: _parentObjSplit
       });
 
-      dataKeys = _dataKeysWithDotNotat3.dataKeys;
+      dataKeys = _dataKeysWithDotNotat2.dataKeys;
     }
 
     args.dataKeys_ = dataKeys;
@@ -606,13 +592,28 @@ PARAMS_APPLIER: {
       var paramsObjNew;
 
       if (paramsWithDotNotation) {
+        var l = 1;
+
         if (Array.isArray(paramsWithDotNotation)) {
-          for (var i = 0, l = paramsWithDotNotation.length; i < l; i++) {
+          l = paramsWithDotNotation.length;
+        }
+
+        for (var i = 0; i < l; i++) {
+          if (Array.isArray(paramsWithDotNotation)) {
+            // Recursion into an Array.
             paramsObjNew = paramsWithDotNotation[i];
-            var paramsObjShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
+          } else {
+            // Recursion into a plain Object.
+            paramsObjNew = paramsWithDotNotation;
+          }
+
+          var paramsObjKeys = Object.keys(paramsObjNew);
+
+          if (paramsObjKeys.length) {
+            var paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
             var paramsObjShallowItrn = paramsObjShallowItr.next();
 
-            var _dataKeysCollect3 = dataKeysCollect({
+            var _dataKeysCollect2 = dataKeysCollect({
               dataKeys_: [],
               dataObjShallowItr: paramsObjShallowItr,
               dataObjShallowItrn: paramsObjShallowItrn,
@@ -621,25 +622,8 @@ PARAMS_APPLIER: {
 
             });
 
-            dataKeys = _dataKeysCollect3.dataKeys;
+            dataKeys = _dataKeysCollect2.dataKeys;
           }
-        } else {
-          paramsObjNew = paramsWithDotNotation;
-
-          var _paramsObjShallowItr = Object.keys(paramsObjNew)[Symbol.iterator]();
-
-          var _paramsObjShallowItrn = _paramsObjShallowItr.next();
-
-          var _dataKeysCollect4 = dataKeysCollect({
-            dataKeys_: [],
-            dataObjShallowItr: _paramsObjShallowItr,
-            dataObjShallowItrn: _paramsObjShallowItrn,
-            dataObj: paramsObjNew,
-            parentObjAsStr: '' //partialShort // For debugging.
-
-          });
-
-          dataKeys = _dataKeysCollect4.dataKeys;
         }
 
         paramKeysNew = paramKeys.concat(dataKeys);
@@ -648,22 +632,24 @@ PARAMS_APPLIER: {
         paramsObjNew = paramsObj;
       }
 
-      var tagParseItr = tagParse[Symbol.iterator]();
-      var tagParseItrn = tagParseItr.next();
+      if (tagParse.length) {
+        var tagParseItr = tagParse[Symbol.iterator]();
+        var tagParseItrn = tagParseItr.next();
 
-      var _paramsApply = paramsApply({
-        // eslint-disable-line no-use-before-define
-        contextKeys: contextKeys,
-        paramKeys: paramKeysNew,
-        paramsObj: paramsObjNew,
-        partialParseItr: tagParseItr,
-        partialParseItrn: tagParseItrn,
-        //partialShort, // For debugging.
-        partialText_: partialText_
-      });
+        var _paramsApply = paramsApply({
+          // eslint-disable-line no-use-before-define
+          contextKeys: contextKeys,
+          paramKeys: paramKeysNew,
+          paramsObj: paramsObjNew,
+          partialParseItr: tagParseItr,
+          partialParseItrn: tagParseItrn,
+          //partialShort, // For debugging.
+          partialText_: partialText_
+        });
 
-      delimiters = _paramsApply.delimiters;
-      partialText = _paramsApply.partialText;
+        delimiters = _paramsApply.delimiters;
+        partialText = _paramsApply.partialText;
+      }
     } else {
       var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
         contextKeys: contextKeys,
@@ -704,22 +690,29 @@ PARAMS_APPLIER: {
     }
 
     var parseObj = partialParseItrn.value;
-    var parseObjKeysItr = Object.keys(parseObj)[Symbol.iterator]();
-    var parseObjKeysItrn = parseObjKeysItr.next();
+    var parseObjKeys = Object.keys(parseObj);
+    var delimiters;
+    var partialText = '';
 
-    var _paramsApplyToParseOb = paramsApplyToParseObj({
-      contextKeys: contextKeys,
-      delimiters_: delimiters_,
-      paramKeys: paramKeys,
-      paramsObj: paramsObj,
-      parseObj: parseObj,
-      parseObjKeysItr: parseObjKeysItr,
-      parseObjKeysItrn: parseObjKeysItrn,
-      //partialShort, // For debugging.
-      partialText_: partialText_
-    }),
-        delimiters = _paramsApplyToParseOb.delimiters,
-        partialText = _paramsApplyToParseOb.partialText;
+    if (parseObjKeys.length) {
+      var parseObjKeysItr = parseObjKeys[Symbol.iterator]();
+      var parseObjKeysItrn = parseObjKeysItr.next();
+
+      var _paramsApplyToParseOb = paramsApplyToParseObj({
+        contextKeys: contextKeys,
+        delimiters_: delimiters_,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        parseObj: parseObj,
+        parseObjKeysItr: parseObjKeysItr,
+        parseObjKeysItrn: parseObjKeysItrn,
+        //partialShort, // For debugging.
+        partialText_: partialText_
+      });
+
+      delimiters = _paramsApplyToParseOb.delimiters;
+      partialText = _paramsApplyToParseOb.partialText;
+    }
 
     args.delimiters_ = delimiters || delimiters_;
     args.partialParseItrn = partialParseItr.next();
@@ -809,37 +802,49 @@ PARAMS_APPLIER: {
       paramsObj.styleModifier = styleModClasses;
     }
 
-    var paramsObjShallowItr = Object.keys(paramsObj)[Symbol.iterator]();
-    var paramsObjShallowItrn = paramsObjShallowItr.next();
+    var paramsObjKeys = Object.keys(paramsObj);
+    var dataKeys;
 
-    var _dataKeysCollect5 = dataKeysCollect({
-      dataKeys_: [],
-      dataObjShallowItr: paramsObjShallowItr,
-      dataObjShallowItrn: paramsObjShallowItrn,
-      dataObj: paramsObj,
-      parentObjAsStr: '' //partialShort // For debugging.
+    if (paramsObjKeys.length) {
+      var paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
+      var paramsObjShallowItrn = paramsObjShallowItr.next();
 
-    }),
-        dataKeys = _dataKeysCollect5.dataKeys;
+      var _dataKeysCollect3 = dataKeysCollect({
+        dataKeys_: [],
+        dataObjShallowItr: paramsObjShallowItr,
+        dataObjShallowItrn: paramsObjShallowItrn,
+        dataObj: paramsObj,
+        parentObjAsStr: '' //partialShort // For debugging.
+
+      });
+
+      dataKeys = _dataKeysCollect3.dataKeys;
+    }
 
     var paramKeys = dataKeys;
     var partialText_ = partials[partialShort] || '';
     var partialScan = hogan.scan(partialText_);
     var partialParseArr = hogan.parse(partialScan);
-    var partialParseItr = partialParseArr[Symbol.iterator]();
-    var partialParseItrn = partialParseItr.next();
+    var delimiters;
+    var partialText = '';
 
-    var _paramsApply2 = paramsApply({
-      contextKeys: contextKeys,
-      paramKeys: paramKeys,
-      paramsObj: paramsObj,
-      partialParseItr: partialParseItr,
-      partialParseItrn: partialParseItrn,
-      //partialShort, // For debugging.
-      partialText_: partialText_
-    }),
-        delimiters = _paramsApply2.delimiters,
-        partialText = _paramsApply2.partialText;
+    if (partialParseArr.length) {
+      var partialParseItr = partialParseArr[Symbol.iterator]();
+      var partialParseItrn = partialParseItr.next();
+
+      var _paramsApply2 = paramsApply({
+        contextKeys: contextKeys,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        partialParseItr: partialParseItr,
+        partialParseItrn: partialParseItrn,
+        //partialShort, // For debugging.
+        partialText_: partialText_
+      });
+
+      delimiters = _paramsApply2.delimiters;
+      partialText = _paramsApply2.partialText;
+    }
 
     if (delimiters) {
       var options = {
@@ -868,28 +873,39 @@ METHODS: {
       return {};
     }
 
-    var dataObjShallowItr = Object.keys(context)[Symbol.iterator]();
-    var dataObjShallowItrn = dataObjShallowItr.next();
+    var contextObjKeys = Object.keys(context);
+    var dataKeys = [];
 
-    var _dataKeysCollect6 = dataKeysCollect({
-      dataKeys_: [],
-      dataObjShallowItr: dataObjShallowItr,
-      dataObjShallowItrn: dataObjShallowItrn,
-      dataObj: context,
-      parentObjAsStr: ''
-    }),
-        dataKeys = _dataKeysCollect6.dataKeys;
+    if (contextObjKeys.length) {
+      var dataObjShallowItr = contextObjKeys[Symbol.iterator]();
+      var dataObjShallowItrn = dataObjShallowItr.next();
 
-    var contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
+      var _dataKeysCollect4 = dataKeysCollect({
+        dataKeys_: [],
+        dataObjShallowItr: dataObjShallowItr,
+        dataObjShallowItrn: dataObjShallowItrn,
+        dataObj: context,
+        parentObjAsStr: ''
+      });
 
-    var contextKeysItrn = contextKeysItr.next();
+      dataKeys = _dataKeysCollect4.dataKeys;
+    }
 
-    var _contextKeysCollect = contextKeysCollect({
-      contextKeys_: dataKeys,
-      contextKeysItr: contextKeysItr,
-      contextKeysItrn: contextKeysItrn
-    }),
-        contextKeys = _contextKeysCollect.contextKeys;
+    var contextKeys;
+
+    if (dataKeys.length) {
+      var contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
+
+      var contextKeysItrn = contextKeysItr.next();
+
+      var _contextKeysCollect = contextKeysCollect({
+        contextKeys_: dataKeys,
+        contextKeysItr: contextKeysItr,
+        contextKeysItrn: contextKeysItrn
+      });
+
+      contextKeys = _contextKeysCollect.contextKeys;
+    }
 
     return contextKeys;
   };
@@ -921,22 +937,26 @@ METHODS: {
       }
     }
 
-    var partialsKeysItr = partialsKeys[Symbol.iterator]();
-    var partialsKeysItrn = partialsKeysItr.next();
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _partialsWithParamsAd = partialsWithParamsAdd({
-      compilation: compilation,
-      contextKeys: contextKeys,
-      partials: partials,
-      partialsComp: partialsComp,
-      partialsKeysItr: partialsKeysItr,
-      partialsKeysItrn: partialsKeysItrn
-    });
+    if (partialsKeys.length) {
+      var partialsKeysItr = partialsKeys[Symbol.iterator]();
+      var partialsKeysItrn = partialsKeysItr.next();
 
-    partials = _partialsWithParamsAd.partials;
-    partialsComp = _partialsWithParamsAd.partialsComp;
+      var _partialsWithParamsAd = partialsWithParamsAdd({
+        compilation: compilation,
+        contextKeys: contextKeys,
+        partials: partials,
+        partialsComp: partialsComp,
+        partialsKeysItr: partialsKeysItr,
+        partialsKeysItrn: partialsKeysItrn
+      });
+
+      partials = _partialsWithParamsAd.partials;
+      partialsComp = _partialsWithParamsAd.partialsComp;
+    }
+
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
