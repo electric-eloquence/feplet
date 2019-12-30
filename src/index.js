@@ -974,17 +974,17 @@ METHODS: {
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
-    // Remove any reference between partialsArr and partials object because we need to add to the partials object.
+    // Remove any reference between partialsValues and partials object because we need to add to the partials object.
     // We therefore do not want to iterate on the partials object itself.
-    const partialsArr = Object.values(partials);
+    const partialsValues = Object.values(partials);
 
     // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
-    for (let i = 0, l = partialsArr.length; i < l; i++) {
+    for (let i = 0, l = partialsValues.length; i < l; i++) {
       ({
         _contextKeys,
         partials,
         partialsComp
-      } = preProcessPartialParams(partialsArr[i], partialsComp[i], partials, partialsComp, contextKeys, context));
+      } = preProcessPartialParams(partialsValues[i], partialsComp[i], partials, partialsComp, contextKeys, context));
     }
 
     if (_contextKeys) {
@@ -1024,8 +1024,12 @@ METHODS: {
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
-    // Using for..of because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
-    for (let partialName of Object.keys(partials)) {
+    const partialsKeys = Object.keys(partials);
+
+    // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
+    for (let i = 0, l = partialsKeys.length; i < l; i++) {
+      const partialName = partialsKeys[i];
+
       if (!partialsComp[partialName]) {
         ({
           partials,

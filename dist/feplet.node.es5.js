@@ -971,13 +971,13 @@ METHODS: {
     var _contextKeys;
 
     var partials = partials_ || this.partials || {};
-    var partialsComp = partialsComp_ || this.partialsComp || {}; // Remove any reference between partialsArr and partials object because we need to add to the partials object.
+    var partialsComp = partialsComp_ || this.partialsComp || {}; // Remove any reference between partialsValues and partials object because we need to add to the partials object.
     // We therefore do not want to iterate on the partials object itself.
 
-    var partialsArr = Object.values(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
+    var partialsValues = Object.values(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
 
-    for (var i = 0, l = partialsArr.length; i < l; i++) {
-      var _preProcessPartialPar = preProcessPartialParams(partialsArr[i], partialsComp[i], partials, partialsComp, contextKeys, context);
+    for (var i = 0, l = partialsValues.length; i < l; i++) {
+      var _preProcessPartialPar = preProcessPartialParams(partialsValues[i], partialsComp[i], partials, partialsComp, contextKeys, context);
 
       _contextKeys = _preProcessPartialPar._contextKeys;
       partials = _preProcessPartialPar.partials;
@@ -1022,10 +1022,11 @@ METHODS: {
     var context = context_ || this.context || {};
     var contextKeys = contextKeys_ || this && this.contextKeys;
     var partials = partials_ || this.partials || {};
-    var partialsComp = partialsComp_ || this.partialsComp || {}; // Using for..of because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
+    var partialsComp = partialsComp_ || this.partialsComp || {};
+    var partialsKeys = Object.keys(partials); // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
 
-    for (var _i2 = 0, _Object$keys = Object.keys(partials); _i2 < _Object$keys.length; _i2++) {
-      var partialName = _Object$keys[_i2];
+    for (var i = 0, l = partialsKeys.length; i < l; i++) {
+      var partialName = partialsKeys[i];
 
       if (!partialsComp[partialName]) {
         var _registerPartial = registerPartial(partialName, partials[partialName], null, partials, partialsComp);
