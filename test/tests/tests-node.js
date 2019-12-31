@@ -314,7 +314,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('  heck\n');
       });
 
-      it('hydrates templates with variables passed per the Pattern Lab styleModifier convention', function () {
+      it('hydrates templates with variable passed per the Pattern Lab styleModifier convention', function () {
         const files = [
           '02-stylemod-atom.fpt'
         ];
@@ -328,13 +328,12 @@ module.exports = function (Feplet) {
         const render = Feplet.render(
           templateText,
           {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
+            description: 'DESCRIPTION' // Need to test hydration of only one variable.
           },
           partials
         );
 
-        expect(render).to.equal('<span class="test_base test_1">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
+        expect(render).to.equal('<span class="test_base test_1">\n    \n    DESCRIPTION\n</span>\n');
       });
 
       it('recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
@@ -833,11 +832,10 @@ same name', function () {
     });
 
     describe('Instance render', function () {
-      it('hydrates templates with variables passed per the Pattern Lab styleModifier convention', function () {
+      it('hydrates templates with variable passed per the Pattern Lab styleModifier convention', function () {
         const feplet = new Feplet(
           {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
+            description: 'DESCRIPTION' // Need to test hydration of only one variable.
           }
         );
         const files = [
@@ -851,7 +849,7 @@ same name', function () {
         const templateText = fs.readFileSync(pathToFixtures('02-stylemod-molecule.fpt'), enc);
         const render = feplet.render(templateText);
 
-        expect(render).to.equal('<span class="test_base test_1">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
+        expect(render).to.equal('<span class="test_base test_1">\n    \n    DESCRIPTION\n</span>\n');
       });
 
       it('recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\

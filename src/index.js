@@ -120,8 +120,21 @@ COLLECTORS: {
           const dataObjItemKeys = Object.keys(dataObjItem);
 
           if (dataObjItemKeys.length) {
-            const dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
-            const dataObjDeeperItrn = dataObjDeeperItr.next();
+            let dataObjDeeperItr;
+            let dataObjDeeperItrn;
+
+            if (dataObjItemKeys.length === 1) {
+              dataObjDeeperItr = {
+                next: () => {return {done: true};}
+              };
+              dataObjDeeperItrn = {
+                value: dataObjItemKeys[0]
+              };
+            }
+            else {
+              dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
+              dataObjDeeperItrn = dataObjDeeperItr.next();
+            }
 
             let parentObjAsStrNew = parentObjAsStr;
 
@@ -649,8 +662,22 @@ PARAMS_APPLIER: {
           const paramsObjKeys = Object.keys(paramsObjNew);
 
           if (paramsObjKeys.length) {
-            const paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-            const paramsObjShallowItrn = paramsObjShallowItr.next();
+            let paramsObjShallowItr;
+            let paramsObjShallowItrn;
+
+            if (paramsObjKeys.length === 1) {
+              paramsObjShallowItr = {
+                next: () => {return {done: true};}
+              };
+              paramsObjShallowItrn = {
+                value: paramsObjKeys[0]
+              };
+            }
+            else {
+              paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
+              paramsObjShallowItrn = paramsObjShallowItr.next();
+            }
+
             ({dataKeys} = dataKeysCollect({
               dataKeys_: [],
               dataObjShallowItr: paramsObjShallowItr,
@@ -670,8 +697,21 @@ PARAMS_APPLIER: {
       }
 
       if (tagParse.length) {
-        const tagParseItr = tagParse[Symbol.iterator]();
-        const tagParseItrn = tagParseItr.next();
+        let tagParseItr;
+        let tagParseItrn;
+
+        if (tagParse.length === 1) {
+          tagParseItr = {
+            next: () => {return {done: true};}
+          };
+          tagParseItrn = {
+            value: tagParse[0]
+          };
+        }
+        else {
+          tagParseItr = tagParse[Symbol.iterator]();
+          tagParseItrn = tagParseItr.next();
+        }
 
         ({
           delimiters,
@@ -732,27 +772,24 @@ PARAMS_APPLIER: {
 
     const parseObj = partialParseItrn.value;
     const parseObjKeys = Object.keys(parseObj);
-    let delimiters;
-    let partialText = '';
 
-    if (parseObjKeys.length) {
-      const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-      const parseObjKeysItrn = parseObjKeysItr.next();
-      ({
-        delimiters,
-        partialText
-      } = paramsApplyToParseObj({
-        contextKeys,
-        delimiters_,
-        paramKeys,
-        paramsObj,
-        parseObj,
-        parseObjKeysItr,
-        parseObjKeysItrn,
-        //partialShort, // For debugging.
-        partialText_
-      }));
-    }
+    // parseObjKeys.length is always > 1. Cannot optimize by creating conditions on parseObjKeys.length.
+    const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
+    const parseObjKeysItrn = parseObjKeysItr.next();
+    const {
+      delimiters,
+      partialText
+    } = paramsApplyToParseObj({
+      contextKeys,
+      delimiters_,
+      paramKeys,
+      paramsObj,
+      parseObj,
+      parseObjKeysItr,
+      parseObjKeysItrn,
+      //partialShort, // For debugging.
+      partialText_
+    });
 
     args.delimiters_ = delimiters || delimiters_;
     args.partialParseItrn = partialParseItr.next();
@@ -844,8 +881,22 @@ PARAMS_APPLIER: {
     let dataKeys;
 
     if (paramsObjKeys.length) {
-      const paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-      const paramsObjShallowItrn = paramsObjShallowItr.next();
+      let paramsObjShallowItr;
+      let paramsObjShallowItrn;
+
+      if (paramsObjKeys.length === 1) {
+        paramsObjShallowItr = {
+          next: () => {return {done: true};}
+        };
+        paramsObjShallowItrn = {
+          value: paramsObjKeys[0]
+        };
+      }
+      else {
+        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
+        paramsObjShallowItrn = paramsObjShallowItr.next();
+      }
+
       ({dataKeys} = dataKeysCollect({
         dataKeys_: [],
         dataObjShallowItr: paramsObjShallowItr,
@@ -865,8 +916,22 @@ PARAMS_APPLIER: {
     let partialText = '';
 
     if (partialParseArr.length) {
-      const partialParseItr = partialParseArr[Symbol.iterator]();
-      const partialParseItrn = partialParseItr.next();
+      let partialParseItr;
+      let partialParseItrn;
+
+      if (partialParseArr.length === 1) {
+        partialParseItr = {
+          next: () => {return {done: true};}
+        };
+        partialParseItrn = {
+          value: partialParseArr[0]
+        };
+      }
+      else {
+        partialParseItr = partialParseArr[Symbol.iterator]();
+        partialParseItrn = partialParseItr.next();
+      }
+
       ({
         delimiters,
         partialText
@@ -912,8 +977,22 @@ METHODS: {
     let dataKeys = [];
 
     if (contextObjKeys.length) {
-      const dataObjShallowItr = contextObjKeys[Symbol.iterator]();
-      const dataObjShallowItrn = dataObjShallowItr.next();
+      let dataObjShallowItr;
+      let dataObjShallowItrn;
+
+      if (contextObjKeys.length === 1) {
+        dataObjShallowItr = {
+          next: () => {return {done: true};}
+        };
+        dataObjShallowItrn = {
+          value: contextObjKeys[0]
+        };
+      }
+      else {
+        dataObjShallowItr = contextObjKeys[Symbol.iterator]();
+        dataObjShallowItrn = dataObjShallowItr.next();
+      }
+
       ({dataKeys} = dataKeysCollect({
         dataKeys_: [],
         dataObjShallowItr,
@@ -926,8 +1005,21 @@ METHODS: {
     let contextKeys;
 
     if (dataKeys.length) {
-      const contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
-      const contextKeysItrn = contextKeysItr.next();
+      let contextKeysItr;
+      let contextKeysItrn;
+
+      if (dataKeys.length === 1) {
+        contextKeysItr = {
+          next: () => {return {done: true};}
+        };
+        contextKeysItrn = {
+          value: dataKeys[0]
+        };
+      }
+      else {
+        contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
+        contextKeysItrn = contextKeysItr.next();
+      }
 
       ({contextKeys} = contextKeysCollect({
         contextKeys_: dataKeys,
@@ -970,8 +1062,21 @@ METHODS: {
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
     if (partialsKeys.length) {
-      const partialsKeysItr = partialsKeys[Symbol.iterator]();
-      const partialsKeysItrn = partialsKeysItr.next();
+      let partialsKeysItr;
+      let partialsKeysItrn;
+
+      if (partialsKeys.length === 1) {
+        partialsKeysItr = {
+          next: () => {return {done: true};}
+        };
+        partialsKeysItrn = {
+          value: partialsKeys[0]
+        };
+      }
+      else {
+        partialsKeysItr = partialsKeys[Symbol.iterator]();
+        partialsKeysItrn = partialsKeysItr.next();
+      }
 
       ({
         partials,
