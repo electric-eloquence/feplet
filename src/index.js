@@ -772,24 +772,28 @@ PARAMS_APPLIER: {
 
     const parseObj = partialParseItrn.value;
     const parseObjKeys = Object.keys(parseObj);
+    let delimiters;
+    let partialText;
 
-    // parseObjKeys.length is always > 1. Cannot optimize by creating conditions on parseObjKeys.length.
-    const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-    const parseObjKeysItrn = parseObjKeysItr.next();
-    const {
-      delimiters,
-      partialText
-    } = paramsApplyToParseObj({
-      contextKeys,
-      delimiters_,
-      paramKeys,
-      paramsObj,
-      parseObj,
-      parseObjKeysItr,
-      parseObjKeysItrn,
-      //partialShort, // For debugging.
-      partialText_
-    });
+    if (parseObjKeys.length) {
+      // At this point, parseObjKeys.length is always > 1.
+      const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
+      const parseObjKeysItrn = parseObjKeysItr.next();
+      ({
+        delimiters,
+        partialText
+      } = paramsApplyToParseObj({
+        contextKeys,
+        delimiters_,
+        paramKeys,
+        paramsObj,
+        parseObj,
+        parseObjKeysItr,
+        parseObjKeysItrn,
+        //partialShort, // For debugging.
+        partialText_
+      }));
+    }
 
     args.delimiters_ = delimiters || delimiters_;
     args.partialParseItrn = partialParseItr.next();

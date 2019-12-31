@@ -739,24 +739,30 @@ PARAMS_APPLIER: {
     }
 
     var parseObj = partialParseItrn.value;
-    var parseObjKeys = Object.keys(parseObj); // parseObjKeys.length is always > 1. Cannot optimize by creating conditions on parseObjKeys.length.
+    var parseObjKeys = Object.keys(parseObj);
+    var delimiters;
+    var partialText;
 
-    var parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-    var parseObjKeysItrn = parseObjKeysItr.next();
+    if (parseObjKeys.length) {
+      // At this point, parseObjKeys.length is always > 1.
+      var parseObjKeysItr = parseObjKeys[Symbol.iterator]();
+      var parseObjKeysItrn = parseObjKeysItr.next();
 
-    var _paramsApplyToParseOb = paramsApplyToParseObj({
-      contextKeys: contextKeys,
-      delimiters_: delimiters_,
-      paramKeys: paramKeys,
-      paramsObj: paramsObj,
-      parseObj: parseObj,
-      parseObjKeysItr: parseObjKeysItr,
-      parseObjKeysItrn: parseObjKeysItrn,
-      //partialShort, // For debugging.
-      partialText_: partialText_
-    }),
-        delimiters = _paramsApplyToParseOb.delimiters,
-        partialText = _paramsApplyToParseOb.partialText;
+      var _paramsApplyToParseOb = paramsApplyToParseObj({
+        contextKeys: contextKeys,
+        delimiters_: delimiters_,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        parseObj: parseObj,
+        parseObjKeysItr: parseObjKeysItr,
+        parseObjKeysItrn: parseObjKeysItrn,
+        //partialShort, // For debugging.
+        partialText_: partialText_
+      });
+
+      delimiters = _paramsApplyToParseOb.delimiters;
+      partialText = _paramsApplyToParseOb.partialText;
+    }
 
     args.delimiters_ = delimiters || delimiters_;
     args.partialParseItrn = partialParseItr.next();
