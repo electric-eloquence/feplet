@@ -189,27 +189,34 @@ COLLECTORS: {
 
 HELPERS: {
   var paramsObjDotNotationParse = function paramsObjDotNotationParse(args) {
-    var obj = args.obj,
-        prop_ = args.prop_;
-    var propSplit = prop_.split('.');
-    var prop0 = propSplit.shift();
-    var prop = propSplit.join('.');
-    var value; // eslint-disable-next-line no-prototype-builtins
+    var paramsObjPart = args.paramsObjPart,
+        parseObjTagName = args.parseObjTagName;
+    var tagNameSplit = parseObjTagName.split('.');
+    var tagName0 = tagNameSplit.shift(); // First delimit.
 
-    if (obj.hasOwnProperty(prop0)) {
-      var _value = obj[prop0];
+    var tagNameShifted = tagNameSplit.join('.'); // Rest of the dot-delimited tagName.
 
-      if (_value instanceof Object && prop.length) {
+    var value;
+
+    if (tagName0 in paramsObjPart) {
+      var _value = paramsObjPart[tagName0];
+
+      if (_value instanceof Object && tagNameShifted.length) {
         value = paramsObjDotNotationParse({
-          obj: _value,
-          prop_: prop
+          paramsObjPart: _value,
+          parseObjTagName: tagNameShifted
         });
       } else {
         value = _value;
       }
     }
 
-    return value;
+    if (value instanceof Object) {
+      return value;
+    } else {
+      // Ok to return null because we only need keys, not values.
+      return null;
+    }
   };
 
   var styleModifierExtract = function styleModifierExtract(args) {
@@ -335,7 +342,8 @@ HELPERS: {
       i = parseObj.otag.length;
 
       while (i--) {
-        partialText += "\x02"; //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText += "\x02";
+        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       switch (parseObj.tag) {
@@ -373,7 +381,8 @@ HELPERS: {
       i = parseObj.ctag.length;
 
       while (i--) {
-        partialText += "\x03"; //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText += "\x03";
+        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -433,7 +442,8 @@ HELPERS: {
       i = parseObj.otag.length;
 
       while (i--) {
-        partialText += "\x02"; //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText += "\x02";
+        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       partialText += '/';
@@ -455,7 +465,8 @@ HELPERS: {
       i = parseObj.ctag.length;
 
       while (i--) {
-        partialText += "\x03"; //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText += "\x03";
+        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -532,13 +543,13 @@ HELPERS: {
 PARAMS_APPLIER: {
   var paramsApplyByKeyArrays = function paramsApplyByKeyArrays(args) {
     var contextKeys = args.contextKeys,
-        delimiters_ = args.delimiters_,
+        delimiterUnicodes_ = args.delimiterUnicodes_,
         tagParseVal = args.tagParseVal,
         paramKeys = args.paramKeys,
         parseObj = args.parseObj,
         parseObjKey = args.parseObjKey,
         partialText_ = args.partialText_;
-    var delimiters;
+    var delimiterUnicodes;
     var otag;
     var ctag;
     var partialText;
@@ -552,34 +563,36 @@ PARAMS_APPLIER: {
       otag = _tagReplace.otag;
       ctag = _tagReplace.ctag;
       partialText = _tagReplace.partialText;
-    } else if (parseObjKey === 'tag' && !delimiters_) {
+    } else if (parseObjKey === 'tag' && !delimiterUnicodes_) {
       otag = parseObj.otag;
       ctag = parseObj.ctag;
     }
 
-    if (!delimiters_ && otag && ctag) {
-      delimiters = '';
+    if (!delimiterUnicodes_ && otag && ctag) {
+      delimiterUnicodes = '';
 
       for (var i = 0, l = otag.length; i < l; i++) {
-        delimiters += "\x02"; //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
+        delimiterUnicodes += "\x02";
+        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
       }
 
-      delimiters += ' ';
+      delimiterUnicodes += ' ';
 
       for (var _i = 0, _l = ctag.length; _i < _l; _i++) {
-        delimiters += "\x03"; //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
+        delimiterUnicodes += "\x03";
+        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
       }
     }
 
     return {
-      delimiters: delimiters || delimiters_,
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText || partialText_
     };
   };
 
   var paramsApplyToParseObj = function paramsApplyToParseObj(args) {
     var contextKeys = args.contextKeys,
-        delimiters_ = args.delimiters_,
+        delimiterUnicodes_ = args.delimiterUnicodes_,
         paramKeys = args.paramKeys,
         paramsObj = args.paramsObj,
         parseObj = args.parseObj,
@@ -589,7 +602,7 @@ PARAMS_APPLIER: {
 
     if (parseObjKeysItrn.done) {
       return {
-        delimiters: delimiters_,
+        delimiterUnicodes: delimiterUnicodes_,
         partialText: partialText_
       };
     }
@@ -597,18 +610,18 @@ PARAMS_APPLIER: {
     var parseObjKey = parseObjKeysItrn.value;
     var tagParse = parseObj[parseObjKey];
     var partialText;
-    var delimiters;
+    var delimiterUnicodes;
 
     if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
       var paramsWithDotNotation = paramsObjDotNotationParse({
-        obj: paramsObj,
-        prop_: parseObj.n
+        paramsObjPart: paramsObj,
+        parseObjTagName: parseObj.n
       });
       var dataKeys = [];
       var paramKeysNew;
       var paramsObjNew;
 
-      if (paramsWithDotNotation) {
+      if (paramsWithDotNotation instanceof Object) {
         var l = 1;
 
         if (Array.isArray(paramsWithDotNotation)) {
@@ -696,13 +709,13 @@ PARAMS_APPLIER: {
           partialText_: partialText_
         });
 
-        delimiters = _paramsApply.delimiters;
+        delimiterUnicodes = _paramsApply.delimiterUnicodes;
         partialText = _paramsApply.partialText;
       }
     } else {
       var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
         contextKeys: contextKeys,
-        delimiters_: delimiters_,
+        delimiterUnicodes_: delimiterUnicodes_,
         tagParseVal: tagParse,
         paramKeys: paramKeys,
         //paramsObj, // For debugging.
@@ -712,11 +725,11 @@ PARAMS_APPLIER: {
         partialText_: partialText_
       });
 
-      delimiters = _paramsApplyByKeyArra.delimiters;
+      delimiterUnicodes = _paramsApplyByKeyArra.delimiterUnicodes;
       partialText = _paramsApplyByKeyArra.partialText;
     }
 
-    args.delimiters_ = delimiters || delimiters_;
+    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
     args.parseObjKeysItrn = parseObjKeysItr.next();
     args.partialText_ = partialText || partialText_;
     return paramsApplyToParseObj(args);
@@ -724,7 +737,7 @@ PARAMS_APPLIER: {
 
   var paramsApply = function paramsApply(args) {
     var contextKeys = args.contextKeys,
-        delimiters_ = args.delimiters_,
+        delimiterUnicodes_ = args.delimiterUnicodes_,
         paramKeys = args.paramKeys,
         paramsObj = args.paramsObj,
         partialParseItr = args.partialParseItr,
@@ -733,14 +746,14 @@ PARAMS_APPLIER: {
 
     if (partialParseItrn.done) {
       return {
-        delimiters: delimiters_,
+        delimiterUnicodes: delimiterUnicodes_,
         partialText: partialText_
       };
     }
 
     var parseObj = partialParseItrn.value;
     var parseObjKeys = Object.keys(parseObj);
-    var delimiters;
+    var delimiterUnicodes;
     var partialText;
 
     if (parseObjKeys.length) {
@@ -750,7 +763,7 @@ PARAMS_APPLIER: {
 
       var _paramsApplyToParseOb = paramsApplyToParseObj({
         contextKeys: contextKeys,
-        delimiters_: delimiters_,
+        delimiterUnicodes_: delimiterUnicodes_,
         paramKeys: paramKeys,
         paramsObj: paramsObj,
         parseObj: parseObj,
@@ -760,11 +773,11 @@ PARAMS_APPLIER: {
         partialText_: partialText_
       });
 
-      delimiters = _paramsApplyToParseOb.delimiters;
+      delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
       partialText = _paramsApplyToParseOb.partialText;
     }
 
-    args.delimiters_ = delimiters || delimiters_;
+    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
     args.partialParseItrn = partialParseItr.next();
     args.partialText_ = partialText || partialText_;
     return paramsApply(args);
@@ -795,7 +808,7 @@ PARAMS_APPLIER: {
     }
 
     var paramsMatch = partialFull.match(paramRegex);
-    var paramsObj;
+    var paramsObj = {};
     var partialShort = partialFull;
 
     if (paramsMatch) {
@@ -842,11 +855,9 @@ PARAMS_APPLIER: {
     /* istanbul ignore if */
 
 
-    if (partialShort === partialFull) {
+    if (partialShort === partialFull || !partials[partialShort]) {
       return partialsWithParamsAdd(args);
     }
-
-    paramsObj = paramsObj || {};
 
     if (styleModClasses) {
       paramsObj.styleModifier = styleModClasses;
@@ -888,10 +899,9 @@ PARAMS_APPLIER: {
     }
 
     var paramKeys = dataKeys;
-    var partialText_ = partials[partialShort] || '';
-    var partialScan = hogan.scan(partialText_);
-    var partialParseArr = hogan.parse(partialScan);
-    var delimiters;
+    var partialParseArr = partials[partialShort].parseArr || [];
+    var partialText_ = partials[partialShort].text || '';
+    var delimiterUnicodes;
     var partialText = '';
 
     if (partialParseArr.length) {
@@ -924,24 +934,22 @@ PARAMS_APPLIER: {
         partialText_: partialText_
       });
 
-      delimiters = _paramsApply2.delimiters;
+      delimiterUnicodes = _paramsApply2.delimiterUnicodes;
       partialText = _paramsApply2.partialText;
     }
 
-    if (delimiters) {
+    if (delimiterUnicodes && partialText !== partialText_) {
       var options = {
-        delimiters: delimiters
+        delimiters: delimiterUnicodes
       };
-      var partialScanNew = hogan.scan(partialText, delimiters);
+      var partialScanNew = hogan.scan(partialText, delimiterUnicodes);
       var partialParseArrNew = hogan.parse(partialScanNew, partialText, options);
       var partialGeneration = hogan.generate(partialParseArrNew, partialText, options);
-      partials[partialFull] = partialGeneration.render(paramsObj);
-      partialsComp[partialFull] = hogan.compile(partials[partialFull]);
-    } else {
-      // Do not have nyc/istanbul ignore this.
-      // Stay open to the possibility of testing this.
-      partials[partialFull] = partialText;
-      partialsComp[partialFull] = hogan.generate(partialParseArr, partialText, {});
+      partials[partialFull] = {
+        text: partialGeneration.render(paramsObj),
+        parseArr: partialParseArrNew
+      };
+      partialsComp[partialFull] = hogan.compile(partials[partialFull].text);
     }
 
     return partialsWithParamsAdd(args);
@@ -1108,7 +1116,7 @@ METHODS: {
     var partialsValues = Object.values(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
 
     for (var i = 0, l = partialsValues.length; i < l; i++) {
-      var _preProcessPartialPar = preProcessPartialParams(partialsValues[i], partialsComp[i], partials, partialsComp, contextKeys, context);
+      var _preProcessPartialPar = preProcessPartialParams(partialsValues[i].text, partialsComp[i], partials, partialsComp, contextKeys, context);
 
       _contextKeys = _preProcessPartialPar._contextKeys;
       partials = _preProcessPartialPar.partials;
@@ -1130,11 +1138,14 @@ METHODS: {
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
     if (!partials[partialName]) {
-      partials[partialName] = partialTemplate;
+      partials[partialName] = {
+        text: partialTemplate,
+        parseArr: hogan.parse(hogan.scan(partialTemplate))
+      };
     }
 
     if (!partialsComp[partialName]) {
-      var partialComp = partialComp_ || hogan.compile(partialTemplate);
+      var partialComp = partialComp_ || hogan.generate(partials[partialName].parseArr, partialTemplate, {});
       partialsComp[partialName] = partialComp;
     }
 
@@ -1142,7 +1153,9 @@ METHODS: {
       partials: partials,
       partialsComp: partialsComp
     };
-  };
+  }; // For simplicity's sake, the partials_ arg is documented to be a key-value object of strings.
+  // Will get converted to an object of objects internally.
+
 
   var render = function render() {
     var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -1152,19 +1165,46 @@ METHODS: {
     var contextKeys_ = arguments.length > 4 ? arguments[4] : undefined;
     var context = context_ || this.context || {};
     var contextKeys = contextKeys_ || this && this.contextKeys;
-    var partials = partials_ || this.partials || {};
+    var partials;
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    var partialsKeys = Object.keys(partials); // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
+    var partialsKeys;
 
-    for (var i = 0, l = partialsKeys.length; i < l; i++) {
-      var partialName = partialsKeys[i];
+    if (partials_ instanceof Object) {
+      partials = {};
+      partialsKeys = Object.keys(partials_);
 
-      if (!partialsComp[partialName]) {
-        var _registerPartial = registerPartial(partialName, partials[partialName], null, partials, partialsComp);
+      for (var i = 0, l = partialsKeys.length; i < l; i++) {
+        var partialKey = partialsKeys[i];
+        var partial = partials_[partialKey];
 
-        partials = _registerPartial.partials;
-        partialsComp = _registerPartial.partialsComp;
+        if (partial instanceof Object) {
+          partials[partialKey] = partial;
+        } else if (typeof partial === 'string') {
+          partials[partialKey] = {
+            text: partial,
+            parseArr: hogan.parse(hogan.scan(partial))
+          };
+        }
       }
+    } else {
+      partials = this.partials;
+    }
+
+    if (partials instanceof Object) {
+      partialsKeys = Object.keys(partials); // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
+
+      for (var _i2 = 0, _l2 = partialsKeys.length; _i2 < _l2; _i2++) {
+        var _partialKey = partialsKeys[_i2];
+
+        if (!partialsComp[_partialKey]) {
+          var _registerPartial = registerPartial(_partialKey, partials[_partialKey].text, null, partials, partialsComp);
+
+          partials = _registerPartial.partials;
+          partialsComp = _registerPartial.partialsComp;
+        }
+      }
+    } else {
+      partials = {};
     }
 
     var compilation;
@@ -1175,27 +1215,54 @@ METHODS: {
       compilation = hogan.compile(text);
     }
 
-    return compilation.render(context, partials, null, partialsComp);
+    var partialsTexts = {};
+    partialsKeys = Object.keys(partials);
+
+    for (var _i3 = 0, _l3 = partialsKeys.length; _i3 < _l3; _i3++) {
+      partialsTexts[partialsKeys[_i3]] = partials[partialsKeys[_i3]].text;
+    }
+
+    return compilation.render(context, partialsTexts, null, partialsComp);
   };
 
-  var unregisterPartial = function unregisterPartial(partialName, partials_, partialsComp_) {
+  var unregisterPartial = function unregisterPartial(partialKey, partials_, partialsComp_) {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    delete partials[partialName];
-    delete partialsComp[partialName];
+    delete partials[partialKey];
+    delete partialsComp[partialKey];
     return {
       partials: partials,
       partialsComp: partialsComp
     };
   };
 } // PREPARE FOR EXPORT.
+// The partials arg is not documented, but ideally, it should be an object of objects.
+// For simplicity's sake, we allow a key-value object of strings to be converted internally.
 
 
 function Feplet(context, partials, partialsComp, contextKeys) {
   this.context = context || {};
-  this.partials = partials || {};
+  this.partials = {};
   this.partialsComp = partialsComp || {};
   this.contextKeys = contextKeys || preProcessContextKeys(this.context);
+
+  if (partials instanceof Object) {
+    var partialsKeys = Object.keys(partials);
+
+    for (var i = 0, l = partialsKeys.length; i < l; i++) {
+      var partialKey = partialsKeys[i];
+      var partial = partials[partialKey];
+
+      if (partial instanceof Object) {
+        this.partials[partialKey] = partial;
+      } else if (typeof partial === 'string') {
+        this.partials[partialKey] = {
+          text: partial,
+          parseArr: hogan.parse(hogan.scan(partial))
+        };
+      }
+    }
+  }
 } // STATIC METHODS.
 
 

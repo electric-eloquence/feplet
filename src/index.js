@@ -186,23 +186,22 @@ COLLECTORS: {
 HELPERS: {
   var paramsObjDotNotationParse = function (args) {
     const {
-      obj,
-      prop_
+      paramsObjPart,
+      parseObjTagName
     } = args;
 
-    const propSplit = prop_.split('.');
-    const prop0 = propSplit.shift();
-    const prop = propSplit.join('.');
+    const tagNameSplit = parseObjTagName.split('.');
+    const tagName0 = tagNameSplit.shift(); // First delimit.
+    const tagNameShifted = tagNameSplit.join('.'); // Rest of the dot-delimited tagName.
     let value;
 
-    // eslint-disable-next-line no-prototype-builtins
-    if (obj.hasOwnProperty(prop0)) {
-      const _value = obj[prop0];
+    if (tagName0 in paramsObjPart) {
+      const _value = paramsObjPart[tagName0];
 
-      if (_value instanceof Object && prop.length) {
+      if (_value instanceof Object && tagNameShifted.length) {
         value = paramsObjDotNotationParse({
-          obj: _value,
-          prop_: prop
+          paramsObjPart: _value,
+          parseObjTagName: tagNameShifted
         });
       }
       else {
@@ -210,7 +209,13 @@ HELPERS: {
       }
     }
 
-    return value;
+    if (value instanceof Object) {
+      return value;
+    }
+    else {
+      // Ok to return null because we only need keys, not values.
+      return null;
+    }
   };
 
   var styleModifierExtract = function (args) {
@@ -350,7 +355,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0002';
-        //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       switch (parseObj.tag) {
@@ -388,7 +393,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0003';
-        //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -454,7 +459,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0002';
-        //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       partialText += '/';
@@ -477,7 +482,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0003';
-        //partialText = partialText.slice(0, -1) + 'u'; // For debugging.
+        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -556,7 +561,7 @@ PARAMS_APPLIER: {
   var paramsApplyByKeyArrays = function (args) {
     const {
       contextKeys,
-      delimiters_,
+      delimiterUnicodes_,
       tagParseVal,
       paramKeys,
       //paramsObj, // For debugging.
@@ -566,7 +571,7 @@ PARAMS_APPLIER: {
       partialText_
     } = args;
 
-    let delimiters;
+    let delimiterUnicodes;
     let otag;
     let ctag;
     let partialText;
@@ -581,29 +586,29 @@ PARAMS_APPLIER: {
         partialText_
       }));
     }
-    else if (parseObjKey === 'tag' && !delimiters_) {
+    else if (parseObjKey === 'tag' && !delimiterUnicodes_) {
       otag = parseObj.otag;
       ctag = parseObj.ctag;
     }
 
-    if (!delimiters_ && otag && ctag) {
-      delimiters = '';
+    if (!delimiterUnicodes_ && otag && ctag) {
+      delimiterUnicodes = '';
 
       for (let i = 0, l = otag.length; i < l; i++) {
-        delimiters += '\u0002';
-        //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
+        delimiterUnicodes += '\u0002';
+        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
       }
 
-      delimiters += ' ';
+      delimiterUnicodes += ' ';
 
       for (let i = 0, l = ctag.length; i < l; i++) {
-        delimiters += '\u0003';
-        //delimiters = delimiters.slice(0, -1) + 'u'; // For debugging.
+        delimiterUnicodes += '\u0003';
+        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
       }
     }
 
     return {
-      delimiters: delimiters || delimiters_,
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText || partialText_
     };
   };
@@ -611,7 +616,7 @@ PARAMS_APPLIER: {
   var paramsApplyToParseObj = function (args) {
     const {
       contextKeys,
-      delimiters_,
+      delimiterUnicodes_,
       paramKeys,
       paramsObj,
       parseObj,
@@ -623,7 +628,7 @@ PARAMS_APPLIER: {
 
     if (parseObjKeysItrn.done) {
       return {
-        delimiters: delimiters_,
+        delimiterUnicodes: delimiterUnicodes_,
         partialText: partialText_
       };
     }
@@ -631,18 +636,19 @@ PARAMS_APPLIER: {
     const parseObjKey = parseObjKeysItrn.value;
     const tagParse = parseObj[parseObjKey];
     let partialText;
-    let delimiters;
+    let delimiterUnicodes;
 
     if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
       const paramsWithDotNotation = paramsObjDotNotationParse({
-        obj: paramsObj,
-        prop_: parseObj.n
+        paramsObjPart: paramsObj,
+        parseObjTagName: parseObj.n
       });
+
       let dataKeys = [];
       let paramKeysNew;
       let paramsObjNew;
 
-      if (paramsWithDotNotation) {
+      if (paramsWithDotNotation instanceof Object) {
         let l = 1;
 
         if (Array.isArray(paramsWithDotNotation)) {
@@ -714,7 +720,7 @@ PARAMS_APPLIER: {
         }
 
         ({
-          delimiters,
+          delimiterUnicodes,
           partialText
         } = paramsApply({ // eslint-disable-line no-use-before-define
           contextKeys,
@@ -729,11 +735,11 @@ PARAMS_APPLIER: {
     }
     else {
       ({
-        delimiters,
+        delimiterUnicodes,
         partialText
       } = paramsApplyByKeyArrays({
         contextKeys,
-        delimiters_,
+        delimiterUnicodes_,
         tagParseVal: tagParse,
         paramKeys,
         //paramsObj, // For debugging.
@@ -744,7 +750,7 @@ PARAMS_APPLIER: {
       }));
     }
 
-    args.delimiters_ = delimiters || delimiters_;
+    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
     args.parseObjKeysItrn = parseObjKeysItr.next();
     args.partialText_ = partialText || partialText_;
 
@@ -754,7 +760,7 @@ PARAMS_APPLIER: {
   var paramsApply = function (args) {
     const {
       contextKeys,
-      delimiters_,
+      delimiterUnicodes_,
       paramKeys,
       paramsObj,
       partialParseItr,
@@ -765,14 +771,14 @@ PARAMS_APPLIER: {
 
     if (partialParseItrn.done) {
       return {
-        delimiters: delimiters_,
+        delimiterUnicodes: delimiterUnicodes_,
         partialText: partialText_
       };
     }
 
     const parseObj = partialParseItrn.value;
     const parseObjKeys = Object.keys(parseObj);
-    let delimiters;
+    let delimiterUnicodes;
     let partialText;
 
     if (parseObjKeys.length) {
@@ -780,11 +786,11 @@ PARAMS_APPLIER: {
       const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
       const parseObjKeysItrn = parseObjKeysItr.next();
       ({
-        delimiters,
+        delimiterUnicodes,
         partialText
       } = paramsApplyToParseObj({
         contextKeys,
-        delimiters_,
+        delimiterUnicodes_,
         paramKeys,
         paramsObj,
         parseObj,
@@ -795,7 +801,7 @@ PARAMS_APPLIER: {
       }));
     }
 
-    args.delimiters_ = delimiters || delimiters_;
+    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
     args.partialParseItrn = partialParseItr.next();
     args.partialText_ = partialText || partialText_;
 
@@ -822,6 +828,7 @@ PARAMS_APPLIER: {
     const partialFull = compilation.partials[partialsKeysItrn.value].name;
     let styleModClasses;
     let styleModifierMatch;
+
     args.partialsKeysItrn = partialsKeysItr.next();
 
     if (partials[partialFull]) {
@@ -829,7 +836,7 @@ PARAMS_APPLIER: {
     }
 
     const paramsMatch = partialFull.match(paramRegex);
-    let paramsObj;
+    let paramsObj = {};
     let partialShort = partialFull;
 
     if (paramsMatch) {
@@ -871,11 +878,9 @@ PARAMS_APPLIER: {
     }
 
     /* istanbul ignore if */
-    if (partialShort === partialFull) {
+    if (partialShort === partialFull || !partials[partialShort]) {
       return partialsWithParamsAdd(args);
     }
-
-    paramsObj = paramsObj || {};
 
     if (styleModClasses) {
       paramsObj.styleModifier = styleModClasses;
@@ -912,11 +917,9 @@ PARAMS_APPLIER: {
     }
 
     const paramKeys = dataKeys;
-    let partialText_ = partials[partialShort] || '';
-
-    const partialScan = hogan.scan(partialText_);
-    const partialParseArr = hogan.parse(partialScan);
-    let delimiters;
+    const partialParseArr = partials[partialShort].parseArr || [];
+    const partialText_ = partials[partialShort].text || '';
+    let delimiterUnicodes;
     let partialText = '';
 
     if (partialParseArr.length) {
@@ -937,7 +940,7 @@ PARAMS_APPLIER: {
       }
 
       ({
-        delimiters,
+        delimiterUnicodes,
         partialText
       } = paramsApply({
         contextKeys,
@@ -950,20 +953,17 @@ PARAMS_APPLIER: {
       }));
     }
 
-    if (delimiters) {
-      const options = {delimiters};
-      const partialScanNew = hogan.scan(partialText, delimiters);
+    if (delimiterUnicodes && partialText !== partialText_) {
+      const options = {delimiters: delimiterUnicodes};
+      const partialScanNew = hogan.scan(partialText, delimiterUnicodes);
       const partialParseArrNew = hogan.parse(partialScanNew, partialText, options);
       const partialGeneration = hogan.generate(partialParseArrNew, partialText, options);
 
-      partials[partialFull] = partialGeneration.render(paramsObj);
-      partialsComp[partialFull] = hogan.compile(partials[partialFull]);
-    }
-    else {
-      // Do not have nyc/istanbul ignore this.
-      // Stay open to the possibility of testing this.
-      partials[partialFull] = partialText;
-      partialsComp[partialFull] = hogan.generate(partialParseArr, partialText, {});
+      partials[partialFull] = {
+        text: partialGeneration.render(paramsObj),
+        parseArr: partialParseArrNew
+      };
+      partialsComp[partialFull] = hogan.compile(partials[partialFull].text);
     }
 
     return partialsWithParamsAdd(args);
@@ -1120,7 +1120,14 @@ METHODS: {
         _contextKeys,
         partials,
         partialsComp
-      } = preProcessPartialParams(partialsValues[i], partialsComp[i], partials, partialsComp, contextKeys, context));
+      } = preProcessPartialParams(
+        partialsValues[i].text,
+        partialsComp[i],
+        partials,
+        partialsComp,
+        contextKeys,
+        context
+      ));
     }
 
     if (_contextKeys) {
@@ -1129,7 +1136,14 @@ METHODS: {
 
     ({
       compilation
-    } = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context));
+    } = preProcessPartialParams(
+      text,
+      compilation,
+      partials,
+      partialsComp,
+      contextKeys,
+      context
+    ));
 
     return compilation;
   };
@@ -1139,11 +1153,14 @@ METHODS: {
     const partialsComp = partialsComp_ || this.partialsComp || {};
 
     if (!partials[partialName]) {
-      partials[partialName] = partialTemplate;
+      partials[partialName] = {
+        text: partialTemplate,
+        parseArr: hogan.parse(hogan.scan(partialTemplate))
+      };
     }
 
     if (!partialsComp[partialName]) {
-      const partialComp = partialComp_ || hogan.compile(partialTemplate);
+      const partialComp = partialComp_ || hogan.generate(partials[partialName].parseArr, partialTemplate, {});
 
       partialsComp[partialName] = partialComp;
     }
@@ -1154,24 +1171,55 @@ METHODS: {
     };
   };
 
+  // For simplicity's sake, the partials_ arg is documented to be a key-value object of strings.
+  // Will get converted to an object of objects internally.
   var render = function (text = '', context_, partials_, partialsComp_, contextKeys_) {
     const context = context_ || this.context || {};
     const contextKeys = contextKeys_ || (this && this.contextKeys);
-    let partials = partials_ || this.partials || {};
+    let partials;
     let partialsComp = partialsComp_ || this.partialsComp || {};
+    let partialsKeys;
 
-    const partialsKeys = Object.keys(partials);
+    if (partials_ instanceof Object) {
+      partials = {};
+      partialsKeys = Object.keys(partials_);
 
-    // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
-    for (let i = 0, l = partialsKeys.length; i < l; i++) {
-      const partialName = partialsKeys[i];
+      for (let i = 0, l = partialsKeys.length; i < l; i++) {
+        const partialKey = partialsKeys[i];
+        const partial = partials_[partialKey];
 
-      if (!partialsComp[partialName]) {
-        ({
-          partials,
-          partialsComp
-        } = registerPartial(partialName, partials[partialName], null, partials, partialsComp));
+        if (partial instanceof Object) {
+          partials[partialKey] = partial;
+        }
+        else if (typeof partial === 'string') {
+          partials[partialKey] = {
+            text: partial,
+            parseArr: hogan.parse(hogan.scan(partial))
+          };
+        }
       }
+    }
+    else {
+      partials = this.partials;
+    }
+
+    if (partials instanceof Object) {
+      partialsKeys = Object.keys(partials);
+
+      // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
+      for (let i = 0, l = partialsKeys.length; i < l; i++) {
+        const partialKey = partialsKeys[i];
+
+        if (!partialsComp[partialKey]) {
+          ({
+            partials,
+            partialsComp
+          } = registerPartial(partialKey, partials[partialKey].text, null, partials, partialsComp));
+        }
+      }
+    }
+    else {
+      partials = {};
     }
 
     let compilation;
@@ -1183,15 +1231,22 @@ METHODS: {
       compilation = hogan.compile(text);
     }
 
-    return compilation.render(context, partials, null, partialsComp);
+    const partialsTexts = {};
+    partialsKeys = Object.keys(partials);
+
+    for (let i = 0, l = partialsKeys.length; i < l; i++) {
+      partialsTexts[partialsKeys[i]] = partials[partialsKeys[i]].text;
+    }
+
+    return compilation.render(context, partialsTexts, null, partialsComp);
   };
 
-  var unregisterPartial = function (partialName, partials_, partialsComp_) {
+  var unregisterPartial = function (partialKey, partials_, partialsComp_) {
     const partials = partials_ || this.partials || {};
     const partialsComp = partialsComp_ || this.partialsComp || {};
 
-    delete partials[partialName];
-    delete partialsComp[partialName];
+    delete partials[partialKey];
+    delete partialsComp[partialKey];
 
     return {
       partials,
@@ -1202,11 +1257,32 @@ METHODS: {
 
 // PREPARE FOR EXPORT.
 
+// The partials arg is not documented, but ideally, it should be an object of objects.
+// For simplicity's sake, we allow a key-value object of strings to be converted internally.
 function Feplet(context, partials, partialsComp, contextKeys) {
   this.context = context || {};
-  this.partials = partials || {};
+  this.partials = {};
   this.partialsComp = partialsComp || {};
   this.contextKeys = contextKeys || preProcessContextKeys(this.context);
+
+  if (partials instanceof Object) {
+    const partialsKeys = Object.keys(partials);
+
+    for (let i = 0, l = partialsKeys.length; i < l; i++) {
+      const partialKey = partialsKeys[i];
+      const partial = partials[partialKey];
+
+      if (partial instanceof Object) {
+        this.partials[partialKey] = partial;
+      }
+      else if (typeof partial === 'string') {
+        this.partials[partialKey] = {
+          text: partial,
+          parseArr: hogan.parse(hogan.scan(partial))
+        };
+      }
+    }
+  }
 }
 
 // STATIC METHODS.

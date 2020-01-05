@@ -14,7 +14,7 @@ function pathToFixtures(file) {
 module.exports = function (Feplet) {
   return function () {
     describe('Static render', function () {
-      it('hydrates templates with variables', function () {
+      it('1. Hydrates templates with variables', function () {
         const templateText = fs.readFileSync(pathToFixtures('00-base.fpt'), enc);
         const render = Feplet.render(
           templateText,
@@ -27,7 +27,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('foo\nbar\n');
       });
 
-      it('hydrates templates with nested variables', function () {
+      it('2. Hydrates templates with nested variables', function () {
         const templateText = fs.readFileSync(pathToFixtures('00-nested.fpt'), enc);
         const render = Feplet.render(
           templateText,
@@ -41,55 +41,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('\nYes\n');
       });
 
-      it('hydrates templates with an array of variables', function () {
-        const templateText = fs.readFileSync(pathToFixtures('00-nested.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            check: [
-              {
-                i18n: true
-              }
-            ]
-          }
-        );
-
-        expect(render).to.equal('\nYes\n');
-      });
-
-      it('hydrates variables written in dot.notation', function () {
-        const templateText = fs.readFileSync(pathToFixtures('01-dotted.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            dot: {
-              title: 'foo',
-              message: 'bar'
-            }
-          }
-        );
-
-        expect(render).to.equal('foo\nbar\n');
-      });
-
-      it('hydrates variables within an array written in dot.notation', function () {
-        const templateText = fs.readFileSync(pathToFixtures('01-dotted_array.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            dot: [
-              {
-                title: 'foo',
-                message: 'bar'
-              }
-            ]
-          }
-        );
-
-        expect(render).to.equal('foo\nbar\n');
-      });
-
-      it('recursively hydrates templates with variables', function () {
+      it('3. Recursively hydrates templates with variables', function () {
         const files = [
           '00-base.fpt'
         ];
@@ -112,7 +64,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('foo\nbar\n');
       });
 
-      it('recursively hydrates templates with nested variables', function () {
+      it('4. Recursively hydrates templates with nested variables', function () {
         const files = [
           '00-nested.fpt'
         ];
@@ -136,33 +88,39 @@ module.exports = function (Feplet) {
         expect(render).to.equal('\nYes\n');
       });
 
-      it('recursively hydrates templates with an array of variables', function () {
-        const files = [
-          '00-nested.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('00_nested-includer.fpt'), enc);
+      it('5. Hydrates variables written in dot.notation', function () {
+        const templateText = fs.readFileSync(pathToFixtures('01-dotted.fpt'), enc);
         const render = Feplet.render(
           templateText,
           {
-            check: [
-              {
-                i18n: true
-              }
-            ]
-          },
-          partials
+            dot: {
+              title: 'foo',
+              message: 'bar'
+            }
+          }
         );
 
-        expect(render).to.equal('\nYes\n');
+        expect(render).to.equal('foo\nbar\n');
       });
 
-      it('recursively hydrates variables written in dot.notation', function () {
+      it('6. Hydrates variables within an array written in dot.notation', function () {
+        const templateText = fs.readFileSync(pathToFixtures('01-dotted_array.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            dot: [
+              {
+                title: 'foo',
+                message: 'bar'
+              }
+            ]
+          }
+        );
+
+        expect(render).to.equal('foo\nbar\n');
+      });
+
+      it('7. Recursively hydrates variables written in dot.notation', function () {
         const files = [
           '01-dotted.fpt'
         ];
@@ -182,7 +140,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('foo\nbar\n');
       });
 
-      it('recursively hydrates variables within an array written in dot.notation', function () {
+      it('8. Recursively hydrates variables within an array written in dot.notation', function () {
         const files = [
           '01-dotted_array.fpt'
         ];
@@ -202,7 +160,470 @@ module.exports = function (Feplet) {
         expect(render).to.equal('foo\nbar\n');
       });
 
-      it('renders a top-level dot.notation parameter that nests more tags', function () {
+      it('9. Hydrates templates with variables passed per the Pattern Lab styleModifier convention', function () {
+        const files = [
+          '02-stylemod-atom.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('02-stylemod-molecule.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            description: 'DESCRIPTION' // Need to test hydration of only one variable.
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base test_1">\n    \n    DESCRIPTION\n</span>\n');
+      });
+
+      it('10. Recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
+', function () {
+        const files = [
+          '02-stylemod-atom.fpt',
+          '02-stylemod-molecule.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('02-stylemod-organism.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base test_1">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('11. Hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
+        const files = [
+          '02-stylemod-atom.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('02_stylemod-multiple-classes.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('12. Hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
+        const files = [
+          '02-stylemod-atom.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('02_stylemod-param.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('13. Hydrates templates with both data parameters and a styleModifier with multiple classes', function () {
+        const files = [
+          '02-stylemod-atom.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('02_stylemod-param_multiple-classes.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('14. Recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
+        const files = [
+          '02-stylemod-atom.fpt',
+          '02_stylemod-multiple-classes.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('02~stylemod-multiple-classes-includer.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('15. Recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
+        const files = [
+          '02-stylemod-atom.fpt',
+          '02_stylemod-param.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('02~stylemod-param-includer.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('16. Recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
+', function () {
+        const files = [
+          '02-stylemod-atom.fpt',
+          '02_stylemod-param_multiple-classes.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('02~stylemod-param_multiple-classes-includer.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            message: 'MESSAGE',
+            description: 'DESCRIPTION'
+          },
+          partials
+        );
+
+        expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
+      });
+
+      it('17. Shuts off otherwise infinite recursion paths with default false conditions', function () {
+        const files = [
+          '00-base.fpt',
+          '00-nested.fpt',
+          '00_nested-includer.fpt',
+          '03-include-self-w-condition.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('03-include-self-w-condition.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            check: [],
+            i18n: true,
+            heck: 'hack',
+            bar: true,
+            title: 'TITLE',
+            message: 'MESSAGE'
+          },
+          partials
+        );
+
+        expect(render).to.equal('No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n');
+      });
+
+      it('18. Shuts off otherwise infinite recursion paths when flagged to do so by parameters', function () {
+        const files = [
+          '00-base.fpt',
+          '00-nested.fpt',
+          '00_nested-includer.fpt',
+          '03-include-self-w-condition.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('03_include-self-w-condition-includer.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            check: [],
+            i18n: true,
+            heck: 'hack',
+            bar: true,
+            title: 'TITLE',
+            message: 'MESSAGE'
+          },
+          partials
+        );
+
+        expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
+      });
+
+      it('19. Renders a nested parameter variable differently than a non-parameter variable of the same name\
+', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            bez: 'hack',
+            biz: 'heck'
+          },
+          partials
+        );
+
+        expect(render).to.equal('hack heck\n  hick hock\n');
+      });
+
+      it('20. Renders an array of nested parameter variables differently from non-parameter variables of the same name\
+', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer_array.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            bez: 'hack',
+            biz: 'heck'
+          },
+          partials
+        );
+
+        expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
+      });
+
+      it('21. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
+', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param_deep.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer_deep.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            biz: 'hack',
+            boz: 'heck'
+          },
+          partials
+        );
+
+        expect(render).to.equal('hack heck\n  hick hock\n');
+      });
+
+      it('22. Renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
+', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param_dotted-inner.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            biz: {
+              boz: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('hack\n    heck\n');
+      });
+
+      it('23. Renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
+same name', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param_dotted-inner.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            biz: {
+              boz: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('hack\n    heck\n    hick\n');
+      });
+
+      it('24. Renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same \
+name', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param_dotted-middle.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            bez: {
+              biz: {
+                boz: 'hack'
+              }
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('  hack\n    heck\n');
+      });
+
+      it('25. Renders a moderately nested array of dot.notation parameters differently than non-parameter variables of \
+the same name', function () {
+        const files = [
+          '04-nested-param-same-name-as-non-param_dotted-middle.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            bez: {
+              biz: [
+                {
+                  boz: 'hack'
+                },
+                {
+                  boz: 'heck'
+                }
+              ]
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('  hack\n  heck\n    hick\n    hock\n');
+      });
+
+      it('26. Renders a top-level dot.notation parameter that nests more tags', function () {
         const files = [
           '05-dotted-param.fpt'
         ];
@@ -222,7 +643,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('  hack\n');
       });
 
-      it('renders an array of top-level dot.notation parameters that nest more tags', function () {
+      it('27. Renders an array of top-level dot.notation parameters that nest more tags', function () {
         const files = [
           '05-dotted-param.fpt'
         ];
@@ -245,7 +666,115 @@ module.exports = function (Feplet) {
         expect(render).to.equal('  hack\n  heck\n');
       });
 
-      it('renders a deeply nested dot.notation parameter containing an array', function () {
+      it('28. Renders a dot.notation parameter nested within a non-parameter', function () {
+        const files = [
+          '05-dotted-param_nested-in-non-param.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_nested-in-non-param.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            baz: {
+              bez: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('  hack\n    heck\n');
+      });
+
+      it('29. Renders an array of dot.notation parameters nested within a non-parameter', function () {
+        const files = [
+          '05-dotted-param_nested-in-non-param.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_nested-in-non-param_array.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            baz: {
+              bez: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('  hack\n    heck\n    hick\n');
+      });
+
+      it('30. Renders dot.notation parameters nested aside each other within a non-parameter', function () {
+        const files = [
+          '05-dotted-param_nested-in-non-param_aside.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_nested-in-non-param_aside.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            baz: {
+              byz: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('    heck\n    hick\n');
+      });
+
+      it('31. Renders dot.notation parameter nested within another within a non-parameter', function () {
+        const files = [
+          '05-dotted-param_nested-in-non-param_nested.fpt'
+        ];
+        const partials = {};
+
+        files.forEach((file) => {
+          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_nested-in-non-param_nested.fpt'),
+          enc
+        );
+        const render = Feplet.render(
+          templateText,
+          {
+            baz: {
+              byz: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(render).to.equal('    heck\n');
+      });
+
+      it('32. Renders a deeply nested dot.notation parameter containing an array', function () {
         const files = [
           '06-dotted-array-param-inner.fpt'
         ];
@@ -268,7 +797,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('    heck\n');
       });
 
-      it('renders a moderately nested dot.notation parameter containing an array', function () {
+      it('33. Renders a moderately nested dot.notation parameter containing an array', function () {
         const files = [
           '06-dotted-array-param-middle.fpt'
         ];
@@ -291,7 +820,7 @@ module.exports = function (Feplet) {
         expect(render).to.equal('    heck\n');
       });
 
-      it('renders a top-level dot.notation parameter containing an array', function () {
+      it('34. Renders a top-level dot.notation parameter containing an array', function () {
         const files = [
           '06-dotted-array-param-outer.fpt'
         ];
@@ -313,526 +842,53 @@ module.exports = function (Feplet) {
 
         expect(render).to.equal('  heck\n');
       });
-
-      it('hydrates templates with variable passed per the Pattern Lab styleModifier convention', function () {
-        const files = [
-          '02-stylemod-atom.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('02-stylemod-molecule.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            description: 'DESCRIPTION' // Need to test hydration of only one variable.
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base test_1">\n    \n    DESCRIPTION\n</span>\n');
-      });
-
-      it('recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
-', function () {
-        const files = [
-          '02-stylemod-atom.fpt',
-          '02-stylemod-molecule.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('02-stylemod-organism.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base test_1">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
-        const files = [
-          '02-stylemod-atom.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('02_stylemod-multiple-classes.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
-        const files = [
-          '02-stylemod-atom.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('02_stylemod-param.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('hydrates templates with both data parameters and a styleModifier with multiple classes', function () {
-        const files = [
-          '02-stylemod-atom.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('02_stylemod-param_multiple-classes.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
-        const files = [
-          '02-stylemod-atom.fpt',
-          '02_stylemod-multiple-classes.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('02~stylemod-multiple-classes-includer.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
-        const files = [
-          '02-stylemod-atom.fpt',
-          '02_stylemod-param.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('02~stylemod-param-includer.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
-', function () {
-        const files = [
-          '02-stylemod-atom.fpt',
-          '02_stylemod-param_multiple-classes.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('02~stylemod-param_multiple-classes-includer.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            message: 'MESSAGE',
-            description: 'DESCRIPTION'
-          },
-          partials
-        );
-
-        expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
-      });
-
-      it('shuts off otherwise infinite recursion paths with default false conditions', function () {
-        const files = [
-          '00-base.fpt',
-          '00-nested.fpt',
-          '00_nested-includer.fpt',
-          '03-include-self-w-condition.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(pathToFixtures('03-include-self-w-condition.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
-          {
-            check: [],
-            i18n: true,
-            heck: 'hack',
-            bar: true,
-            title: 'TITLE',
-            message: 'MESSAGE'
-          },
-          partials
-        );
-
-        expect(render).to.equal('No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n');
-      });
-
-      it('shuts off otherwise infinite recursion paths when flagged to do so by parameters', function () {
-        const files = [
-          '00-base.fpt',
-          '00-nested.fpt',
-          '00_nested-includer.fpt',
-          '03-include-self-w-condition.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('03_include-self-w-condition-includer.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            check: [],
-            i18n: true,
-            heck: 'hack',
-            bar: true,
-            title: 'TITLE',
-            message: 'MESSAGE'
-          },
-          partials
-        );
-
-        expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
-      });
-
-      it('renders a nested parameter variable differently than a non-parameter variable of the same name', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            bez: 'hack',
-            biz: 'heck'
-          },
-          partials
-        );
-
-        expect(render).to.equal('hack heck\n  hick hock\n');
-      });
-
-      it('renders an array of nested parameter variables differently from non-parameter variables of the same name\
-', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer_array.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            bez: 'hack',
-            biz: 'heck'
-          },
-          partials
-        );
-
-        expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
-      });
-
-      it('renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
-', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param_deep.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer_deep.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            biz: 'hack',
-            boz: 'heck'
-          },
-          partials
-        );
-
-        expect(render).to.equal('hack heck\n  hick hock\n');
-      });
-
-      it('renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
-', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param_dotted-inner.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            biz: {
-              boz: 'hack'
-            }
-          },
-          partials
-        );
-
-        expect(render).to.equal('hack\n    heck\n');
-      });
-
-      it('renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
-same name', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param_dotted-inner.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            biz: {
-              boz: 'hack'
-            }
-          },
-          partials
-        );
-
-        expect(render).to.equal('hack\n    heck\n    hick\n');
-      });
-
-      it('renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same name\
-', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param_dotted-middle.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            bez: {
-              biz: {
-                boz: 'hack'
-              }
-            }
-          },
-          partials
-        );
-
-        expect(render).to.equal('  hack\n    heck\n');
-      });
-
-      it('renders a moderately nested array of dot.notation parameters differently than non-parameter variables of the \
-same name', function () {
-        const files = [
-          '04-nested-param-same-name-as-non-param_dotted-middle.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            bez: {
-              biz: [
-                {
-                  boz: 'hack'
-                },
-                {
-                  boz: 'heck'
-                }
-              ]
-            }
-          },
-          partials
-        );
-
-        expect(render).to.equal('  hack\n  heck\n    hick\n    hock\n');
-      });
-
-      it('renders a dot.notation parameter nested within a non-parameter', function () {
-        const files = [
-          '05-dotted-param_nested-in-non-param.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('05_dotted-param-includer_nested-in-non-param.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            baz: {
-              bez: 'hack'
-            }
-          },
-          partials
-        );
-
-        expect(render).to.equal('  hack\n    heck\n');
-      });
-
-      it('renders an array of dot.notation parameters nested within a non-parameter', function () {
-        const files = [
-          '05-dotted-param_nested-in-non-param.fpt'
-        ];
-        const partials = {};
-
-        files.forEach((file) => {
-          partials[file.replace(/\.fpt$/, '')] = fs.readFileSync(pathToFixtures(file), enc);
-        });
-
-        const templateText = fs.readFileSync(
-          pathToFixtures('05_dotted-param-includer_nested-in-non-param_array.fpt'),
-          enc
-        );
-        const render = Feplet.render(
-          templateText,
-          {
-            baz: {
-              bez: 'hack'
-            }
-          },
-          partials
-        );
-
-        expect(render).to.equal('  hack\n    heck\n    hick\n');
-      });
     });
 
     describe('Instance render', function () {
-      it('hydrates templates with variable passed per the Pattern Lab styleModifier convention', function () {
+      it('3. Recursively hydrates templates with variables', function () {
+        const feplet = new Feplet(
+          {
+            title: 'foo',
+            message: 'bar'
+          }
+        );
+        const files = [
+          '00-base.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('00_base-includer.fpt'), enc);
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('foo\nbar\n');
+      });
+
+      it('4. Recursively hydrates templates with nested variables', function () {
+        const feplet = new Feplet(
+          {
+            check: {
+              i18n: true
+            }
+          }
+        );
+        const files = [
+          '00-nested.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('00_nested-includer.fpt'), enc);
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('\nYes\n');
+      });
+
+      it('9. Hydrates templates with variables passed per the Pattern Lab styleModifier convention', function () {
         const feplet = new Feplet(
           {
             description: 'DESCRIPTION' // Need to test hydration of only one variable.
@@ -852,7 +908,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base test_1">\n    \n    DESCRIPTION\n</span>\n');
       });
 
-      it('recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
+      it('10. Recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
 ', function () {
         const feplet = new Feplet(
           {
@@ -875,7 +931,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base test_1">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
       });
 
-      it('hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
+      it('11. Hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
         const feplet = new Feplet(
           {
             message: 'MESSAGE',
@@ -896,7 +952,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
       });
 
-      it('hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
+      it('12. Hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
         const feplet = new Feplet(
           {
             message: 'MESSAGE',
@@ -917,7 +973,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
       });
 
-      it('hydrates templates with both data parameters and a styleModifier with multiple classes', function () {
+      it('13. Hydrates templates with both data parameters and a styleModifier with multiple classes', function () {
         const feplet = new Feplet(
           {
             message: 'MESSAGE',
@@ -941,7 +997,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
       });
 
-      it('recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
+      it('14. Recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', function () {
         const feplet = new Feplet(
           {
             message: 'MESSAGE',
@@ -966,7 +1022,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    MESSAGE\n    DESCRIPTION\n</span>\n');
       });
 
-      it('recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
+      it('15. Recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', function () {
         const feplet = new Feplet(
           {
             message: 'MESSAGE',
@@ -988,7 +1044,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base test_2">\n    1\n    DESCRIPTION\n</span>\n');
       });
 
-      it('recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
+      it('16. Recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
 ', function () {
         const feplet = new Feplet(
           {
@@ -1014,7 +1070,7 @@ same name', function () {
         expect(render).to.equal('<span class="test_base foo1 foo2">\n    2\n    DESCRIPTION\n</span>\n');
       });
 
-      it('shuts off otherwise infinite recursion paths with default false conditions', function () {
+      it('17. Shuts off otherwise infinite recursion paths with default false conditions', function () {
         const feplet = new Feplet(
           {
             check: [],
@@ -1042,7 +1098,7 @@ same name', function () {
         expect(render).to.equal('No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n');
       });
 
-      it('shuts off otherwise infinite recursion paths when flagged to do so by parameters', function () {
+      it('18. Shuts off otherwise infinite recursion paths when flagged to do so by parameters', function () {
         const feplet = new Feplet(
           {
             check: [],
@@ -1073,7 +1129,8 @@ same name', function () {
         expect(render).to.equal('No\n\nfoo\nMESSAGE\n  No\n\nfoo\nMESSAGE\n  bar\n  MESSAGE\n  bar\n  MESSAGE\n');
       });
 
-      it('renders a nested parameter variable differently than a non-parameter variable of the same name', function () {
+      it('19. Renders a nested parameter variable differently than a non-parameter variable of the same name\
+', function () {
         const feplet = new Feplet(
           {
             bez: 'hack',
@@ -1097,7 +1154,7 @@ same name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n');
       });
 
-      it('renders an array of nested parameter variables differently from non-parameter variables of the same name\
+      it('20. Renders an array of nested parameter variables differently from non-parameter variables of the same name\
 ', function () {
         const feplet = new Feplet(
           {
@@ -1122,8 +1179,8 @@ same name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n  huck hyck\n');
       });
 
-      it('renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
-', function () {
+      it('21. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same \
+name', function () {
         const feplet = new Feplet(
           {
             biz: 'hack',
@@ -1147,7 +1204,7 @@ same name', function () {
         expect(render).to.equal('hack heck\n  hick hock\n');
       });
 
-      it('renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
+      it('22. Renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
 ', function () {
         const feplet = new Feplet(
           {
@@ -1173,7 +1230,7 @@ same name', function () {
         expect(render).to.equal('hack\n    heck\n');
       });
 
-      it('renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
+      it('23. Renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
 same name', function () {
         const feplet = new Feplet(
           {
@@ -1199,8 +1256,8 @@ same name', function () {
         expect(render).to.equal('hack\n    heck\n    hick\n');
       });
 
-      it('renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same name\
-', function () {
+      it('24. Renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same \
+name', function () {
         const feplet = new Feplet(
           {
             bez: {
@@ -1227,8 +1284,8 @@ same name', function () {
         expect(render).to.equal('  hack\n    heck\n');
       });
 
-      it('renders a moderately nested array of dot.notation parameters differently than non-parameter variables of the \
-same name', function () {
+      it('25. Renders a moderately nested array of dot.notation parameters differently than non-parameter variables of \
+the same name', function () {
         const feplet = new Feplet(
           {
             bez: {
@@ -1260,7 +1317,46 @@ same name', function () {
         expect(render).to.equal('  hack\n  heck\n    hick\n    hock\n');
       });
 
-      it('renders a dot.notation parameter nested within a non-parameter', function () {
+      it('26. Renders a top-level dot.notation parameter that nests more tags', function () {
+        const feplet = new Feplet(
+          {}
+        );
+        const files = [
+          '05-dotted-param.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(pathToFixtures('05_dotted-param-includer.fpt'), enc);
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('  hack\n');
+      });
+
+      it('27. Renders an array of top-level dot.notation parameters that nest more tags', function () {
+        const feplet = new Feplet(
+          {}
+        );
+        const files = [
+          '05-dotted-param.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_array.fpt'),
+          enc
+        );
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('  hack\n  heck\n');
+      });
+
+      it('28. Renders a dot.notation parameter nested within a non-parameter', function () {
         const feplet = new Feplet(
           {
             baz: {
@@ -1285,7 +1381,7 @@ same name', function () {
         expect(render).to.equal('  hack\n    heck\n');
       });
 
-      it('renders an array of dot.notation parameters nested within a non-parameter', function () {
+      it('29. Renders an array of dot.notation parameters nested within a non-parameter', function () {
         const feplet = new Feplet(
           {
             baz: {
@@ -1308,10 +1404,206 @@ same name', function () {
         const render = feplet.render(templateText);
 
         expect(render).to.equal('  hack\n    heck\n    hick\n');
+      });
+
+      it('30. Renders dot.notation parameters nested aside each other within a non-parameter', function () {
+        const feplet = new Feplet(
+          {
+            baz: {
+              byz: 'hack'
+            }
+          }
+        );
+        const files = [
+          '05-dotted-param_nested-in-non-param_aside.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_nested-in-non-param_aside.fpt'),
+          enc
+        );
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('    heck\n    hick\n');
+      });
+
+      it('31. Renders dot.notation parameter nested within another within a non-parameter', function () {
+        const feplet = new Feplet(
+          {
+            baz: {
+              byz: 'hack'
+            }
+          }
+        );
+        const files = [
+          '05-dotted-param_nested-in-non-param_nested.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('05_dotted-param-includer_nested-in-non-param_nested.fpt'),
+          enc
+        );
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('    heck\n');
+      });
+
+      it('32. Renders a deeply nested dot.notation parameter containing an array', function () {
+        const feplet = new Feplet(
+          {}
+        );
+        const files = [
+          '06-dotted-array-param-inner.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('06_dotted-array-param-inner-includer.fpt'),
+          enc
+        );
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('    heck\n');
+      });
+
+      it('33. Renders a moderately nested dot.notation parameter containing an array', function () {
+        const feplet = new Feplet(
+          {}
+        );
+        const files = [
+          '06-dotted-array-param-middle.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('06_dotted-array-param-middle-includer.fpt'),
+          enc
+        );
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('    heck\n');
+      });
+
+      it('34. Renders a top-level dot.notation parameter containing an array', function () {
+        const feplet = new Feplet(
+          {}
+        );
+        const files = [
+          '06-dotted-array-param-outer.fpt'
+        ];
+
+        files.forEach((file) => {
+          feplet.registerPartial(file.replace(/\.fpt$/, ''), fs.readFileSync(pathToFixtures(file), enc));
+        });
+
+        const templateText = fs.readFileSync(
+          pathToFixtures('06_dotted-array-param-outer-includer.fpt'),
+          enc
+        );
+        const render = feplet.render(templateText);
+
+        expect(render).to.equal('  heck\n');
       });
     });
 
     describe('Additional methods', function () {
+      it('constructor registers partials from object of objects', function () {
+        const partialName = '05-dotted-param_nested-in-non-param';
+        const file = `${partialName}.fpt`;
+        const partials = {};
+        partials[partialName] = {
+          text: fs.readFileSync(pathToFixtures(file), enc)
+        };
+        partials[partialName].parseArr = Feplet.parse(Feplet.scan(partials[partialName].text));
+
+        const feplet = new Feplet(
+          {
+            baz: {
+              bez: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(feplet.partials[partialName].text).to.equal(`{{#baz}}
+  {{bez}}
+  {{#biz.boz}}
+    {{{buz}}}
+  {{/biz.boz}}
+{{/baz}}
+`);
+        expect(feplet.partials[partialName].parseArr.length).to.equal(1);
+        expect(feplet.partials[partialName].parseArr[0].tag).to.equal('#');
+        expect(feplet.partials[partialName].parseArr[0].n).to.equal('baz');
+        expect(feplet.partials[partialName].parseArr[0].otag).to.equal('{{');
+        expect(feplet.partials[partialName].parseArr[0].ctag).to.equal('}}');
+      });
+
+      it('constructor registers partials from object of strings', function () {
+        const partialName = '05-dotted-param_nested-in-non-param';
+        const file = `${partialName}.fpt`;
+        const partials = {};
+        partials[partialName] = fs.readFileSync(pathToFixtures(file), enc);
+
+        const feplet = new Feplet(
+          {
+            baz: {
+              bez: 'hack'
+            }
+          },
+          partials
+        );
+
+        expect(feplet.partials[partialName].text).to.equal(`{{#baz}}
+  {{bez}}
+  {{#biz.boz}}
+    {{{buz}}}
+  {{/biz.boz}}
+{{/baz}}
+`);
+        expect(feplet.partials[partialName].parseArr.length).to.equal(1);
+        expect(feplet.partials[partialName].parseArr[0].tag).to.equal('#');
+        expect(feplet.partials[partialName].parseArr[0].n).to.equal('baz');
+        expect(feplet.partials[partialName].parseArr[0].otag).to.equal('{{');
+        expect(feplet.partials[partialName].parseArr[0].ctag).to.equal('}}');
+      });
+
+      it('render() renders partials from object of objects', function () {
+        const partialName = '00-base';
+        const file = `${partialName}.fpt`;
+        const partials = {};
+        partials[partialName] = {
+          text: fs.readFileSync(pathToFixtures(file), enc)
+        };
+        partials[partialName].parseArr = Feplet.parse(Feplet.scan(partials[partialName].text));
+
+        const templateText = fs.readFileSync(pathToFixtures('00_base-includer.fpt'), enc);
+        const render = Feplet.render(
+          templateText,
+          {
+            title: 'foo',
+            message: 'bar'
+          },
+          partials
+        );
+
+        expect(render).to.equal('foo\nbar\n');
+      });
+
       it('unregisterPartial() unregisters partial', function () {
         const feplet = new Feplet(
           {

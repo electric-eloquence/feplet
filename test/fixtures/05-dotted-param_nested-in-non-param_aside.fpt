@@ -1,0 +1,8 @@
+{{#baz}}
+  {{#bez.biz}}
+    {{{byz}}}
+  {{/bez.biz}}
+  {{#boz.buz}}
+    {{{byz}}}
+  {{/boz.buz}}
+{{/baz}}
