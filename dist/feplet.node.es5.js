@@ -803,7 +803,7 @@ PARAMS_APPLIER: {
     var styleModifierMatch;
     args.partialsKeysItrn = partialsKeysItr.next();
 
-    if (partials[partialFull]) {
+    if (partials[partialFull] && partials[partialFull].text) {
       return partialsWithParamsAdd(args);
     }
 

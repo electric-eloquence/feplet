@@ -831,7 +831,7 @@ PARAMS_APPLIER: {
 
     args.partialsKeysItrn = partialsKeysItr.next();
 
-    if (partials[partialFull]) {
+    if (partials[partialFull] && partials[partialFull].text) {
       return partialsWithParamsAdd(args);
     }
 
