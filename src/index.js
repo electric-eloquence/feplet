@@ -7,7 +7,7 @@
 // nor Array methods inherently imply whether or not recomputation occurs. On the other hand, iterators' .next()
 // unambiguously expresses computation on each call.
 
-// Labeled block statements are used to segregate functions into organizational units. We could also achieve this end by
+// Labeled block statements are used to segregate functions into organizational units. We could also achieve this by
 // breaking this file into multiple files. However, we need to compile our code into ES5 consumable by less modern
 // browsers. Given that this is a relatively small file, it is easier to keep the code in one file.
 
@@ -955,13 +955,13 @@ PARAMS_APPLIER: {
 
     if (delimiterUnicodes && partialText !== partialText_) {
       const options = {delimiters: delimiterUnicodes};
-      const partialScanNew = hogan.scan(partialText, delimiterUnicodes);
-      const partialParseArrNew = hogan.parse(partialScanNew, partialText, options);
-      const partialGeneration = hogan.generate(partialParseArrNew, partialText, options);
+      const hoganScan = hogan.scan(partialText, delimiterUnicodes);
+      const parseArr = hogan.parse(hoganScan, partialText, options);
+      const partialGeneration = hogan.generate(parseArr, partialText, options);
 
       partials[partialFull] = partialGeneration.render(paramsObj);
       partialsComp[partialFull] = {
-        parseArr: partialParseArrNew,
+        parseArr,
         compilation: hogan.compile(partials[partialFull])
       };
     }
