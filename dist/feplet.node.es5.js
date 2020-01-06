@@ -803,7 +803,7 @@ PARAMS_APPLIER: {
     var styleModifierMatch;
     args.partialsKeysItrn = partialsKeysItr.next();
 
-    if (partials[partialFull] && partials[partialFull].text) {
+    if (partials[partialFull]) {
       return partialsWithParamsAdd(args);
     }
 
@@ -899,8 +899,8 @@ PARAMS_APPLIER: {
     }
 
     var paramKeys = dataKeys;
-    var partialParseArr = partials[partialShort].parseArr || [];
-    var partialText_ = partials[partialShort].text || '';
+    var partialParseArr = partialsComp[partialShort].parseArr || [];
+    var partialText_ = partials[partialShort] || '';
     var delimiterUnicodes;
     var partialText = '';
 
@@ -945,11 +945,11 @@ PARAMS_APPLIER: {
       var partialScanNew = hogan.scan(partialText, delimiterUnicodes);
       var partialParseArrNew = hogan.parse(partialScanNew, partialText, options);
       var partialGeneration = hogan.generate(partialParseArrNew, partialText, options);
-      partials[partialFull] = {
-        text: partialGeneration.render(paramsObj),
-        parseArr: partialParseArrNew
+      partials[partialFull] = partialGeneration.render(paramsObj);
+      partialsComp[partialFull] = {
+        parseArr: partialParseArrNew,
+        compilation: hogan.compile(partials[partialFull])
       };
-      partialsComp[partialFull] = hogan.compile(partials[partialFull].text);
     }
 
     return partialsWithParamsAdd(args);
@@ -1113,10 +1113,10 @@ METHODS: {
     var partialsComp = partialsComp_ || this.partialsComp || {}; // Remove any reference between partialsValues and partials object because we need to add to the partials object.
     // We therefore do not want to iterate on the partials object itself.
 
-    var partialsValues = Object.values(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
+    var partialsKeys = Object.keys(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
 
-    for (var i = 0, l = partialsValues.length; i < l; i++) {
-      var _preProcessPartialPar = preProcessPartialParams(partialsValues[i].text, partialsComp[i], partials, partialsComp, contextKeys, context);
+    for (var i = 0, l = partialsKeys.length; i < l; i++) {
+      var _preProcessPartialPar = preProcessPartialParams(partials[partialsKeys[i]], partialsComp[partialsKeys[i]].compilation, partials, partialsComp, contextKeys, context);
 
       _contextKeys = _preProcessPartialPar._contextKeys;
       partials = _preProcessPartialPar.partials;
@@ -1138,24 +1138,26 @@ METHODS: {
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
     if (!partials[partialName]) {
-      partials[partialName] = {
-        text: partialTemplate,
-        parseArr: hogan.parse(hogan.scan(partialTemplate))
-      };
+      partials[partialName] = partialTemplate;
     }
 
     if (!partialsComp[partialName]) {
-      var partialComp = partialComp_ || hogan.generate(partials[partialName].parseArr, partialTemplate, {});
-      partialsComp[partialName] = partialComp;
+      if (partialComp_) {
+        partialsComp[partialName] = partialComp_;
+      } else {
+        var parseArr = hogan.parse(hogan.scan(partialTemplate));
+        partialsComp[partialName] = {
+          parseArr: parseArr,
+          compilation: hogan.generate(parseArr, partialTemplate, {})
+        };
+      }
     }
 
     return {
       partials: partials,
       partialsComp: partialsComp
     };
-  }; // For simplicity's sake, the partials_ arg is documented to be a key-value object of strings.
-  // Will get converted to an object of objects internally.
-
+  };
 
   var render = function render() {
     var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -1165,46 +1167,19 @@ METHODS: {
     var contextKeys_ = arguments.length > 4 ? arguments[4] : undefined;
     var context = context_ || this.context || {};
     var contextKeys = contextKeys_ || this && this.contextKeys;
-    var partials;
+    var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    var partialsKeys;
+    var partialsKeys = Object.keys(partials); // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
 
-    if (partials_ instanceof Object) {
-      partials = {};
-      partialsKeys = Object.keys(partials_);
+    for (var i = 0, l = partialsKeys.length; i < l; i++) {
+      var partialKey = partialsKeys[i];
 
-      for (var i = 0, l = partialsKeys.length; i < l; i++) {
-        var partialKey = partialsKeys[i];
-        var partial = partials_[partialKey];
+      if (!partialsComp[partialKey]) {
+        var _registerPartial = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp);
 
-        if (partial instanceof Object) {
-          partials[partialKey] = partial;
-        } else if (typeof partial === 'string') {
-          partials[partialKey] = {
-            text: partial,
-            parseArr: hogan.parse(hogan.scan(partial))
-          };
-        }
+        partials = _registerPartial.partials;
+        partialsComp = _registerPartial.partialsComp;
       }
-    } else {
-      partials = this.partials;
-    }
-
-    if (partials instanceof Object) {
-      partialsKeys = Object.keys(partials); // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
-
-      for (var _i2 = 0, _l2 = partialsKeys.length; _i2 < _l2; _i2++) {
-        var _partialKey = partialsKeys[_i2];
-
-        if (!partialsComp[_partialKey]) {
-          var _registerPartial = registerPartial(_partialKey, partials[_partialKey].text, null, partials, partialsComp);
-
-          partials = _registerPartial.partials;
-          partialsComp = _registerPartial.partialsComp;
-        }
-      }
-    } else {
-      partials = {};
     }
 
     var compilation;
@@ -1215,14 +1190,7 @@ METHODS: {
       compilation = hogan.compile(text);
     }
 
-    var partialsTexts = {};
-    partialsKeys = Object.keys(partials);
-
-    for (var _i3 = 0, _l3 = partialsKeys.length; _i3 < _l3; _i3++) {
-      partialsTexts[partialsKeys[_i3]] = partials[partialsKeys[_i3]].text;
-    }
-
-    return compilation.render(context, partialsTexts, null, partialsComp);
+    return compilation.render(context, partials, null, partialsComp);
   };
 
   var unregisterPartial = function unregisterPartial(partialKey, partials_, partialsComp_) {
@@ -1236,33 +1204,13 @@ METHODS: {
     };
   };
 } // PREPARE FOR EXPORT.
-// The partials arg is not documented, but ideally, it should be an object of objects.
-// For simplicity's sake, we allow a key-value object of strings to be converted internally.
 
 
 function Feplet(context, partials, partialsComp, contextKeys) {
   this.context = context || {};
-  this.partials = {};
+  this.partials = partials || {};
   this.partialsComp = partialsComp || {};
   this.contextKeys = contextKeys || preProcessContextKeys(this.context);
-
-  if (partials instanceof Object) {
-    var partialsKeys = Object.keys(partials);
-
-    for (var i = 0, l = partialsKeys.length; i < l; i++) {
-      var partialKey = partialsKeys[i];
-      var partial = partials[partialKey];
-
-      if (partial instanceof Object) {
-        this.partials[partialKey] = partial;
-      } else if (typeof partial === 'string') {
-        this.partials[partialKey] = {
-          text: partial,
-          parseArr: hogan.parse(hogan.scan(partial))
-        };
-      }
-    }
-  }
 } // STATIC METHODS.
 
 

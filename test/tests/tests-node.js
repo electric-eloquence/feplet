@@ -1521,85 +1521,26 @@ the same name', function () {
     });
 
     describe('Additional methods', function () {
-      it('constructor registers partials from object of objects', function () {
-        const partialName = '05-dotted-param_nested-in-non-param';
-        const file = `${partialName}.fpt`;
-        const partials = {};
-        partials[partialName] = {
-          text: fs.readFileSync(pathToFixtures(file), enc)
-        };
-        partials[partialName].parseArr = Feplet.parse(Feplet.scan(partials[partialName].text));
-
+      // This tests an edge-case and is primarily here for coverage.
+      it('registerPartial() accepts a partialComp argument', function () {
         const feplet = new Feplet(
-          {
-            baz: {
-              bez: 'hack'
-            }
-          },
-          partials
-        );
-
-        expect(feplet.partials[partialName].text).to.equal(`{{#baz}}
-  {{bez}}
-  {{#biz.boz}}
-    {{{buz}}}
-  {{/biz.boz}}
-{{/baz}}
-`);
-        expect(feplet.partials[partialName].parseArr.length).to.equal(1);
-        expect(feplet.partials[partialName].parseArr[0].tag).to.equal('#');
-        expect(feplet.partials[partialName].parseArr[0].n).to.equal('baz');
-        expect(feplet.partials[partialName].parseArr[0].otag).to.equal('{{');
-        expect(feplet.partials[partialName].parseArr[0].ctag).to.equal('}}');
-      });
-
-      it('constructor registers partials from object of strings', function () {
-        const partialName = '05-dotted-param_nested-in-non-param';
-        const file = `${partialName}.fpt`;
-        const partials = {};
-        partials[partialName] = fs.readFileSync(pathToFixtures(file), enc);
-
-        const feplet = new Feplet(
-          {
-            baz: {
-              bez: 'hack'
-            }
-          },
-          partials
-        );
-
-        expect(feplet.partials[partialName].text).to.equal(`{{#baz}}
-  {{bez}}
-  {{#biz.boz}}
-    {{{buz}}}
-  {{/biz.boz}}
-{{/baz}}
-`);
-        expect(feplet.partials[partialName].parseArr.length).to.equal(1);
-        expect(feplet.partials[partialName].parseArr[0].tag).to.equal('#');
-        expect(feplet.partials[partialName].parseArr[0].n).to.equal('baz');
-        expect(feplet.partials[partialName].parseArr[0].otag).to.equal('{{');
-        expect(feplet.partials[partialName].parseArr[0].ctag).to.equal('}}');
-      });
-
-      it('render() renders partials from object of objects', function () {
-        const partialName = '00-base';
-        const file = `${partialName}.fpt`;
-        const partials = {};
-        partials[partialName] = {
-          text: fs.readFileSync(pathToFixtures(file), enc)
-        };
-        partials[partialName].parseArr = Feplet.parse(Feplet.scan(partials[partialName].text));
-
-        const templateText = fs.readFileSync(pathToFixtures('00_base-includer.fpt'), enc);
-        const render = Feplet.render(
-          templateText,
           {
             title: 'foo',
             message: 'bar'
-          },
-          partials
+          }
         );
+        const file = '00-base.fpt';
+        const text = fs.readFileSync(pathToFixtures(file), enc);
+        const parseArr = Feplet.parse(Feplet.scan(text));
+        const partialComp = {
+          parseArr,
+          compilation: Feplet.generate(parseArr, text, {})
+        };
+
+        feplet.registerPartial(file.replace(/\.fpt$/, ''), text, partialComp);
+
+        const templateText = fs.readFileSync(pathToFixtures('00_base-includer.fpt'), enc);
+        const render = feplet.render(templateText);
 
         expect(render).to.equal('foo\nbar\n');
       });
