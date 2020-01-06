@@ -342,8 +342,7 @@ HELPERS: {
       i = parseObj.otag.length;
 
       while (i--) {
-        partialText += "\x02";
-        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        partialText += "\x02"; //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       switch (parseObj.tag) {
@@ -381,8 +380,7 @@ HELPERS: {
       i = parseObj.ctag.length;
 
       while (i--) {
-        partialText += "\x03";
-        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        partialText += "\x03"; //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -442,8 +440,7 @@ HELPERS: {
       i = parseObj.otag.length;
 
       while (i--) {
-        partialText += "\x02";
-        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        partialText += "\x02"; //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       partialText += '/';
@@ -465,8 +462,7 @@ HELPERS: {
       i = parseObj.ctag.length;
 
       while (i--) {
-        partialText += "\x03";
-        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        partialText += "\x03"; //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -572,15 +568,13 @@ PARAMS_APPLIER: {
       delimiterUnicodes = '';
 
       for (var i = 0, l = otag.length; i < l; i++) {
-        delimiterUnicodes += "\x02";
-        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
+        delimiterUnicodes += "\x02"; //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       delimiterUnicodes += ' ';
 
       for (var _i = 0, _l = ctag.length; _i < _l; _i++) {
-        delimiterUnicodes += "\x03";
-        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
+        delimiterUnicodes += "\x03"; //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
       }
     }
 
@@ -1110,9 +1104,7 @@ METHODS: {
     var _contextKeys;
 
     var partials = partials_ || this.partials || {};
-    var partialsComp = partialsComp_ || this.partialsComp || {}; // Remove any reference between partialsValues and partials object because we need to add to the partials object.
-    // We therefore do not want to iterate on the partials object itself.
-
+    var partialsComp = partialsComp_ || this.partialsComp || {};
     var partialsKeys = Object.keys(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
 
     for (var i = 0, l = partialsKeys.length; i < l; i++) {

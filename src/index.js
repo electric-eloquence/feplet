@@ -355,7 +355,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0002';
-        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       switch (parseObj.tag) {
@@ -393,7 +393,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0003';
-        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -459,7 +459,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0002';
-        partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       partialText += '/';
@@ -482,7 +482,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0003';
-        partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
       }
 
       return {
@@ -596,14 +596,14 @@ PARAMS_APPLIER: {
 
       for (let i = 0, l = otag.length; i < l; i++) {
         delimiterUnicodes += '\u0002';
-        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
+        //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
       }
 
       delimiterUnicodes += ' ';
 
       for (let i = 0, l = ctag.length; i < l; i++) {
         delimiterUnicodes += '\u0003';
-        delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
+        //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
       }
     }
 
@@ -1110,8 +1110,6 @@ METHODS: {
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
-    // Remove any reference between partialsValues and partials object because we need to add to the partials object.
-    // We therefore do not want to iterate on the partials object itself.
     const partialsKeys = Object.keys(partials);
 
     // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
