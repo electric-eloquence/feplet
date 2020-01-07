@@ -815,7 +815,8 @@ PARAMS_APPLIER: {
       partials,
       partialsComp,
       partialsKeysItr,
-      partialsKeysItrn
+      partialsKeysItrn,
+      options
     } = args;
 
     if (partialsKeysItrn.done) {
@@ -954,16 +955,33 @@ PARAMS_APPLIER: {
     }
 
     if (delimiterUnicodes && partialText !== partialText_) {
-      const options = {delimiters: delimiterUnicodes};
-      const hoganScan = hogan.scan(partialText, delimiterUnicodes);
-      const parseArr = hogan.parse(hoganScan, partialText, options);
-      const partialGeneration = hogan.generate(parseArr, partialText, options);
-
+      const optionsNew = Object.assign({delimiters: delimiterUnicodes}, options);
+      const partialGeneration = hogan.generate(
+        hogan.parse(
+          hogan.scan(
+            partialText,
+            delimiterUnicodes
+          ),
+          partialText,
+          optionsNew
+        ),
+        partialText,
+        optionsNew
+      );
       partials[partialFull] = partialGeneration.render(paramsObj);
+
+      const parseArr = hogan.parse(
+        hogan.scan(
+          partials[partialFull],
+          options.delimiters
+        ),
+        partialText,
+        options
+      );
       partialsComp[partialFull] = {
-        parseArr,
-        compilation: hogan.compile(partials[partialFull])
+        parseArr
       };
+      partialsComp[partialFull].compilation = hogan.generate(parseArr, partials[partialFull], options);
     }
 
     return partialsWithParamsAdd(args);
@@ -1035,8 +1053,10 @@ METHODS: {
     return contextKeys;
   };
 
-  var preProcessPartialParams = function (text, compilation_, partials_, partialsComp_, contextKeys_, context) {
-    const compilation = compilation_ || hogan.compile(text);
+  var preProcessPartialParams =
+  function (text, compilation_, partials_, partialsComp_, contextKeys_, context, options_) {
+    const options = options_ || this.options || {};
+    const compilation = compilation_ || hogan.compile(text, options);
     const partialsKeys = Object.keys(compilation.partials);
     let contextKeys = contextKeys_ || (this && this.contextKeys);
     let _contextKeys;
@@ -1091,7 +1111,8 @@ METHODS: {
         partials,
         partialsComp,
         partialsKeysItr,
-        partialsKeysItrn
+        partialsKeysItrn,
+        options
       }));
     }
 
@@ -1103,7 +1124,8 @@ METHODS: {
     };
   };
 
-  var compile = function (text, options, partials_, partialsComp_, contextKeys_, context) {
+  var compile = function (text, options_, partials_, partialsComp_, contextKeys_, context) {
+    const options = options_ || this.options || {};
     let compilation = hogan.compile(text, options);
     let contextKeys = contextKeys_ || (this && this.contextKeys);
     let _contextKeys;
@@ -1124,7 +1146,8 @@ METHODS: {
         partials,
         partialsComp,
         contextKeys,
-        context
+        context,
+        options
       ));
     }
 
@@ -1140,15 +1163,17 @@ METHODS: {
       partials,
       partialsComp,
       contextKeys,
-      context
+      context,
+      options
     ));
 
     return compilation;
   };
 
-  var registerPartial = function (partialName, partialTemplate, partialComp_, partials_, partialsComp_) {
+  var registerPartial = function (partialName, partialTemplate, partialComp_, partials_, partialsComp_, options_) {
     const partials = partials_ || this.partials || {};
     const partialsComp = partialsComp_ || this.partialsComp || {};
+    const options = options_ || this.options || {};
 
     if (!partials[partialName]) {
       partials[partialName] = partialTemplate;
@@ -1159,11 +1184,11 @@ METHODS: {
         partialsComp[partialName] = partialComp_;
       }
       else {
-        const parseArr = hogan.parse(hogan.scan(partialTemplate));
+        const parseArr = hogan.parse(hogan.scan(partialTemplate, options.delimiters));
 
         partialsComp[partialName] = {
           parseArr,
-          compilation: hogan.generate(parseArr, partialTemplate, {})
+          compilation: hogan.generate(parseArr, partialTemplate, options)
         };
       }
     }
@@ -1174,9 +1199,10 @@ METHODS: {
     };
   };
 
-  var render = function (text = '', context_, partials_, partialsComp_, contextKeys_) {
+  var render = function (text = '', context_, partials_, partialsComp_, contextKeys_, options_) {
     const context = context_ || this.context || {};
     const contextKeys = contextKeys_ || (this && this.contextKeys);
+    const options = options_ || this.options || {};
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
     let partialsKeys = Object.keys(partials);
@@ -1189,17 +1215,17 @@ METHODS: {
         ({
           partials,
           partialsComp
-        } = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp));
+        } = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp, options));
       }
     }
 
     let compilation;
 
     if (Object.keys(partialsComp).length) {
-      compilation = compile(text, null, partials, partialsComp, contextKeys, context);
+      compilation = compile(text, options, partials, partialsComp, contextKeys, context);
     }
     else {
-      compilation = hogan.compile(text);
+      compilation = hogan.compile(text, options);
     }
 
     return compilation.render(context, partials, null, partialsComp);
@@ -1221,11 +1247,12 @@ METHODS: {
 
 // PREPARE FOR EXPORT.
 
-function Feplet(context, partials, partialsComp, contextKeys) {
+function Feplet(context, partials, partialsComp, contextKeys, options) {
   this.context = context || {};
   this.partials = partials || {};
   this.partialsComp = partialsComp || {};
   this.contextKeys = contextKeys || preProcessContextKeys(this.context);
+  this.options = options || {};
 }
 
 // STATIC METHODS.
