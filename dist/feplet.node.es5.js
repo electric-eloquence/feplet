@@ -934,11 +934,13 @@ PARAMS_APPLIER: {
     }
 
     if (delimiterUnicodes && partialText !== partialText_) {
-      var optionsNew = Object.assign({
+      // First, render with unicode delimiters.
+      var optionsWithUnicodes = Object.assign({
         delimiters: delimiterUnicodes
       }, options);
-      var partialGeneration = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsNew), partialText, optionsNew);
-      partials[partialFull] = partialGeneration.render(paramsObj);
+      var compilationWithUnicodes = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsWithUnicodes), partialText, optionsWithUnicodes);
+      partials[partialFull] = compilationWithUnicodes.render(paramsObj); // Then, write to partialsComp with previous render as partialText and with regular delimiters and options.
+
       var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partialText, options);
       partialsComp[partialFull] = {
         parseArr: parseArr,
