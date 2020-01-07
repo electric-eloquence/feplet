@@ -50,21 +50,19 @@ JS:
 ```javascript
 const Feplet = require('feplet');
 
+const text = 'Hello {{place}}';
 const context = {
   place: 'World'
 };
 
 // These are references to Hogan.js methods:
-const template = Feplet.compile('Hello {{place}}');
+const template = Feplet.compile(text);
 const output = template.render(context); // Hello World
 
 // These are also references to Hogan.js methods:
-const text = 'Hello <%place%>';
-const delimiters = '<% %>';
-const options = {delimiters};
-const scanned = Feplet.scan(text, delimiters);
-const parsed = Feplet.parse(scanned, text, options);
-const generation = Feplet.generate(parsed, text, options);
+const scanned = Feplet.scan(text);
+const parsed = Feplet.parse(scanned, text);
+const generation = Feplet.generate(parsed, text);
 const output1 = generation.render(context); // Hello World
 
 // This is a Feplet implementation:
