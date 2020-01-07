@@ -5,6 +5,8 @@ const path = require('path');
 
 const {expect} = require('chai');
 
+const hogan = require('../../lib/hogan.js/lib/hogan.js');
+
 const enc = 'utf8';
 
 function pathToFixtures(file) {
@@ -1521,6 +1523,70 @@ the same name', function () {
     });
 
     describe('Additional methods', function () {
+      // DEPRECATED.
+      // TODO: To be removed.
+      it('preProcessPartialParams() accepts partialsComp arg where its keyed values are hogan.compile() objects\
+', function () {
+        const partial = '01-dotted';
+        const partials = {};
+        const partialsComp = {};
+        partials[partial] = fs.readFileSync(pathToFixtures(`${partial}.fpt`), enc);
+        partialsComp[partial] = hogan.compile(partials[partial]);
+
+        const templateText = fs.readFileSync(pathToFixtures('01_dotted-includer.fpt'), enc);
+        const preProcess = Feplet.preProcessPartialParams(templateText, null, partials, partialsComp);
+        const render = Feplet.render(
+          templateText,
+          {
+            dot: {
+              title: 'foo',
+              message: 'bar'
+            }
+          },
+          partials,
+          partialsComp
+        );
+
+        expect(preProcess).to.have.property('compilation');
+        expect(preProcess).to.have.property('_contextKeys');
+        expect(preProcess).to.have.property('partials');
+        expect(preProcess).to.have.property('partialsComp');
+        expect(preProcess.partialsComp['01-dotted']).to.have.property('parseArr');
+        expect(preProcess.partialsComp['01-dotted']).to.have.property('compilation');
+        expect(render).to.equal('foo\nbar\n');
+      });
+
+      // DEPRECATED.
+      // TODO: To be removed.
+      it('compile() accepts partialsComp arg where its keyed values are hogan.compile() objects', function () {
+        const partial = '00-base';
+        const partials = {};
+        const partialsComp = {};
+        partials[partial] = fs.readFileSync(pathToFixtures(`${partial}.fpt`), enc);
+        partialsComp[partial] = hogan.compile(partials[partial]);
+
+        const templateText = fs.readFileSync(pathToFixtures('00_base-includer.fpt'), enc);
+        const compilation = Feplet.compile(templateText, null, partials, partialsComp);
+        const render = compilation.render(
+          {
+            title: 'foo',
+            message: 'bar'
+          },
+          partials,
+          null,
+          partialsComp
+        );
+
+        expect(compilation).to.have.property('r');
+        expect(compilation).to.have.property('c');
+        expect(compilation).to.have.property('options');
+        expect(compilation).to.have.property('text');
+        expect(compilation).to.have.property('partials');
+        expect(compilation).to.have.property('subs');
+        expect(compilation).to.have.property('buf');
+        expect(render).to.equal('foo\nbar\n');
+      });
+
       // This tests an edge-case and is primarily here for coverage.
       it('registerPartial() accepts a partialComp argument', function () {
         const feplet = new Feplet(
@@ -1529,15 +1595,15 @@ the same name', function () {
             message: 'bar'
           }
         );
-        const file = '00-base.fpt';
-        const text = fs.readFileSync(pathToFixtures(file), enc);
+        const partial = '00-base';
+        const text = fs.readFileSync(pathToFixtures(`${partial}.fpt`), enc);
         const parseArr = Feplet.parse(Feplet.scan(text));
         const partialComp = {
           parseArr,
           compilation: Feplet.generate(parseArr, text, {})
         };
 
-        feplet.registerPartial(file.replace(/\.fpt$/, ''), text, partialComp);
+        feplet.registerPartial(partial, text, partialComp);
 
         const templateText = fs.readFileSync(pathToFixtures('00_base-includer.fpt'), enc);
         const render = feplet.render(templateText);

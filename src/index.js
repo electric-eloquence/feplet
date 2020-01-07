@@ -918,10 +918,30 @@ PARAMS_APPLIER: {
     }
 
     const paramKeys = dataKeys;
-    const partialParseArr = partialsComp[partialShort].parseArr || [];
     const partialText_ = partials[partialShort] || '';
     let delimiterUnicodes;
+    let partialParseArr = [];
     let partialText = '';
+
+    if (partialsComp[partialShort].parseArr) {
+      partialParseArr = partialsComp[partialShort].parseArr;
+    }
+    // DEPRECATED.
+    // TODO: This accommodates old usage of partialsComp. To be removed.
+    else {
+      partialParseArr = hogan.parse(
+        hogan.scan(
+          partials[partialShort],
+          options.delimiters
+        ),
+        partials[partialShort],
+        options
+      );
+      partialsComp[partialShort] = {
+        parseArr: partialParseArr,
+        compilation: partialsComp[partialShort]
+      };
+    }
 
     if (partialParseArr.length) {
       let partialParseItr;
@@ -971,13 +991,13 @@ PARAMS_APPLIER: {
       );
       partials[partialFull] = compilationWithUnicodes.render(paramsObj);
 
-      // Then, write to partialsComp with previous render as partialText and with regular delimiters and options.
+      // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
       const parseArr = hogan.parse(
         hogan.scan(
           partials[partialFull],
           options.delimiters
         ),
-        partialText,
+        partials[partialFull],
         options
       );
       partialsComp[partialFull] = {
@@ -1138,13 +1158,32 @@ METHODS: {
 
     // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
     for (let i = 0, l = partialsKeys.length; i < l; i++) {
+      const partialKey = partialsKeys[i];
+
+      // DEPRECATED.
+      // TODO: This accommodates old usage of partialsComp. To be removed.
+      if (!partialsComp[partialKey].compilation) {
+        const parseArr = hogan.parse(
+          hogan.scan(
+            partials[partialKey],
+            options.delimiters
+          ),
+          partials[partialKey],
+          options
+        );
+        partialsComp[partialKey] = {
+          parseArr,
+          compilation: partialsComp[partialKey]
+        };
+      }
+
       ({
         _contextKeys,
         partials,
         partialsComp
       } = preProcessPartialParams(
-        partials[partialsKeys[i]],
-        partialsComp[partialsKeys[i]].compilation,
+        partials[partialKey],
+        partialsComp[partialKey].compilation,
         partials,
         partialsComp,
         contextKeys,

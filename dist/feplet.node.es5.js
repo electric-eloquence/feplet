@@ -894,10 +894,22 @@ PARAMS_APPLIER: {
     }
 
     var paramKeys = dataKeys;
-    var partialParseArr = partialsComp[partialShort].parseArr || [];
     var partialText_ = partials[partialShort] || '';
     var delimiterUnicodes;
+    var partialParseArr = [];
     var partialText = '';
+
+    if (partialsComp[partialShort].parseArr) {
+      partialParseArr = partialsComp[partialShort].parseArr;
+    } // DEPRECATED.
+    // TODO: This accommodates old usage of partialsComp. To be removed.
+    else {
+        partialParseArr = hogan.parse(hogan.scan(partials[partialShort], options.delimiters), partials[partialShort], options);
+        partialsComp[partialShort] = {
+          parseArr: partialParseArr,
+          compilation: partialsComp[partialShort]
+        };
+      }
 
     if (partialParseArr.length) {
       var partialParseItr;
@@ -939,9 +951,9 @@ PARAMS_APPLIER: {
         delimiters: delimiterUnicodes
       }, options);
       var compilationWithUnicodes = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsWithUnicodes), partialText, optionsWithUnicodes);
-      partials[partialFull] = compilationWithUnicodes.render(paramsObj); // Then, write to partialsComp with previous render as partialText and with regular delimiters and options.
+      partials[partialFull] = compilationWithUnicodes.render(paramsObj); // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
 
-      var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partialText, options);
+      var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partials[partialFull], options);
       partialsComp[partialFull] = {
         parseArr: parseArr,
         compilation: hogan.generate(parseArr, partials[partialFull], options)
@@ -1113,7 +1125,18 @@ METHODS: {
     var partialsKeys = Object.keys(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
 
     for (var i = 0, l = partialsKeys.length; i < l; i++) {
-      var _preProcessPartialPar = preProcessPartialParams(partials[partialsKeys[i]], partialsComp[partialsKeys[i]].compilation, partials, partialsComp, contextKeys, context, options);
+      var partialKey = partialsKeys[i]; // DEPRECATED.
+      // TODO: This accommodates old usage of partialsComp. To be removed.
+
+      if (!partialsComp[partialKey].compilation) {
+        var parseArr = hogan.parse(hogan.scan(partials[partialKey], options.delimiters), partials[partialKey], options);
+        partialsComp[partialKey] = {
+          parseArr: parseArr,
+          compilation: partialsComp[partialKey]
+        };
+      }
+
+      var _preProcessPartialPar = preProcessPartialParams(partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
 
       _contextKeys = _preProcessPartialPar._contextKeys;
       partials = _preProcessPartialPar.partials;
