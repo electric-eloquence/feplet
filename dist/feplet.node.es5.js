@@ -941,9 +941,9 @@ PARAMS_APPLIER: {
       partials[partialFull] = partialGeneration.render(paramsObj);
       var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partialText, options);
       partialsComp[partialFull] = {
-        parseArr: parseArr
+        parseArr: parseArr,
+        compilation: hogan.generate(parseArr, partials[partialFull], options)
       };
-      partialsComp[partialFull].compilation = hogan.generate(parseArr, partials[partialFull], options);
     }
 
     return partialsWithParamsAdd(args);

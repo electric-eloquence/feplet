@@ -979,9 +979,9 @@ PARAMS_APPLIER: {
         options
       );
       partialsComp[partialFull] = {
-        parseArr
+        parseArr,
+        compilation: hogan.generate(parseArr, partials[partialFull], options)
       };
-      partialsComp[partialFull].compilation = hogan.generate(parseArr, partials[partialFull], options);
     }
 
     return partialsWithParamsAdd(args);
