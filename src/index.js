@@ -56,6 +56,7 @@ COLLECTORS: {
       parentObjSplit
     } = args;
 
+    const dataKeysPart = [];
     let i = 0;
     let itemNext;
     let dataKey = parentObjSplit[i];
@@ -65,82 +66,64 @@ COLLECTORS: {
     while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
       dataKey += `.${itemNext}`;
 
-      if (!dataKeys.includes(dataKey)) {
-        dataKeys.push(dataKey);
+      if (!dataKeysPart.includes(dataKey)) {
+        dataKeysPart.push(dataKey);
       }
     }
 
-    return {dataKeys};
+    return {dataKeysPart};
   };
 
   var dataKeysCollect = function (args) {
     const {
-      dataKeys_,
-      //dataObjShallowItr, // For debugging.
-      dataObjShallowItrn,
+      dataKeys,
       dataObj,
       parentObjAsStr,
       //partialShort // For debugging.
     } = args;
 
-    let dataKeys = dataKeys_;
+    const dataKeysPart = [];
+    const dataObjKeys = Object.keys(dataObj);
 
-    if (dataObjShallowItrn.done) {
-      return {dataKeys};
-    }
+    // 0 FOR-LOOP LEVELS IN.
+    for (let in0 = 0, le0 = dataObjKeys.length; in0 < le0; in0++) {
+      const key = dataObjKeys[in0];
 
-    const key = dataObjShallowItrn.value;
-
-    if (!dataKeys.includes(key) && !parentObjAsStr) {
-      dataKeys.push(key);
-    }
-
-    // Recurse deeper into dataObj if this property is an instance of Object.
-    if (dataObj[key] instanceof Object) {
-      const dataObjNestedObj = dataObj[key];
-      let l = 1;
-
-      if (Array.isArray(dataObjNestedObj)) {
-        l = dataObjNestedObj.length;
+      if (!dataKeys.includes(key) && !parentObjAsStr) {
+        dataKeysPart.push(key);
       }
 
-      for (let i = 0; i < l; i++) {
-        let dataObjItem;
+      // Recurse deeper into dataObj if this property is an instance of Object.
+      if (dataObj[key] instanceof Object) {
+        const dataObjNestedObj = dataObj[key];
+        let le1 = 1;
 
         if (Array.isArray(dataObjNestedObj)) {
-          // Recursion into an Array.
-          dataObjItem = dataObjNestedObj[i];
-        }
-        else {
-          // Recursion into a plain Object.
-          dataObjItem = dataObjNestedObj;
+          le1 = dataObjNestedObj.length;
         }
 
-        if (dataObjItem && dataObjItem.constructor === Object) {
-          const dataObjItemKeys = Object.keys(dataObjItem);
+        // 1 FOR-LOOP LEVELS IN.
+        for (let in1 = 0; in1 < le1; in1++) {
+          let dataObjItem;
 
-          if (dataObjItemKeys.length) {
-            let dataObjDeeperItr;
-            let dataObjDeeperItrn;
+          if (Array.isArray(dataObjNestedObj)) {
+            // Recursion into an Array.
+            dataObjItem = dataObjNestedObj[in1];
+          }
+          else {
+            // Recursion into a plain Object.
+            dataObjItem = dataObjNestedObj;
+          }
 
-            if (dataObjItemKeys.length === 1) {
-              dataObjDeeperItr = {
-                next: () => {return {done: true};}
-              };
-              dataObjDeeperItrn = {
-                value: dataObjItemKeys[0]
-              };
-            }
-            else {
-              dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
-              dataObjDeeperItrn = dataObjDeeperItr.next();
-            }
+          if (dataObjItem && dataObjItem.constructor === Object) {
+            const dataObjItemKeys = Object.keys(dataObjItem);
 
-            let parentObjAsStrNew = parentObjAsStr;
+            // 2 FOR-LOOP LEVELS IN.
+            for (let in2 = 0, le2 = dataObjItemKeys.length; in2 < le2; in2++) {
+              let parentObjAsStrNew = parentObjAsStr;
 
-            if (dataObjDeeperItrn.value) {
               if (Array.isArray(dataObjNestedObj)) {
-                parentObjAsStrNew += parentObjAsStr ? `.${key}.${i}` : `${key}.${i}`;
+                parentObjAsStrNew += parentObjAsStr ? `.${key}.${in1}` : `${key}.${in1}`;
               }
               else {
                 parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
@@ -148,38 +131,54 @@ COLLECTORS: {
 
               const parentObjSplit = parentObjAsStrNew.split('.');
 
-              ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
+              const dataKeysPart1 = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit});
+
+              // 3 FOR-LOOP LEVELS IN.
+              for (let in3 = 0, le3 = dataKeysPart1.length; in3 < le3; in3++) {
+                if (!dataKeys.includes(dataKeysPart1[in3]) && !dataKeysPart.includes(dataKeysPart1[in3])) {
+                  dataKeysPart.push(dataKeysPart1[in3]);
+                }
+              }
+
+              // Clone args object for recursion deeper into dataObj.
+              const argsDeeper = {
+                dataKeys,
+                dataObj: dataObjItem,
+                parentObjAsStr: parentObjAsStrNew,
+                //partialShort: args.partialShort // For debugging.
+              };
+
+              const dataKeysPart2 = dataKeysCollect(argsDeeper);
+
+              // 3 FOR-LOOP LEVELS IN.
+              for (let in3 = 0, le3 = dataKeysPart2.length; in3 < le3; in3++) {
+                if (!dataKeys.includes(dataKeysPart2[in3]) && !dataKeysPart.includes(dataKeysPart2[in3])) {
+                  dataKeysPart.push(dataKeysPart2[in3]);
+                }
+              }
             }
+          }
+        }
+      }
+      else {
+        const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-            // Clone args object for recursion deeper into dataObj.
-            const argsDeeper = {
-              dataKeys_: dataKeys,
-              dataObjShallowItr: dataObjDeeperItr,
-              dataObjShallowItrn: dataObjDeeperItrn,
-              dataObj: dataObjItem,
-              parentObjAsStr: parentObjAsStrNew,
-              partialShort: args.partialShort
-            };
+        if (!parentObjSplit.includes(key)) {
+          parentObjSplit.push(key);
+        }
 
-            ({dataKeys} = dataKeysCollect(argsDeeper));
+        const dataKeysPart1 = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit});
+
+        // 1 FOR-LOOP LEVELS IN.
+        for (let in1 = 0, le1 = dataKeysPart1.length; in1 < le1; in1++) {
+          if (!dataKeys.includes(dataKeysPart1[in1]) && !dataKeysPart.includes(dataKeysPart1[in1])) {
+            dataKeysPart.push(dataKeysPart1[in1]);
           }
         }
       }
     }
-    else {
-      const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-      if (!parentObjSplit.includes(key)) {
-        parentObjSplit.push(key);
-      }
-
-      ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
-    }
-
-    args.dataKeys_ = dataKeys;
-    args.dataObjShallowItrn = args.dataObjShallowItr.next();
-
-    return dataKeysCollect(args);
+    return dataKeysPart;
   };
 }
 
@@ -684,14 +683,12 @@ PARAMS_APPLIER: {
               paramsObjShallowItrn = paramsObjShallowItr.next();
             }
 
-            ({dataKeys} = dataKeysCollect({
-              dataKeys_: [],
-              dataObjShallowItr: paramsObjShallowItr,
-              dataObjShallowItrn: paramsObjShallowItrn,
+            dataKeys = dataKeysCollect({
+              dataKeys: [],
               dataObj: paramsObjNew,
               parentObjAsStr: '',
               //partialShort // For debugging.
-            }));
+            });
           }
         }
 
@@ -907,14 +904,12 @@ PARAMS_APPLIER: {
         paramsObjShallowItrn = paramsObjShallowItr.next();
       }
 
-      ({dataKeys} = dataKeysCollect({
-        dataKeys_: [],
-        dataObjShallowItr: paramsObjShallowItr,
-        dataObjShallowItrn: paramsObjShallowItrn,
+      dataKeys = dataKeysCollect({
+        dataKeys: [],
         dataObj: paramsObj,
         parentObjAsStr: '',
         //partialShort // For debugging.
-      }));
+      });
     }
 
     const paramKeys = dataKeys;
@@ -1014,7 +1009,7 @@ METHODS: {
   var preProcessContextKeys = function (context) {
     /* istanbul ignore if */
     if (!context) {
-      return {};
+      return [];
     }
 
     const contextObjKeys = Object.keys(context);
@@ -1038,9 +1033,7 @@ METHODS: {
       }
 
       ({dataKeys} = dataKeysCollect({
-        dataKeys_: [],
-        dataObjShallowItr,
-        dataObjShallowItrn,
+        dataKeys: [],
         dataObj: context,
         parentObjAsStr: '',
       }));
@@ -1156,7 +1149,6 @@ METHODS: {
 
     const partialsKeys = Object.keys(partials);
 
-    // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
     for (let i = 0, l = partialsKeys.length; i < l; i++) {
       const partialKey = partialsKeys[i];
 
@@ -1211,23 +1203,26 @@ METHODS: {
     return compilation;
   };
 
-  var registerPartial = function (partialName, partialTemplate, partialComp_, partials_, partialsComp_, options_) {
+  var registerPartial = function (partialName, partialTemplate, partialCom, partials_, partialsComp_, options_) {
     const partials = partials_ || this.partials || {};
     const partialsComp = partialsComp_ || this.partialsComp || {};
     const options = options_ || this.options || {};
 
+    const partialsPart = {};
+    const partialsCompPart = {};
+
     if (!partials[partialName]) {
-      partials[partialName] = partialTemplate;
+      partialsPart[partialName] = partialTemplate;
     }
 
     if (!partialsComp[partialName]) {
-      if (partialComp_) {
-        partialsComp[partialName] = partialComp_;
+      if (partialCom) {
+        partialsCompPart[partialName] = partialCom;
       }
       else {
         const parseArr = hogan.parse(hogan.scan(partialTemplate, options.delimiters));
 
-        partialsComp[partialName] = {
+        partialsCompPart[partialName] = {
           parseArr,
           compilation: hogan.generate(parseArr, partialTemplate, options)
         };
@@ -1235,8 +1230,8 @@ METHODS: {
     }
 
     return {
-      partials,
-      partialsComp
+      partialsPart,
+      partialsCompPart
     };
   };
 
@@ -1248,15 +1243,23 @@ METHODS: {
     let partialsComp = partialsComp_ || this.partialsComp || {};
     let partialsKeys = Object.keys(partials);
 
-    // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
     for (let i = 0, l = partialsKeys.length; i < l; i++) {
       const partialKey = partialsKeys[i];
 
+      let partialsPart;
+      let partialsCompPart;
+
       if (!partialsComp[partialKey]) {
         ({
-          partials,
-          partialsComp
+          partialsPart,
+          partialsCompPart
         } = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp, options));
+
+        Object.assign(partialsComp, partialsCompPart)
+
+        if (!partials[partialKey]) {
+          Object.assign(partials, partialsPart)
+        }
       }
     }
 
