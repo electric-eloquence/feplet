@@ -95,8 +95,8 @@ COLLECTORS: {
       dataKeys.push(key);
     }
 
-    // Recurse deeper into dataObj if this property is of type object.
-    if (dataObj[key] && typeof dataObj[key] === 'object') {
+    // Recurse deeper into dataObj if this property is an instance of Object.
+    if (dataObj[key] instanceof Object) {
       const dataObjNestedObj = dataObj[key];
       let l = 1;
 
