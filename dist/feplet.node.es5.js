@@ -86,10 +86,10 @@ COLLECTORS: {
 
     if (!dataKeys.includes(key) && !parentObjAsStr) {
       dataKeys.push(key);
-    } // Recurse deeper into dataObj if this property is of type object.
+    } // Recurse deeper into dataObj if this property is an instance of Object.
 
 
-    if (dataObj[key] && _typeof(dataObj[key]) === 'object') {
+    if (dataObj[key] instanceof Object) {
       var dataObjNestedObj = dataObj[key];
       var l = 1;
 
