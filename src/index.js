@@ -71,7 +71,7 @@ COLLECTORS: {
       }
     }
 
-    return {dataKeysPart};
+    return dataKeysPart;
   };
 
   var dataKeysCollect = function (args) {
@@ -142,7 +142,7 @@ COLLECTORS: {
 
               // Clone args object for recursion deeper into dataObj.
               const argsDeeper = {
-                dataKeys,
+                dataKeys: dataKeysPart,
                 dataObj: dataObjItem,
                 parentObjAsStr: parentObjAsStrNew,
                 //partialShort: args.partialShort // For debugging.
@@ -1005,6 +1005,9 @@ PARAMS_APPLIER: {
   };
 }
 
+// The exposed methods are object-oriented in methodology. When invoked as object instance methods, they may mutate
+// instance data in a way hidden from outside the method. Invoking functions may similarly not directly depend on the
+// returned data.
 METHODS: {
   var preProcessContextKeys = function (context) {
     /* istanbul ignore if */
@@ -1032,14 +1035,14 @@ METHODS: {
         dataObjShallowItrn = dataObjShallowItr.next();
       }
 
-      ({dataKeys} = dataKeysCollect({
+      dataKeys = dataKeysCollect({
         dataKeys: [],
         dataObj: context,
         parentObjAsStr: '',
-      }));
+      });
     }
 
-    let contextKeys;
+    let contextKeys = [];
 
     if (dataKeys.length) {
       let contextKeysItr;
@@ -1208,21 +1211,18 @@ METHODS: {
     const partialsComp = partialsComp_ || this.partialsComp || {};
     const options = options_ || this.options || {};
 
-    const partialsPart = {};
-    const partialsCompPart = {};
-
     if (!partials[partialName]) {
-      partialsPart[partialName] = partialTemplate;
+      partials[partialName] = partialTemplate;
     }
 
     if (!partialsComp[partialName]) {
       if (partialCom) {
-        partialsCompPart[partialName] = partialCom;
+        partialsComp[partialName] = partialCom;
       }
       else {
         const parseArr = hogan.parse(hogan.scan(partialTemplate, options.delimiters));
 
-        partialsCompPart[partialName] = {
+        partialsComp[partialName] = {
           parseArr,
           compilation: hogan.generate(parseArr, partialTemplate, options)
         };
@@ -1230,8 +1230,8 @@ METHODS: {
     }
 
     return {
-      partialsPart,
-      partialsCompPart
+      partials,
+      partialsComp
     };
   };
 
