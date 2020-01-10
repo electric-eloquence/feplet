@@ -21,38 +21,28 @@ const paramRegex = /\([\S\s]*\)/;
 COLLECTORS: {
   var contextKeysCollect = function (args) {
     const {
-      contextKeys_,
-      contextKeysItr,
-      contextKeysItrn
+      dataKeys
     } = args;
 
-    if (contextKeysItrn.done) {
-      return {
-        contextKeys: contextKeys_
-      };
-    }
+    for (let i = 0, l = dataKeys.length; i < l; i++) {
+      const contextKeySplit = dataKeys[i].split('.');
 
-    const contextKey = contextKeysItrn.value;
-    const contextKeySplit = contextKey.split('.');
+      while (contextKeySplit.shift()) {
+        if (contextKeySplit.length) {
+          const contextKeyNew = contextKeySplit.join('.');
 
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-
-      const contextKeyNew = contextKeySplit.join('.');
-
-      if (!contextKeys_.includes(contextKeyNew)) {
-        contextKeys_.push(contextKeyNew);
+          if (!dataKeys.includes(contextKeyNew)) {
+            dataKeys.push(contextKeyNew);
+          }
+        }
       }
     }
 
-    args.contextKeysItrn = contextKeysItr.next();
-
-    return contextKeysCollect(args);
+    return {contextKeysPart: dataKeys};
   };
 
   var dataKeysWithDotNotationAdd = function (args) {
     const {
-      dataKeys,
       parentObjSplit
     } = args;
 
@@ -148,7 +138,7 @@ COLLECTORS: {
                 //partialShort: args.partialShort // For debugging.
               };
 
-              const dataKeysPart2 = dataKeysCollect(argsDeeper);
+              const {dataKeysPart: dataKeysPart2} = dataKeysCollect(argsDeeper);
 
               // 3 FOR-LOOP LEVELS IN.
               for (let in3 = 0, le3 = dataKeysPart2.length; in3 < le3; in3++) {
@@ -178,7 +168,7 @@ COLLECTORS: {
       }
     }
 
-    return dataKeysPart;
+    return {dataKeysPart};
   };
 }
 
@@ -667,28 +657,12 @@ PARAMS_APPLIER: {
           const paramsObjKeys = Object.keys(paramsObjNew);
 
           if (paramsObjKeys.length) {
-            let paramsObjShallowItr;
-            let paramsObjShallowItrn;
-
-            if (paramsObjKeys.length === 1) {
-              paramsObjShallowItr = {
-                next: () => {return {done: true};}
-              };
-              paramsObjShallowItrn = {
-                value: paramsObjKeys[0]
-              };
-            }
-            else {
-              paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-              paramsObjShallowItrn = paramsObjShallowItr.next();
-            }
-
-            dataKeys = dataKeysCollect({
+            ({dataKeysPart: dataKeys} = dataKeysCollect({
               dataKeys: [],
               dataObj: paramsObjNew,
               parentObjAsStr: '',
               //partialShort // For debugging.
-            });
+            }));
           }
         }
 
@@ -888,28 +862,12 @@ PARAMS_APPLIER: {
     let dataKeys;
 
     if (paramsObjKeys.length) {
-      let paramsObjShallowItr;
-      let paramsObjShallowItrn;
-
-      if (paramsObjKeys.length === 1) {
-        paramsObjShallowItr = {
-          next: () => {return {done: true};}
-        };
-        paramsObjShallowItrn = {
-          value: paramsObjKeys[0]
-        };
-      }
-      else {
-        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-        paramsObjShallowItrn = paramsObjShallowItr.next();
-      }
-
-      dataKeys = dataKeysCollect({
+      ({dataKeysPart: dataKeys} = dataKeysCollect({
         dataKeys: [],
         dataObj: paramsObj,
         parentObjAsStr: '',
         //partialShort // For debugging.
-      });
+      }));
     }
 
     const paramKeys = dataKeys;
@@ -1015,60 +973,21 @@ METHODS: {
       return [];
     }
 
-    const contextObjKeys = Object.keys(context);
-    let dataKeys = [];
+    const {dataKeysPart: dataKeys} = dataKeysCollect({
+      dataKeys: [],
+      dataObj: context,
+      parentObjAsStr: '',
+    });
 
-    if (contextObjKeys.length) {
-      let dataObjShallowItr;
-      let dataObjShallowItrn;
-
-      if (contextObjKeys.length === 1) {
-        dataObjShallowItr = {
-          next: () => {return {done: true};}
-        };
-        dataObjShallowItrn = {
-          value: contextObjKeys[0]
-        };
-      }
-      else {
-        dataObjShallowItr = contextObjKeys[Symbol.iterator]();
-        dataObjShallowItrn = dataObjShallowItr.next();
-      }
-
-      dataKeys = dataKeysCollect({
-        dataKeys: [],
-        dataObj: context,
-        parentObjAsStr: '',
-      });
-    }
-
-    let contextKeys = [];
+    let contextKeysPart = [];
 
     if (dataKeys.length) {
-      let contextKeysItr;
-      let contextKeysItrn;
-
-      if (dataKeys.length === 1) {
-        contextKeysItr = {
-          next: () => {return {done: true};}
-        };
-        contextKeysItrn = {
-          value: dataKeys[0]
-        };
-      }
-      else {
-        contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
-        contextKeysItrn = contextKeysItr.next();
-      }
-
-      ({contextKeys} = contextKeysCollect({
-        contextKeys_: dataKeys,
-        contextKeysItr,
-        contextKeysItrn
+      ({contextKeysPart} = contextKeysCollect({
+        dataKeys
       }));
     }
 
-    return contextKeys;
+    return contextKeysPart;
   };
 
   var preProcessPartialParams =
@@ -1080,7 +999,7 @@ METHODS: {
     let _contextKeys;
 
     // First, check if we still need to preprocess contextKeys because .render() was called statically.
-    if (typeof contextKeys === 'undefined') {
+    if (!contextKeys || !contextKeys.length) {
       let hasParam = false;
 
       for (let i = 0, l = partialsKeys.length; i < l; i++) {
@@ -1245,7 +1164,6 @@ METHODS: {
 
     for (let i = 0, l = partialsKeys.length; i < l; i++) {
       const partialKey = partialsKeys[i];
-
       let partialsPart;
       let partialsCompPart;
 
@@ -1255,10 +1173,10 @@ METHODS: {
           partialsCompPart
         } = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp, options));
 
-        Object.assign(partialsComp, partialsCompPart)
+        Object.assign(partialsComp, partialsCompPart);
 
         if (!partials[partialKey]) {
-          Object.assign(partials, partialsPart)
+          Object.assign(partials, partialsPart);
         }
       }
     }

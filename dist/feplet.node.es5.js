@@ -21,35 +21,29 @@ var paramRegex = /\([\S\s]*\)/;
 
 COLLECTORS: {
   var contextKeysCollect = function contextKeysCollect(args) {
-    var contextKeys_ = args.contextKeys_,
-        contextKeysItr = args.contextKeysItr,
-        contextKeysItrn = args.contextKeysItrn;
+    var dataKeys = args.dataKeys;
 
-    if (contextKeysItrn.done) {
-      return {
-        contextKeys: contextKeys_
-      };
-    }
+    for (var i = 0, l = dataKeys.length; i < l; i++) {
+      var contextKeySplit = dataKeys[i].split('.');
 
-    var contextKey = contextKeysItrn.value;
-    var contextKeySplit = contextKey.split('.');
+      while (contextKeySplit.shift()) {
+        if (contextKeySplit.length) {
+          var contextKeyNew = contextKeySplit.join('.');
 
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-      var contextKeyNew = contextKeySplit.join('.');
-
-      if (!contextKeys_.includes(contextKeyNew)) {
-        contextKeys_.push(contextKeyNew);
+          if (!dataKeys.includes(contextKeyNew)) {
+            dataKeys.push(contextKeyNew);
+          }
+        }
       }
     }
 
-    args.contextKeysItrn = contextKeysItr.next();
-    return contextKeysCollect(args);
+    return {
+      contextKeysPart: dataKeys
+    };
   };
 
   var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
-    var dataKeys = args.dataKeys,
-        parentObjSplit = args.parentObjSplit;
+    var parentObjSplit = args.parentObjSplit;
     var dataKeysPart = [];
     var i = 0;
     var itemNext;
@@ -134,7 +128,10 @@ COLLECTORS: {
                 parentObjAsStr: parentObjAsStrNew //partialShort: args.partialShort // For debugging.
 
               };
-              var dataKeysPart2 = dataKeysCollect(argsDeeper); // 3 FOR-LOOP LEVELS IN.
+
+              var _dataKeysCollect = dataKeysCollect(argsDeeper),
+                  dataKeysPart2 = _dataKeysCollect.dataKeysPart; // 3 FOR-LOOP LEVELS IN.
+
 
               for (var _in = 0, _le = dataKeysPart2.length; _in < _le; _in++) {
                 if (!dataKeys.includes(dataKeysPart2[_in]) && !dataKeysPart.includes(dataKeysPart2[_in])) {
@@ -165,7 +162,9 @@ COLLECTORS: {
       }
     }
 
-    return dataKeysPart;
+    return {
+      dataKeysPart: dataKeysPart
+    };
   };
 }
 
@@ -616,31 +615,14 @@ PARAMS_APPLIER: {
           var paramsObjKeys = Object.keys(paramsObjNew);
 
           if (paramsObjKeys.length) {
-            var paramsObjShallowItr = void 0;
-            var paramsObjShallowItrn = void 0;
-
-            if (paramsObjKeys.length === 1) {
-              paramsObjShallowItr = {
-                next: function next() {
-                  return {
-                    done: true
-                  };
-                }
-              };
-              paramsObjShallowItrn = {
-                value: paramsObjKeys[0]
-              };
-            } else {
-              paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-              paramsObjShallowItrn = paramsObjShallowItr.next();
-            }
-
-            dataKeys = dataKeysCollect({
+            var _dataKeysCollect2 = dataKeysCollect({
               dataKeys: [],
               dataObj: paramsObjNew,
               parentObjAsStr: '' //partialShort // For debugging.
 
             });
+
+            dataKeys = _dataKeysCollect2.dataKeysPart;
           }
         }
 
@@ -840,31 +822,14 @@ PARAMS_APPLIER: {
     var dataKeys;
 
     if (paramsObjKeys.length) {
-      var paramsObjShallowItr;
-      var paramsObjShallowItrn;
-
-      if (paramsObjKeys.length === 1) {
-        paramsObjShallowItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        paramsObjShallowItrn = {
-          value: paramsObjKeys[0]
-        };
-      } else {
-        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-        paramsObjShallowItrn = paramsObjShallowItr.next();
-      }
-
-      dataKeys = dataKeysCollect({
+      var _dataKeysCollect3 = dataKeysCollect({
         dataKeys: [],
         dataObj: paramsObj,
         parentObjAsStr: '' //partialShort // For debugging.
 
       });
+
+      dataKeys = _dataKeysCollect3.dataKeysPart;
     }
 
     var paramKeys = dataKeys;
@@ -948,69 +913,24 @@ METHODS: {
       return [];
     }
 
-    var contextObjKeys = Object.keys(context);
-    var dataKeys = [];
+    var _dataKeysCollect4 = dataKeysCollect({
+      dataKeys: [],
+      dataObj: context,
+      parentObjAsStr: ''
+    }),
+        dataKeys = _dataKeysCollect4.dataKeysPart;
 
-    if (contextObjKeys.length) {
-      var dataObjShallowItr;
-      var dataObjShallowItrn;
-
-      if (contextObjKeys.length === 1) {
-        dataObjShallowItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        dataObjShallowItrn = {
-          value: contextObjKeys[0]
-        };
-      } else {
-        dataObjShallowItr = contextObjKeys[Symbol.iterator]();
-        dataObjShallowItrn = dataObjShallowItr.next();
-      }
-
-      dataKeys = dataKeysCollect({
-        dataKeys: [],
-        dataObj: context,
-        parentObjAsStr: ''
-      });
-    }
-
-    var contextKeys = [];
+    var contextKeysPart = [];
 
     if (dataKeys.length) {
-      var contextKeysItr;
-      var contextKeysItrn;
-
-      if (dataKeys.length === 1) {
-        contextKeysItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        contextKeysItrn = {
-          value: dataKeys[0]
-        };
-      } else {
-        contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
-
-        contextKeysItrn = contextKeysItr.next();
-      }
-
       var _contextKeysCollect = contextKeysCollect({
-        contextKeys_: dataKeys,
-        contextKeysItr: contextKeysItr,
-        contextKeysItrn: contextKeysItrn
+        dataKeys: dataKeys
       });
 
-      contextKeys = _contextKeysCollect.contextKeys;
+      contextKeysPart = _contextKeysCollect.contextKeysPart;
     }
 
-    return contextKeys;
+    return contextKeysPart;
   };
 
   var preProcessPartialParams = function preProcessPartialParams(text, compilation_, partials_, partialsComp_, contextKeys_, context, options_) {
@@ -1022,7 +942,7 @@ METHODS: {
     var _contextKeys; // First, check if we still need to preprocess contextKeys because .render() was called statically.
 
 
-    if (typeof contextKeys === 'undefined') {
+    if (!contextKeys || !contextKeys.length) {
       var hasParam = false;
 
       for (var i = 0, l = partialsKeys.length; i < l; i++) {
