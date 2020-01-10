@@ -1108,6 +1108,7 @@ METHODS: {
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
+      // Only defined if hasParam.
       partials: partials,
       partialsComp: partialsComp
     };
