@@ -632,40 +632,18 @@ PARAMS_APPLIER: {
         paramsObjNew = paramsObj;
       }
 
-      if (tagParse.length) {
-        var tagParseItr;
-        var tagParseItrn;
+      var _paramsApply = paramsApply({
+        // eslint-disable-line no-use-before-define
+        contextKeys: contextKeys,
+        paramKeys: paramKeysNew,
+        paramsObj: paramsObjNew,
+        partialParseArr: tagParse,
+        //partialShort, // For debugging.
+        partialText_: partialText_
+      });
 
-        if (tagParse.length === 1) {
-          tagParseItr = {
-            next: function next() {
-              return {
-                done: true
-              };
-            }
-          };
-          tagParseItrn = {
-            value: tagParse[0]
-          };
-        } else {
-          tagParseItr = tagParse[Symbol.iterator]();
-          tagParseItrn = tagParseItr.next();
-        }
-
-        var _paramsApply = paramsApply({
-          // eslint-disable-line no-use-before-define
-          contextKeys: contextKeys,
-          paramKeys: paramKeysNew,
-          paramsObj: paramsObjNew,
-          partialParseItr: tagParseItr,
-          partialParseItrn: tagParseItrn,
-          //partialShort, // For debugging.
-          partialText_: partialText_
-        });
-
-        delimiterUnicodes = _paramsApply.delimiterUnicodes;
-        partialText = _paramsApply.partialText;
-      }
+      delimiterUnicodes = _paramsApply.delimiterUnicodes;
+      partialText = _paramsApply.partialText;
     } else {
       var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
         contextKeys: contextKeys,
@@ -694,47 +672,46 @@ PARAMS_APPLIER: {
         delimiterUnicodes_ = args.delimiterUnicodes_,
         paramKeys = args.paramKeys,
         paramsObj = args.paramsObj,
-        partialParseItr = args.partialParseItr,
-        partialParseItrn = args.partialParseItrn,
+        partialParseArr = args.partialParseArr,
         partialText_ = args.partialText_;
 
-    if (partialParseItrn.done) {
-      return {
-        delimiterUnicodes: delimiterUnicodes_,
-        partialText: partialText_
-      };
-    }
+    var _delimiterUnicodes;
 
-    var parseObj = partialParseItrn.value;
-    var parseObjKeys = Object.keys(parseObj);
-    var delimiterUnicodes;
     var partialText;
 
-    if (parseObjKeys.length) {
-      // At this point, parseObjKeys.length is always > 1.
-      var parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-      var parseObjKeysItrn = parseObjKeysItr.next();
+    for (var i = 0, l = partialParseArr.length; i < l; i++) {
+      var parseObj = partialParseArr[i];
+      var parseObjKeys = Object.keys(parseObj);
+      var delimiterUnicodes = void 0;
 
-      var _paramsApplyToParseOb = paramsApplyToParseObj({
-        contextKeys: contextKeys,
-        delimiterUnicodes_: delimiterUnicodes_,
-        paramKeys: paramKeys,
-        paramsObj: paramsObj,
-        parseObj: parseObj,
-        parseObjKeysItr: parseObjKeysItr,
-        parseObjKeysItrn: parseObjKeysItrn,
-        //partialShort, // For debugging.
-        partialText_: partialText_
-      });
+      if (parseObjKeys.length) {
+        // At this point, parseObjKeys.length is always > 1.
+        var parseObjKeysItr = parseObjKeys[Symbol.iterator]();
+        var parseObjKeysItrn = parseObjKeysItr.next();
 
-      delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
-      partialText = _paramsApplyToParseOb.partialText;
+        var _paramsApplyToParseOb = paramsApplyToParseObj({
+          contextKeys: contextKeys,
+          delimiterUnicodes_: delimiterUnicodes_,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          parseObj: parseObj,
+          parseObjKeysItr: parseObjKeysItr,
+          parseObjKeysItrn: parseObjKeysItrn,
+          //partialShort, // For debugging.
+          partialText_: partialText || partialText_
+        });
+
+        delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
+        partialText = _paramsApplyToParseOb.partialText;
+      }
+
+      _delimiterUnicodes = _delimiterUnicodes || delimiterUnicodes || delimiterUnicodes_;
     }
 
-    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
-    args.partialParseItrn = partialParseItr.next();
-    args.partialText_ = partialText || partialText_;
-    return paramsApply(args);
+    return {
+      delimiterUnicodes: _delimiterUnicodes,
+      partialText: partialText || partialText_
+    };
   };
 
   var partialsWithParamsAdd = function partialsWithParamsAdd(args) {
@@ -843,39 +820,17 @@ PARAMS_APPLIER: {
           };
         }
 
-      if (partialParseArr.length) {
-        var partialParseItr = void 0;
-        var partialParseItrn = void 0;
+      var _paramsApply2 = paramsApply({
+        contextKeys: contextKeys,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        partialParseArr: partialParseArr,
+        //partialShort, // For debugging.
+        partialText_: partialText_
+      });
 
-        if (partialParseArr.length === 1) {
-          partialParseItr = {
-            next: function next() {
-              return {
-                done: true
-              };
-            }
-          };
-          partialParseItrn = {
-            value: partialParseArr[0]
-          };
-        } else {
-          partialParseItr = partialParseArr[Symbol.iterator]();
-          partialParseItrn = partialParseItr.next();
-        }
-
-        var _paramsApply2 = paramsApply({
-          contextKeys: contextKeys,
-          paramKeys: paramKeys,
-          paramsObj: paramsObj,
-          partialParseItr: partialParseItr,
-          partialParseItrn: partialParseItrn,
-          //partialShort, // For debugging.
-          partialText_: partialText_
-        });
-
-        delimiterUnicodes = _paramsApply2.delimiterUnicodes;
-        partialText = _paramsApply2.partialText;
-      }
+      delimiterUnicodes = _paramsApply2.delimiterUnicodes;
+      partialText = _paramsApply2.partialText;
 
       if (delimiterUnicodes && partialText !== partialText_) {
         // First, render with unicode delimiters.
@@ -939,7 +894,7 @@ METHODS: {
     var _contextKeys; // First, check if we still need to preprocess contextKeys because .render() was called statically.
 
 
-    if (!contextKeys || !contextKeys.length) {
+    if (typeof contextKeys === 'undefined') {
       var hasParam = false;
 
       for (var i = 0, l = partialsKeys.length; i < l; i++) {
@@ -975,6 +930,7 @@ METHODS: {
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
+      // Only defined if hasParam.
       partials: partials,
       partialsComp: partialsComp
     };
