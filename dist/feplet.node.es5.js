@@ -740,166 +740,163 @@ PARAMS_APPLIER: {
   var partialsWithParamsAdd = function partialsWithParamsAdd(args) {
     var compilation = args.compilation,
         contextKeys = args.contextKeys,
+        partialsKeys = args.partialsKeys,
         partials = args.partials,
         partialsComp = args.partialsComp,
-        partialsKeysItr = args.partialsKeysItr,
-        partialsKeysItrn = args.partialsKeysItrn,
         options = args.options;
 
-    if (partialsKeysItrn.done) {
-      return {
-        partials: partials,
-        partialsComp: partialsComp
-      };
-    }
+    for (var i = 0, l = partialsKeys.length; i < l; i++) {
+      var partialKey = partialsKeys[i];
+      var partialFull = compilation.partials[partialKey].name;
+      var styleModClasses = void 0;
+      var styleModifierMatch = void 0;
 
-    var partialFull = compilation.partials[partialsKeysItrn.value].name;
-    var styleModClasses;
-    var styleModifierMatch;
-    args.partialsKeysItrn = partialsKeysItr.next();
-
-    if (partials[partialFull]) {
-      return partialsWithParamsAdd(args);
-    }
-
-    var paramsMatch = partialFull.match(paramRegex);
-    var paramsObj = {};
-    var partialShort = partialFull;
-
-    if (paramsMatch) {
-      var paramsStr = paramsMatch[0];
-      partialShort = partialFull.replace(paramsStr, '');
-
-      var _styleModifierExtract = styleModifierExtract({
-        partialName: partialShort
-      });
-
-      styleModClasses = _styleModifierExtract.styleModClasses;
-      styleModifierMatch = _styleModifierExtract.styleModifierMatch;
-
-      if (partialFull !== partialShort) {
-        try {
-          paramsObj = jsonEval("{".concat(paramsStr.slice(1, -1).trim(), "}"));
-        } catch (err) {
-          /* istanbul ignore next */
-          console.error(err); // eslint-disable-line no-console
-
-          /* istanbul ignore next */
-
-          return partialsWithParamsAdd(args);
-        }
-        /* istanbul ignore if */
-
-
-        if (!paramsObj || paramsObj.constructor !== Object) {
-          return partialsWithParamsAdd(args);
-        }
-      }
-    } else {
-      var _styleModifierExtract2 = styleModifierExtract({
-        partialName: partialFull
-      });
-
-      styleModClasses = _styleModifierExtract2.styleModClasses;
-      styleModifierMatch = _styleModifierExtract2.styleModifierMatch;
-    }
-
-    if (styleModifierMatch) {
-      partialShort = partialShort.replace(styleModifierMatch[0], '');
-    }
-    /* istanbul ignore if */
-
-
-    if (partialShort === partialFull || !partials[partialShort]) {
-      return partialsWithParamsAdd(args);
-    }
-
-    if (styleModClasses) {
-      paramsObj.styleModifier = styleModClasses;
-    }
-
-    var paramsObjKeys = Object.keys(paramsObj);
-    var dataKeys;
-
-    if (paramsObjKeys.length) {
-      var _dataKeysCollect3 = dataKeysCollect({
-        dataKeys: [],
-        dataObj: paramsObj,
-        parentObjAsStr: '' //partialShort // For debugging.
-
-      });
-
-      dataKeys = _dataKeysCollect3.dataKeysPart;
-    }
-
-    var paramKeys = dataKeys;
-    var partialText_ = partials[partialShort] || '';
-    var delimiterUnicodes;
-    var partialParseArr = [];
-    var partialText = '';
-
-    if (partialsComp[partialShort].parseArr) {
-      partialParseArr = partialsComp[partialShort].parseArr;
-    } // DEPRECATED.
-    // TODO: This accommodates old usage of partialsComp. To be removed.
-    else {
-        partialParseArr = hogan.parse(hogan.scan(partials[partialShort], options.delimiters), partials[partialShort], options);
-        partialsComp[partialShort] = {
-          parseArr: partialParseArr,
-          compilation: partialsComp[partialShort]
-        };
+      if (partials[partialFull]) {
+        continue;
       }
 
-    if (partialParseArr.length) {
-      var partialParseItr;
-      var partialParseItrn;
+      var paramsMatch = partialFull.match(paramRegex);
+      var paramsObj = {};
+      var partialShort = partialFull;
 
-      if (partialParseArr.length === 1) {
-        partialParseItr = {
-          next: function next() {
-            return {
-              done: true
-            };
+      if (paramsMatch) {
+        var paramsStr = paramsMatch[0];
+        partialShort = partialFull.replace(paramsStr, '');
+
+        var _styleModifierExtract = styleModifierExtract({
+          partialName: partialShort
+        });
+
+        styleModClasses = _styleModifierExtract.styleModClasses;
+        styleModifierMatch = _styleModifierExtract.styleModifierMatch;
+
+        if (partialFull !== partialShort) {
+          try {
+            paramsObj = jsonEval("{".concat(paramsStr.slice(1, -1).trim(), "}"));
+          } catch (err) {
+            /* istanbul ignore next */
+            console.error(err); // eslint-disable-line no-console
+
+            /* istanbul ignore next */
+
+            continue;
           }
-        };
-        partialParseItrn = {
-          value: partialParseArr[0]
-        };
+          /* istanbul ignore if */
+
+
+          if (!paramsObj || paramsObj.constructor !== Object) {
+            continue;
+          }
+        }
       } else {
-        partialParseItr = partialParseArr[Symbol.iterator]();
-        partialParseItrn = partialParseItr.next();
+        var _styleModifierExtract2 = styleModifierExtract({
+          partialName: partialFull
+        });
+
+        styleModClasses = _styleModifierExtract2.styleModClasses;
+        styleModifierMatch = _styleModifierExtract2.styleModifierMatch;
       }
 
-      var _paramsApply2 = paramsApply({
-        contextKeys: contextKeys,
-        paramKeys: paramKeys,
-        paramsObj: paramsObj,
-        partialParseItr: partialParseItr,
-        partialParseItrn: partialParseItrn,
-        //partialShort, // For debugging.
-        partialText_: partialText_
-      });
+      if (styleModifierMatch) {
+        partialShort = partialShort.replace(styleModifierMatch[0], '');
+      }
+      /* istanbul ignore if */
 
-      delimiterUnicodes = _paramsApply2.delimiterUnicodes;
-      partialText = _paramsApply2.partialText;
+
+      if (partialShort === partialFull || !partials[partialShort]) {
+        continue;
+      }
+
+      if (styleModClasses) {
+        paramsObj.styleModifier = styleModClasses;
+      }
+
+      var paramsObjKeys = Object.keys(paramsObj);
+      var dataKeys = void 0;
+
+      if (paramsObjKeys.length) {
+        var _dataKeysCollect3 = dataKeysCollect({
+          dataKeys: [],
+          dataObj: paramsObj,
+          parentObjAsStr: '' //partialShort // For debugging.
+
+        });
+
+        dataKeys = _dataKeysCollect3.dataKeysPart;
+      }
+
+      var paramKeys = dataKeys;
+      var partialText_ = partials[partialShort] || '';
+      var delimiterUnicodes = void 0;
+      var partialParseArr = [];
+      var partialText = '';
+
+      if (partialsComp[partialShort].parseArr) {
+        partialParseArr = partialsComp[partialShort].parseArr;
+      } // DEPRECATED.
+      // TODO: This accommodates old usage of partialsComp. To be removed.
+      else {
+          partialParseArr = hogan.parse(hogan.scan(partials[partialShort], options.delimiters), partials[partialShort], options);
+          partialsComp[partialShort] = {
+            parseArr: partialParseArr,
+            compilation: partialsComp[partialShort]
+          };
+        }
+
+      if (partialParseArr.length) {
+        var partialParseItr = void 0;
+        var partialParseItrn = void 0;
+
+        if (partialParseArr.length === 1) {
+          partialParseItr = {
+            next: function next() {
+              return {
+                done: true
+              };
+            }
+          };
+          partialParseItrn = {
+            value: partialParseArr[0]
+          };
+        } else {
+          partialParseItr = partialParseArr[Symbol.iterator]();
+          partialParseItrn = partialParseItr.next();
+        }
+
+        var _paramsApply2 = paramsApply({
+          contextKeys: contextKeys,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          partialParseItr: partialParseItr,
+          partialParseItrn: partialParseItrn,
+          //partialShort, // For debugging.
+          partialText_: partialText_
+        });
+
+        delimiterUnicodes = _paramsApply2.delimiterUnicodes;
+        partialText = _paramsApply2.partialText;
+      }
+
+      if (delimiterUnicodes && partialText !== partialText_) {
+        // First, render with unicode delimiters.
+        var optionsWithUnicodes = Object.assign({
+          delimiters: delimiterUnicodes
+        }, options);
+        var compilationWithUnicodes = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsWithUnicodes), partialText, optionsWithUnicodes);
+        partials[partialFull] = compilationWithUnicodes.render(paramsObj); // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
+
+        var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partials[partialFull], options);
+        partialsComp[partialFull] = {
+          parseArr: parseArr,
+          compilation: hogan.generate(parseArr, partials[partialFull], options)
+        };
+      }
     }
 
-    if (delimiterUnicodes && partialText !== partialText_) {
-      // First, render with unicode delimiters.
-      var optionsWithUnicodes = Object.assign({
-        delimiters: delimiterUnicodes
-      }, options);
-      var compilationWithUnicodes = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsWithUnicodes), partialText, optionsWithUnicodes);
-      partials[partialFull] = compilationWithUnicodes.render(paramsObj); // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
-
-      var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partials[partialFull], options);
-      partialsComp[partialFull] = {
-        parseArr: parseArr,
-        compilation: hogan.generate(parseArr, partials[partialFull], options)
-      };
-    }
-
-    return partialsWithParamsAdd(args);
+    return {
+      partials: partials,
+      partialsComp: partialsComp
+    };
   };
 } // The exposed methods are object-oriented in methodology. When invoked as object instance methods, they may mutate
 // instance data in a way hidden from outside the method. Invoking functions may similarly not directly depend on the
@@ -964,40 +961,17 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    if (partialsKeys.length) {
-      var partialsKeysItr;
-      var partialsKeysItrn;
+    var _partialsWithParamsAd = partialsWithParamsAdd({
+      compilation: compilation,
+      contextKeys: contextKeys,
+      partialsKeys: partialsKeys,
+      partials: partials,
+      partialsComp: partialsComp,
+      options: options
+    });
 
-      if (partialsKeys.length === 1) {
-        partialsKeysItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        partialsKeysItrn = {
-          value: partialsKeys[0]
-        };
-      } else {
-        partialsKeysItr = partialsKeys[Symbol.iterator]();
-        partialsKeysItrn = partialsKeysItr.next();
-      }
-
-      var _partialsWithParamsAd = partialsWithParamsAdd({
-        compilation: compilation,
-        contextKeys: contextKeys,
-        partials: partials,
-        partialsComp: partialsComp,
-        partialsKeysItr: partialsKeysItr,
-        partialsKeysItrn: partialsKeysItrn,
-        options: options
-      });
-
-      partials = _partialsWithParamsAd.partials;
-      partialsComp = _partialsWithParamsAd.partialsComp;
-    }
-
+    partials = _partialsWithParamsAd.partials;
+    partialsComp = _partialsWithParamsAd.partialsComp;
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
