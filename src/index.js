@@ -597,7 +597,7 @@ PARAMS_APPLIER: {
     }
 
     return {
-      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
+      delimiterUnicodes,
       partialText: partialText || partialText_
     };
   };
@@ -609,104 +609,104 @@ PARAMS_APPLIER: {
       paramKeys,
       paramsObj,
       parseObj,
-      parseObjKeysItr,
-      parseObjKeysItrn,
       //partialShort, // For debugging.
       partialText_
     } = args;
 
-    if (parseObjKeysItrn.done) {
-      return {
-        delimiterUnicodes: delimiterUnicodes_,
-        partialText: partialText_
-      };
-    }
+    const parseObjKeys = Object.keys(parseObj);
+    let _delimiterUnicodes;
+    let _partialText;
 
-    const parseObjKey = parseObjKeysItrn.value;
-    const tagParse = parseObj[parseObjKey];
-    let partialText;
-    let delimiterUnicodes;
+    for (let i = 0, l = parseObjKeys.length; i < l; i++) {
+      const parseObjKey = parseObjKeys[i];
+      const tagParse = parseObj[parseObjKey];
+      let partialText;
+      let delimiterUnicodes;
 
-    if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
-      const paramsWithDotNotation = paramsObjDotNotationParse({
-        paramsObjPart: paramsObj,
-        parseObjTagName: parseObj.n
-      });
+      if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
+        const paramsWithDotNotation = paramsObjDotNotationParse({
+          paramsObjPart: paramsObj,
+          parseObjTagName: parseObj.n
+        });
 
-      let dataKeys = [];
-      let paramKeysNew;
-      let paramsObjNew;
+        let dataKeys = [];
+        let paramKeysNew;
+        let paramsObjNew;
 
-      if (paramsWithDotNotation instanceof Object) {
-        let l = 1;
+        if (paramsWithDotNotation instanceof Object) {
+          let l = 1;
 
-        if (Array.isArray(paramsWithDotNotation)) {
-          l = paramsWithDotNotation.length;
-        }
-
-        for (let i = 0; i < l; i++) {
           if (Array.isArray(paramsWithDotNotation)) {
-            // Recursion into an Array.
-            paramsObjNew = paramsWithDotNotation[i];
-          }
-          else {
-            // Recursion into a plain Object.
-            paramsObjNew = paramsWithDotNotation;
+            l = paramsWithDotNotation.length;
           }
 
-          const paramsObjKeys = Object.keys(paramsObjNew);
+          for (let i = 0; i < l; i++) {
+            if (Array.isArray(paramsWithDotNotation)) {
+              // Recursion into an Array.
+              paramsObjNew = paramsWithDotNotation[i];
+            }
+            else {
+              // Recursion into a plain Object.
+              paramsObjNew = paramsWithDotNotation;
+            }
 
-          if (paramsObjKeys.length) {
-            ({dataKeysPart: dataKeys} = dataKeysCollect({
-              dataKeys: [],
-              dataObj: paramsObjNew,
-              parentObjAsStr: '',
-              //partialShort // For debugging.
-            }));
+            const paramsObjKeys = Object.keys(paramsObjNew);
+
+            if (paramsObjKeys.length) {
+              ({dataKeysPart: dataKeys} = dataKeysCollect({
+                dataKeys: [],
+                dataObj: paramsObjNew,
+                parentObjAsStr: '',
+                //partialShort // For debugging.
+              }));
+            }
           }
+
+          paramKeysNew = paramKeys.concat(dataKeys);
+        }
+        else {
+          paramKeysNew = paramKeys;
+          paramsObjNew = paramsObj;
         }
 
-        paramKeysNew = paramKeys.concat(dataKeys);
+        ({
+          delimiterUnicodes,
+          partialText
+        } = paramsApply({ // eslint-disable-line no-use-before-define
+          contextKeys,
+          delimiterUnicodes_,
+          paramKeys: paramKeysNew,
+          paramsObj: paramsObjNew,
+          partialParseArr: tagParse,
+          //partialShort, // For debugging.
+          partialText_: _partialText || partialText_
+        }));
       }
       else {
-        paramKeysNew = paramKeys;
-        paramsObjNew = paramsObj;
+        ({
+          delimiterUnicodes,
+          partialText
+        } = paramsApplyByKeyArrays({
+          contextKeys,
+          delimiterUnicodes_,
+          tagParseVal: tagParse,
+          paramKeys,
+          //paramsObj, // For debugging.
+          parseObj,
+          parseObjKey,
+          //partialShort, // For debugging.
+          partialText_: _partialText || partialText_
+        }));
       }
 
-      ({
-        delimiterUnicodes,
-        partialText
-      } = paramsApply({ // eslint-disable-line no-use-before-define
-        contextKeys,
-        paramKeys: paramKeysNew,
-        paramsObj: paramsObjNew,
-        partialParseArr: tagParse,
-        //partialShort, // For debugging.
-        partialText_
-      }));
-    }
-    else {
-      ({
-        delimiterUnicodes,
-        partialText
-      } = paramsApplyByKeyArrays({
-        contextKeys,
-        delimiterUnicodes_,
-        tagParseVal: tagParse,
-        paramKeys,
-        //paramsObj, // For debugging.
-        parseObj,
-        parseObjKey,
-        //partialShort, // For debugging.
-        partialText_
-      }));
+      _delimiterUnicodes = _delimiterUnicodes || delimiterUnicodes || delimiterUnicodes_;
+      _partialText = partialText;
     }
 
-    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
-    args.parseObjKeysItrn = parseObjKeysItr.next();
-    args.partialText_ = partialText || partialText_;
-
-    return paramsApplyToParseObj(args);
+    return {
+      delimiterUnicodes: _delimiterUnicodes,
+      partialText: _partialText
+    };
   };
 
   var paramsApply = function (args) {
@@ -725,28 +725,20 @@ PARAMS_APPLIER: {
 
     for (let i = 0, l = partialParseArr.length; i < l; i++) {
       const parseObj = partialParseArr[i];
-      const parseObjKeys = Object.keys(parseObj);
       let delimiterUnicodes;
 
-      if (parseObjKeys.length) {
-        // At this point, parseObjKeys.length is always > 1.
-        const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-        const parseObjKeysItrn = parseObjKeysItr.next();
-        ({
-          delimiterUnicodes,
-          partialText
-        } = paramsApplyToParseObj({
-          contextKeys,
-          delimiterUnicodes_,
-          paramKeys,
-          paramsObj,
-          parseObj,
-          parseObjKeysItr,
-          parseObjKeysItrn,
-          //partialShort, // For debugging.
-          partialText_: partialText || partialText_
-        }));
-      }
+      ({
+        delimiterUnicodes,
+        partialText
+      } = paramsApplyToParseObj({
+        contextKeys,
+        delimiterUnicodes_,
+        paramKeys,
+        paramsObj,
+        parseObj,
+        //partialShort, // For debugging.
+        partialText_: partialText || partialText_
+      }));
 
       _delimiterUnicodes = _delimiterUnicodes || delimiterUnicodes || delimiterUnicodes_;
     }
@@ -977,17 +969,19 @@ METHODS: {
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
-    ({
-      partials,
-      partialsComp
-    } = partialsWithParamsAdd({
-      compilation,
-      contextKeys,
-      partialsKeys,
-      partials,
-      partialsComp,
-      options
-    }));
+    if (partialsKeys.length) {
+      ({
+        partials,
+        partialsComp
+      } = partialsWithParamsAdd({
+        compilation,
+        contextKeys,
+        partialsKeys,
+        partials,
+        partialsComp,
+        options
+      }));
+    }
 
     return {
       compilation,

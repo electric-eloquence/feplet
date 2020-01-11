@@ -560,7 +560,7 @@ PARAMS_APPLIER: {
     }
 
     return {
-      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
+      delimiterUnicodes: delimiterUnicodes,
       partialText: partialText || partialText_
     };
   };
@@ -571,100 +571,102 @@ PARAMS_APPLIER: {
         paramKeys = args.paramKeys,
         paramsObj = args.paramsObj,
         parseObj = args.parseObj,
-        parseObjKeysItr = args.parseObjKeysItr,
-        parseObjKeysItrn = args.parseObjKeysItrn,
         partialText_ = args.partialText_;
+    var parseObjKeys = Object.keys(parseObj);
 
-    if (parseObjKeysItrn.done) {
-      return {
-        delimiterUnicodes: delimiterUnicodes_,
-        partialText: partialText_
-      };
-    }
+    var _delimiterUnicodes;
 
-    var parseObjKey = parseObjKeysItrn.value;
-    var tagParse = parseObj[parseObjKey];
-    var partialText;
-    var delimiterUnicodes;
+    var _partialText;
 
-    if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
-      var paramsWithDotNotation = paramsObjDotNotationParse({
-        paramsObjPart: paramsObj,
-        parseObjTagName: parseObj.n
-      });
-      var dataKeys = [];
-      var paramKeysNew;
-      var paramsObjNew;
+    for (var i = 0, l = parseObjKeys.length; i < l; i++) {
+      var parseObjKey = parseObjKeys[i];
+      var tagParse = parseObj[parseObjKey];
+      var partialText = void 0;
+      var delimiterUnicodes = void 0;
 
-      if (paramsWithDotNotation instanceof Object) {
-        var l = 1;
+      if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
+        var paramsWithDotNotation = paramsObjDotNotationParse({
+          paramsObjPart: paramsObj,
+          parseObjTagName: parseObj.n
+        });
+        var dataKeys = [];
+        var paramKeysNew = void 0;
+        var paramsObjNew = void 0;
 
-        if (Array.isArray(paramsWithDotNotation)) {
-          l = paramsWithDotNotation.length;
-        }
+        if (paramsWithDotNotation instanceof Object) {
+          var _l2 = 1;
 
-        for (var i = 0; i < l; i++) {
           if (Array.isArray(paramsWithDotNotation)) {
-            // Recursion into an Array.
-            paramsObjNew = paramsWithDotNotation[i];
-          } else {
-            // Recursion into a plain Object.
-            paramsObjNew = paramsWithDotNotation;
+            _l2 = paramsWithDotNotation.length;
           }
 
-          var paramsObjKeys = Object.keys(paramsObjNew);
+          for (var _i2 = 0; _i2 < _l2; _i2++) {
+            if (Array.isArray(paramsWithDotNotation)) {
+              // Recursion into an Array.
+              paramsObjNew = paramsWithDotNotation[_i2];
+            } else {
+              // Recursion into a plain Object.
+              paramsObjNew = paramsWithDotNotation;
+            }
 
-          if (paramsObjKeys.length) {
-            var _dataKeysCollect2 = dataKeysCollect({
-              dataKeys: [],
-              dataObj: paramsObjNew,
-              parentObjAsStr: '' //partialShort // For debugging.
+            var paramsObjKeys = Object.keys(paramsObjNew);
 
-            });
+            if (paramsObjKeys.length) {
+              var _dataKeysCollect2 = dataKeysCollect({
+                dataKeys: [],
+                dataObj: paramsObjNew,
+                parentObjAsStr: '' //partialShort // For debugging.
 
-            dataKeys = _dataKeysCollect2.dataKeysPart;
+              });
+
+              dataKeys = _dataKeysCollect2.dataKeysPart;
+            }
           }
+
+          paramKeysNew = paramKeys.concat(dataKeys);
+        } else {
+          paramKeysNew = paramKeys;
+          paramsObjNew = paramsObj;
         }
 
-        paramKeysNew = paramKeys.concat(dataKeys);
+        var _paramsApply = paramsApply({
+          // eslint-disable-line no-use-before-define
+          contextKeys: contextKeys,
+          delimiterUnicodes_: delimiterUnicodes_,
+          paramKeys: paramKeysNew,
+          paramsObj: paramsObjNew,
+          partialParseArr: tagParse,
+          //partialShort, // For debugging.
+          partialText_: _partialText || partialText_
+        });
+
+        delimiterUnicodes = _paramsApply.delimiterUnicodes;
+        partialText = _paramsApply.partialText;
       } else {
-        paramKeysNew = paramKeys;
-        paramsObjNew = paramsObj;
+        var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
+          contextKeys: contextKeys,
+          delimiterUnicodes_: delimiterUnicodes_,
+          tagParseVal: tagParse,
+          paramKeys: paramKeys,
+          //paramsObj, // For debugging.
+          parseObj: parseObj,
+          parseObjKey: parseObjKey,
+          //partialShort, // For debugging.
+          partialText_: _partialText || partialText_
+        });
+
+        delimiterUnicodes = _paramsApplyByKeyArra.delimiterUnicodes;
+        partialText = _paramsApplyByKeyArra.partialText;
       }
 
-      var _paramsApply = paramsApply({
-        // eslint-disable-line no-use-before-define
-        contextKeys: contextKeys,
-        paramKeys: paramKeysNew,
-        paramsObj: paramsObjNew,
-        partialParseArr: tagParse,
-        //partialShort, // For debugging.
-        partialText_: partialText_
-      });
-
-      delimiterUnicodes = _paramsApply.delimiterUnicodes;
-      partialText = _paramsApply.partialText;
-    } else {
-      var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
-        contextKeys: contextKeys,
-        delimiterUnicodes_: delimiterUnicodes_,
-        tagParseVal: tagParse,
-        paramKeys: paramKeys,
-        //paramsObj, // For debugging.
-        parseObj: parseObj,
-        parseObjKey: parseObjKey,
-        //partialShort, // For debugging.
-        partialText_: partialText_
-      });
-
-      delimiterUnicodes = _paramsApplyByKeyArra.delimiterUnicodes;
-      partialText = _paramsApplyByKeyArra.partialText;
+      _delimiterUnicodes = _delimiterUnicodes || delimiterUnicodes || delimiterUnicodes_;
+      _partialText = partialText;
     }
 
-    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
-    args.parseObjKeysItrn = parseObjKeysItr.next();
-    args.partialText_ = partialText || partialText_;
-    return paramsApplyToParseObj(args);
+    return {
+      delimiterUnicodes: _delimiterUnicodes,
+      partialText: _partialText
+    };
   };
 
   var paramsApply = function paramsApply(args) {
@@ -681,30 +683,20 @@ PARAMS_APPLIER: {
 
     for (var i = 0, l = partialParseArr.length; i < l; i++) {
       var parseObj = partialParseArr[i];
-      var parseObjKeys = Object.keys(parseObj);
       var delimiterUnicodes = void 0;
 
-      if (parseObjKeys.length) {
-        // At this point, parseObjKeys.length is always > 1.
-        var parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-        var parseObjKeysItrn = parseObjKeysItr.next();
+      var _paramsApplyToParseOb = paramsApplyToParseObj({
+        contextKeys: contextKeys,
+        delimiterUnicodes_: delimiterUnicodes_,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        parseObj: parseObj,
+        //partialShort, // For debugging.
+        partialText_: partialText || partialText_
+      });
 
-        var _paramsApplyToParseOb = paramsApplyToParseObj({
-          contextKeys: contextKeys,
-          delimiterUnicodes_: delimiterUnicodes_,
-          paramKeys: paramKeys,
-          paramsObj: paramsObj,
-          parseObj: parseObj,
-          parseObjKeysItr: parseObjKeysItr,
-          parseObjKeysItrn: parseObjKeysItrn,
-          //partialShort, // For debugging.
-          partialText_: partialText || partialText_
-        });
-
-        delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
-        partialText = _paramsApplyToParseOb.partialText;
-      }
-
+      delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
+      partialText = _paramsApplyToParseOb.partialText;
       _delimiterUnicodes = _delimiterUnicodes || delimiterUnicodes || delimiterUnicodes_;
     }
 
@@ -916,17 +908,20 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _partialsWithParamsAd = partialsWithParamsAdd({
-      compilation: compilation,
-      contextKeys: contextKeys,
-      partialsKeys: partialsKeys,
-      partials: partials,
-      partialsComp: partialsComp,
-      options: options
-    });
+    if (partialsKeys.length) {
+      var _partialsWithParamsAd = partialsWithParamsAdd({
+        compilation: compilation,
+        contextKeys: contextKeys,
+        partialsKeys: partialsKeys,
+        partials: partials,
+        partialsComp: partialsComp,
+        options: options
+      });
 
-    partials = _partialsWithParamsAd.partials;
-    partialsComp = _partialsWithParamsAd.partialsComp;
+      partials = _partialsWithParamsAd.partials;
+      partialsComp = _partialsWithParamsAd.partialsComp;
+    }
+
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
