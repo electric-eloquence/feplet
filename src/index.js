@@ -79,7 +79,7 @@ COLLECTORS: {
     for (let in0 = 0, le0 = dataObjKeys.length; in0 < le0; in0++) {
       const key = dataObjKeys[in0];
 
-      if (!dataKeys.includes(key) && !parentObjAsStr) {
+      if (!dataKeys.includes(key) && !dataKeysPart.includes(key) && !parentObjAsStr) {
         dataKeysPart.push(key);
       }
 
@@ -94,13 +94,16 @@ COLLECTORS: {
 
         // 1 FOR-LOOP LEVELS IN.
         for (let in1 = 0; in1 < le1; in1++) {
+          let parentObjAsStrNew = parentObjAsStr;
           let dataObjItem;
 
           if (Array.isArray(dataObjNestedObj)) {
+            parentObjAsStrNew += parentObjAsStr ? `.${key}.${in1}` : `${key}.${in1}`;
             // Recursion into an Array.
             dataObjItem = dataObjNestedObj[in1];
           }
           else {
+            parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
             // Recursion into a plain Object.
             dataObjItem = dataObjNestedObj;
           }
@@ -110,17 +113,7 @@ COLLECTORS: {
 
             // 2 FOR-LOOP LEVELS IN.
             for (let in2 = 0, le2 = dataObjItemKeys.length; in2 < le2; in2++) {
-              let parentObjAsStrNew = parentObjAsStr;
-
-              if (Array.isArray(dataObjNestedObj)) {
-                parentObjAsStrNew += parentObjAsStr ? `.${key}.${in1}` : `${key}.${in1}`;
-              }
-              else {
-                parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
-              }
-
               const parentObjSplit = parentObjAsStrNew.split('.');
-
               const dataKeysPart1 = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit});
 
               // 3 FOR-LOOP LEVELS IN.
@@ -129,22 +122,22 @@ COLLECTORS: {
                   dataKeysPart.push(dataKeysPart1[in3]);
                 }
               }
+            }
 
-              // Clone args object for recursion deeper into dataObj.
-              const argsDeeper = {
-                dataKeys: dataKeysPart,
-                dataObj: dataObjItem,
-                parentObjAsStr: parentObjAsStrNew,
-                //partialShort: args.partialShort // For debugging.
-              };
+            // Clone args object for recursion deeper into dataObj.
+            const argsDeeper = {
+              dataKeys: dataKeysPart,
+              dataObj: dataObjItem,
+              parentObjAsStr: parentObjAsStrNew,
+              //partialShort: args.partialShort // For debugging.
+            };
 
-              const {dataKeysPart: dataKeysPart2} = dataKeysCollect(argsDeeper);
+            const {dataKeysPart: dataKeysPart2} = dataKeysCollect(argsDeeper);
 
-              // 3 FOR-LOOP LEVELS IN.
-              for (let in3 = 0, le3 = dataKeysPart2.length; in3 < le3; in3++) {
-                if (!dataKeys.includes(dataKeysPart2[in3]) && !dataKeysPart.includes(dataKeysPart2[in3])) {
-                  dataKeysPart.push(dataKeysPart2[in3]);
-                }
+            // 2 FOR-LOOP LEVELS IN.
+            for (let in2 = 0, le2 = dataKeysPart2.length; in2 < le2; in2++) {
+              if (!dataKeys.includes(dataKeysPart2[in2]) && !dataKeysPart.includes(dataKeysPart2[in2])) {
+                dataKeysPart.push(dataKeysPart2[in2]);
               }
             }
           }

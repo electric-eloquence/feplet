@@ -72,7 +72,7 @@ COLLECTORS: {
     for (var in0 = 0, le0 = dataObjKeys.length; in0 < le0; in0++) {
       var key = dataObjKeys[in0];
 
-      if (!dataKeys.includes(key) && !parentObjAsStr) {
+      if (!dataKeys.includes(key) && !dataKeysPart.includes(key) && !parentObjAsStr) {
         dataKeysPart.push(key);
       } // Recurse deeper into dataObj if this property is an instance of Object.
 
@@ -87,13 +87,16 @@ COLLECTORS: {
 
 
         for (var in1 = 0; in1 < le1; in1++) {
+          var parentObjAsStrNew = parentObjAsStr;
           var dataObjItem = void 0;
 
           if (Array.isArray(dataObjNestedObj)) {
-            // Recursion into an Array.
+            parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(in1) : "".concat(key, ".").concat(in1); // Recursion into an Array.
+
             dataObjItem = dataObjNestedObj[in1];
           } else {
-            // Recursion into a plain Object.
+            parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key; // Recursion into a plain Object.
+
             dataObjItem = dataObjNestedObj;
           }
 
@@ -101,14 +104,6 @@ COLLECTORS: {
             var dataObjItemKeys = Object.keys(dataObjItem); // 2 FOR-LOOP LEVELS IN.
 
             for (var in2 = 0, le2 = dataObjItemKeys.length; in2 < le2; in2++) {
-              var parentObjAsStrNew = parentObjAsStr;
-
-              if (Array.isArray(dataObjNestedObj)) {
-                parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(in1) : "".concat(key, ".").concat(in1);
-              } else {
-                parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key;
-              }
-
               var parentObjSplit = parentObjAsStrNew.split('.');
               var dataKeysPart1 = dataKeysWithDotNotationAdd({
                 dataKeys: dataKeys,
@@ -119,24 +114,24 @@ COLLECTORS: {
                 if (!dataKeys.includes(dataKeysPart1[in3]) && !dataKeysPart.includes(dataKeysPart1[in3])) {
                   dataKeysPart.push(dataKeysPart1[in3]);
                 }
-              } // Clone args object for recursion deeper into dataObj.
+              }
+            } // Clone args object for recursion deeper into dataObj.
 
 
-              var argsDeeper = {
-                dataKeys: dataKeysPart,
-                dataObj: dataObjItem,
-                parentObjAsStr: parentObjAsStrNew //partialShort: args.partialShort // For debugging.
+            var argsDeeper = {
+              dataKeys: dataKeysPart,
+              dataObj: dataObjItem,
+              parentObjAsStr: parentObjAsStrNew //partialShort: args.partialShort // For debugging.
 
-              };
+            };
 
-              var _dataKeysCollect = dataKeysCollect(argsDeeper),
-                  dataKeysPart2 = _dataKeysCollect.dataKeysPart; // 3 FOR-LOOP LEVELS IN.
+            var _dataKeysCollect = dataKeysCollect(argsDeeper),
+                dataKeysPart2 = _dataKeysCollect.dataKeysPart; // 2 FOR-LOOP LEVELS IN.
 
 
-              for (var _in = 0, _le = dataKeysPart2.length; _in < _le; _in++) {
-                if (!dataKeys.includes(dataKeysPart2[_in]) && !dataKeysPart.includes(dataKeysPart2[_in])) {
-                  dataKeysPart.push(dataKeysPart2[_in]);
-                }
+            for (var _in = 0, _le = dataKeysPart2.length; _in < _le; _in++) {
+              if (!dataKeys.includes(dataKeysPart2[_in]) && !dataKeysPart.includes(dataKeysPart2[_in])) {
+                dataKeysPart.push(dataKeysPart2[_in]);
               }
             }
           }
