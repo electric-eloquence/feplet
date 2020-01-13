@@ -1,6 +1,6 @@
 // For loops are generally replaced by recursion through iterators. This is more verbose, and more difficult to read for
 // the uninitiated, but the idea of recursing on .next() values and terminating on .done values should be easy to grasp.
-// In accordance with the "functional progamming" paradigm, this is useful for traversing nested data structures. In
+// In accordance with the "functional programming" paradigm, this is useful for traversing nested data structures. In
 // addition, since many functions herein add to data structures while recursing through them, we can avoid ambiguity as
 // to whether added values are recomputed as .next() values. (They are.) Plain for, for..of, for..in, and forEach loops,
 // as well as the .map(), .filter(), and .reduce() Array methods, all do this differently. Neither the loop statements
