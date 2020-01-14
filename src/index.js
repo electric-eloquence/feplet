@@ -7,6 +7,10 @@
 // nor Array methods inherently imply whether or not recomputation occurs. On the other hand, iterators' .next()
 // unambiguously expresses computation on each call.
 
+// We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance
+// and readability. It can be argued that iterative loop mutation of variables declared outside the scope of said loops
+// is an eye (and brain) sore to those who've embraced functional programming.
+
 // Labeled block statements are used to segregate functions into organizational units. We could also achieve this by
 // breaking this file into multiple files. However, we need to compile our code into ES5 consumable by less modern
 // browsers. Given that this is a relatively small file, it is easier to keep the code in one file.
