@@ -1,6 +1,6 @@
 {
   "name": "feplet",
-  "version": "1.2.0-rc.0",
+  "version": "1.1.0",
   "description": "A Mustache-compatible template engine. Powerful under the hood. Simple behind the wheel.",
   "main": "src/index.js",
   "scripts": {
@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/electric-eloquence/feplet#readme",
   "dependencies": {
-    "json-eval": "^1.0.5"
+    "json-eval": "^1.0.8"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
@@ -45,10 +45,10 @@
     "chai": "4.x",
     "coveralls": "3.x",
     "eslint": "6.x",
-    "husky": "1.x",
-    "mocha": "6.x",
+    "husky": "4.x",
+    "mocha": "7.x",
     "nodemon": "^1.18.10",
-    "nyc": "14.x",
+    "nyc": "15.x",
     "uglify-es": "3.3.9"
   }
 }
