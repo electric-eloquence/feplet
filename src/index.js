@@ -1290,7 +1290,7 @@ METHODS: {
   };
 }
 
-// PREPARE FOR EXPORT.
+/* PREPARE FOR EXPORT */
 
 function Feplet(context, partials, partialsComp, contextKeys, options) {
   this.context = context || {};
@@ -1300,7 +1300,7 @@ function Feplet(context, partials, partialsComp, contextKeys, options) {
   this.options = options || {};
 }
 
-// STATIC METHODS.
+/* STATIC METHODS */
 
 Object.assign(Feplet, hogan); // hogan is not a class so the constructor does not get overridden.
 
@@ -1316,7 +1316,7 @@ Feplet.render = render;
 
 Feplet.unregisterPartial = unregisterPartial;
 
-// INSTANCE METHODS.
+/* INSTANCE METHODS */
 
 Feplet.prototype.compile = compile;
 
