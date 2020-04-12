@@ -1,4 +1,4 @@
-/* eslint-disable strict */
+'use strict';
 
 var expectation = [];
 expectation[0] = 'foo\nbar\n';
@@ -48,9 +48,4 @@ expectation[43] = '    heck\n';
 expectation[44] = '    heck\n';
 expectation[45] = '  heck\n';
 
-if (typeof global === 'object' && typeof module === 'object' && typeof module.exports === 'object') {
-  module.exports = expectation;
-}
-else if (typeof window === 'object') {
-  window.expectation = expectation;
-}
+module.exports = expectation;
