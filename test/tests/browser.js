@@ -1,7 +1,7 @@
 /* eslint-disable strict */
 
 const expectation = require('./expectation');
-const increment = 15;
+const increment = 20;
 let delay = 0;
 
 module.exports = function () {
