@@ -20,7 +20,7 @@ function pathToFixtures(file) {
   return path.join(__dirname, '..', 'fixtures', file);
 }
 
-templateName.forEach((t, i) => {
+templateName.forEach((t) => {
   template[t] = fs.readFileSync(pathToFixtures(t), enc);
 });
 
