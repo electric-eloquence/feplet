@@ -1,4 +1,4 @@
-{{> 06-dotted-array-param-inner(
+{{> 06-dotted-array-param-inner.fpt(
   baz: {
     bez: {
       biz: [

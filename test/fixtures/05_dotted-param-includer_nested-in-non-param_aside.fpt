@@ -1,4 +1,4 @@
-{{> 05-dotted-param_nested-in-non-param_aside(
+{{> 05-dotted-param_nested-in-non-param_aside.fpt(
   bez: {
     biz: {
       byz: 'heck'

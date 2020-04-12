@@ -4,21 +4,21 @@ var Feplet = window.Feplet;
 var i = 0;
 var main = document.getElementById('main');
 var templates = {
-  'templates/00-base.fpt': // 1
+  'templates/00-base.fpt': // 0
     '{{ title }}\n{{ message }}\n',
-  'templates/00-nested.fpt': // 2
+  'templates/00-nested.fpt': // 1
     '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n',
-  'templates/00_base-includer.fpt': // 3
+  'templates/00_base-includer.fpt': // 2
     '{{> templates/00-base }}\n',
-  'templates/00_nested-includer.fpt': // 4
+  'templates/00_nested-includer.fpt': // 3
     '{{> templates/00-nested }}\n',
-  'templates/01-dotted.fpt': // 5
+  'templates/01-dotted.fpt': // 4
     '{{ dot.title }}\n{{ dot.message }}\n',
-  'templates/01-dotted_array.fpt': // 6
+  'templates/01-dotted_array.fpt': // 5
     '{{ dot.0.title }}\n{{ dot.0.message }}\n',
-  'templates/01_dotted-includer.fpt': // 7
+  'templates/01_dotted-includer.fpt': // 6
     '{{> templates/01-dotted(dot: { title: "foo", message: "bar" }) }}\n',
-  'templates/01_dotted-includer_array.fpt': // 8
+  'templates/01_dotted-includer_array.fpt': // 7
     '{{> templates/01-dotted_array(dot: [{ title: "foo", message: "bar" }]) }}\n'
 };
 
@@ -27,14 +27,14 @@ Object.keys(templates).forEach(function (template) {
   var partials;
 
   switch (template) {
-    case 'templates/00-base.fpt': // 1
+    case 'templates/00-base.fpt': // 0
       context = {
         title: 'foo',
         message: 'bar'
       };
       break;
 
-    case 'templates/00-nested.fpt': // 2
+    case 'templates/00-nested.fpt': // 1
       context = {
         check: {
           i18n: true
@@ -42,7 +42,7 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/00_base-includer.fpt': // 3
+    case 'templates/00_base-includer.fpt': // 2
       context = {
         title: 'foo',
         message: 'bar'
@@ -52,7 +52,7 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/00_nested-includer.fpt': // 4
+    case 'templates/00_nested-includer.fpt': // 3
       context = {
         check: {
           i18n: true
@@ -63,7 +63,7 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/01-dotted.fpt': // 5
+    case 'templates/01-dotted.fpt': // 4
       context = {
         dot: {
           title: 'foo',
@@ -72,7 +72,7 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/01-dotted_array.fpt': // 6
+    case 'templates/01-dotted_array.fpt': // 5
       context = {
         dot: [
           {
@@ -83,13 +83,13 @@ Object.keys(templates).forEach(function (template) {
       };
       break;
 
-    case 'templates/01_dotted-includer.fpt': // 7
+    case 'templates/01_dotted-includer.fpt': // 6
       partials = {
         'templates/01-dotted': templates['templates/01-dotted.fpt']
       };
       break;
 
-    case 'templates/01_dotted-includer_array.fpt': // 8
+    case 'templates/01_dotted-includer_array.fpt': // 7
       partials = {
         'templates/01-dotted_array': templates['templates/01-dotted_array.fpt']
       };
@@ -110,42 +110,42 @@ Object.keys(templates).forEach(function (template) {
   }
 
   switch (template) {
-    case 'templates/00-base.fpt': // 1
+    case 'templates/00-base.fpt': // 0
       contentParagraph.innerHTML = ++i + '. Hydrates templates with variables:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/00-nested.fpt': // 2
+    case 'templates/00-nested.fpt': // 1
       contentParagraph.innerHTML = ++i + '. Hydrates templates with nested variables:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
-    case 'templates/00_base-includer.fpt': // 3
+    case 'templates/00_base-includer.fpt': // 2
       contentParagraph.innerHTML = ++i + '. Recursively hydrates templates with variables:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/00_nested-includer.fpt': // 4
+    case 'templates/00_nested-includer.fpt': // 3
       contentParagraph.innerHTML = ++i + '. Recursively hydrates templates with nested variables:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">\\nYes\\n</span>"<br>';
       break;
 
-    case 'templates/01-dotted.fpt': // 5
+    case 'templates/01-dotted.fpt': // 4
       contentParagraph.innerHTML = ++i + '. Hydrates variables written in dot.notation:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/01-dotted_array.fpt': // 6
+    case 'templates/01-dotted_array.fpt': // 5
       contentParagraph.innerHTML = ++i + '. Hydrates variables within an array written in dot.notation:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/01_dotted-includer.fpt': // 7
+    case 'templates/01_dotted-includer.fpt': // 6
       contentParagraph.innerHTML = ++i + '. Recursively hydrates variables written in dot.notation:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
 
-    case 'templates/01_dotted-includer_array.fpt': // 8
+    case 'templates/01_dotted-includer_array.fpt': // 7
       contentParagraph.innerHTML = ++i + '. Recursively hydrates variables within an array written in dot.notation:<br>';
       contentParagraph.innerHTML += 'expect to equal "<span class="expect">foo\\nbar\\n</span>"<br>';
       break;
@@ -158,9 +158,9 @@ Object.keys(templates).forEach(function (template) {
 });
 
 var templates1 = {
-  'templates/00-base.fpt': '{{ title }}\n{{ message }}\n',
-  'templates/00-nested.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n',
-  'templates/00_nested-includer.fpt': '{{> templates/00-nested }}\n',
+  'templates/00-base.fpt': '{{ title }}\n{{ message }}\n', // 0
+  'templates/00-nested.fpt': '{{^check}}{{#i18n}}No{{/i18n}}{{/check}}\n{{#check}}{{#i18n}}Yes{{/i18n}}{{/check}}\n', // 1
+  'templates/00_nested-includer.fpt': '{{> templates/00-nested }}\n', // 3
   'templates/02-stylemod-atom.fpt': '<span class="test_base {{ styleModifier }}">\n    {{ message }}\n' +
     '    {{ description }}\n</span>\n',
   'templates/02-stylemod-molecule.fpt': // 9
@@ -190,21 +190,25 @@ var templates1 = {
     '{{/ bar }}\n',
   'templates/03_include-self-w-condition-includer.fpt': // 18
     '{{> templates/03-include-self-w-condition(foo: true) }}\n',
-  'templates/04-nested-param-same-name-as-non-param.fpt': '{{bez}} {{biz}}\n' +
+  'templates/04-nested-param-same-name-as-non-param.fpt': // 19
+    '{{bez}} {{biz}}\n' +
     '{{#baz}}\n' +
     '  {{bez}} {{biz}}\n' +
     '{{/baz}}\n',
-  'templates/04-nested-param-same-name-as-non-param_deep.fpt': '{{biz}} {{boz}}\n' +
+  'templates/04-nested-param-same-name-as-non-param_deep.fpt': // 20
+    '{{biz}} {{boz}}\n' +
     '{{#baz}}{{#bez}}\n' +
     '  {{biz}} {{boz}}\n' +
     '{{/bez}}{{/baz}}\n',
-  'templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt': '{{biz.boz}}\n' +
+  'templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt': // 21
+    '{{biz.boz}}\n' +
     '{{#baz}}\n' +
     '  {{#bez}}\n' +
     '    {{biz.boz}}\n' +
     '  {{/bez}}\n' +
     '{{/baz}}\n',
-  'templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt': '{{#bez.biz}}\n' +
+  'templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt': // 22
+    '{{#bez.biz}}\n' +
     '  {{boz}}\n' +
     '{{/bez.biz}}\n' +
     '{{#baz}}\n' +
@@ -212,16 +216,16 @@ var templates1 = {
     '    {{boz}}\n' +
     '  {{/bez.biz}}\n' +
     '{{/baz}}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer.fpt': // 19
+  'templates/04_nested-param-same-name-as-non-param-includer.fpt': // 23
     '{{> templates/04-nested-param-same-name-as-non-param(baz: { bez: "hick", biz: "hock" }) }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': // 20
+  'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': // 24
     '{{> templates/04-nested-param-same-name-as-non-param(\n  baz: [\n    { bez: "hick", biz: "hock" },\n' +
     '    { bez: "huck", biz: "hyck" }\n  ]\n) }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': // 21
+  'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': // 25
     '{{> templates/04-nested-param-same-name-as-non-param_deep(baz: { bez: { biz: "hick", boz: "hock" } }) }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': // 22
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': // 26
     '{{> templates/04-nested-param-same-name-as-non-param_dotted-inner(baz: { bez: { biz: { boz: "heck" } } }) }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': // 23
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': // 27
     '{{> templates/04-nested-param-same-name-as-non-param_dotted-inner(\n' +
     '  baz: {\n' +
     '    bez: [\n' +
@@ -238,9 +242,9 @@ var templates1 = {
     '    ]\n' +
     '  }\n' +
     ') }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': // 24
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': // 28
     '{{> templates/04-nested-param-same-name-as-non-param_dotted-middle(baz: { bez: { biz: { boz: "heck" } } }) }}\n',
-  'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': // 25
+  'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': // 29
     '{{> templates/04-nested-param-same-name-as-non-param_dotted-middle(\n' +
     '  baz: {\n' +
     '    bez: {\n' +
@@ -255,16 +259,19 @@ var templates1 = {
     '    }\n' +
     '  }\n' +
     ') }}\n',
-  'templates/05-dotted-param.fpt': '{{#baz.bez}}\n' +
+  'templates/05-dotted-param.fpt': // 30
+    '{{#baz.bez}}\n' +
     '  {{biz}}\n' +
     '{{/baz.bez}}\n',
-  'templates/05-dotted-param_nested-in-non-param.fpt': '{{#baz}}\n' +
+  'templates/05-dotted-param_nested-in-non-param.fpt': // 31
+    '{{#baz}}\n' +
     '  {{bez}}\n' +
     '  {{#biz.boz}}\n' +
     '    {{{buz}}}\n' +
     '  {{/biz.boz}}\n' +
     '{{/baz}}\n',
-  'templates/05-dotted-param_nested-in-non-param_aside.fpt': '{{#baz}}\n' +
+  'templates/05-dotted-param_nested-in-non-param_aside.fpt': // 32
+    '{{#baz}}\n' +
     '  {{#bez.biz}}\n' +
     '    {{{byz}}}\n' +
     '  {{/bez.biz}}\n' +
@@ -272,14 +279,15 @@ var templates1 = {
     '    {{{byz}}}\n' +
     '  {{/boz.buz}}\n' +
     '{{/baz}}\n',
-  'templates/05-dotted-param_nested-in-non-param_nested.fpt': '{{#baz}}\n' +
+  'templates/05-dotted-param_nested-in-non-param_nested.fpt': // 33
+    '{{#baz}}\n' +
     '  {{#bez.biz.boz}}\n' +
     '    {{{buz.byz}}}\n' +
     '  {{/bez.biz.boz}}\n' +
     '{{/baz}}\n',
-  'templates/05_dotted-param-includer.fpt': // 26
+  'templates/05_dotted-param-includer.fpt': // 34
     '{{> templates/05-dotted-param(baz: { bez: { biz: "hack" } }) }}\n',
-  'templates/05_dotted-param-includer_array.fpt': // 27
+  'templates/05_dotted-param-includer_array.fpt': // 35
     '{{> templates/05-dotted-param(\n' +
     '  baz: {\n' +
     '    bez: [\n' +
@@ -292,9 +300,9 @@ var templates1 = {
     '    ]\n' +
     '  }\n' +
     ') }}\n',
-  'templates/05_dotted-param-includer_nested-in-non-param.fpt': // 28
+  'templates/05_dotted-param-includer_nested-in-non-param.fpt': // 36
     '{{> templates/05-dotted-param_nested-in-non-param(biz: { boz: { buz: "heck" } }) }}\n',
-  'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': // 29
+  'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': // 37
     '{{> templates/05-dotted-param_nested-in-non-param(\n' +
     '  biz: {\n' +
     '    boz: [\n' +
@@ -307,7 +315,7 @@ var templates1 = {
     '    ]\n' +
     '  }\n' +
     ') }}\n',
-  'templates/05_dotted-param-includer_nested-in-non-param_aside.fpt': // 30
+  'templates/05_dotted-param-includer_nested-in-non-param_aside.fpt': // 38
     '{{> 05-dotted-param_nested-in-non-param_aside(\n' +
     '  bez: {\n' +
     '    biz: {\n' +
@@ -320,22 +328,25 @@ var templates1 = {
     '    }\n' +
     '  }\n' +
     ') }}\n',
-  'templates/05_dotted-param-includer_nested-in-non-param_nested.fpt': // 31
+  'templates/05_dotted-param-includer_nested-in-non-param_nested.fpt': // 39
     '{{> 05-dotted-param_nested-in-non-param_nested(bez: { biz: { boz: { buz: { byz: \'heck\' } } } } ) }}\n',
-  'templates/06-dotted-array-param-inner.fpt': '{{#baz}}\n' +
+  'templates/06-dotted-array-param-inner.fpt': // 40
+    '{{#baz}}\n' +
     '  {{#bez}}\n' +
     '    {{biz.1.boz}}\n' +
     '  {{/bez}}\n' +
     '{{/baz}}\n',
-  'templates/06-dotted-array-param-middle.fpt': '{{#baz}}\n' +
+  'templates/06-dotted-array-param-middle.fpt': // 41
+    '{{#baz}}\n' +
     '  {{#bez.1.biz}}\n' +
     '    {{boz}}\n' +
     '  {{/bez.1.biz}}\n' +
     '{{/baz}}\n',
-  'templates/06-dotted-array-param-outer.fpt': '{{#baz.1.bez}}\n' +
+  'templates/06-dotted-array-param-outer.fpt': // 42
+    '{{#baz.1.bez}}\n' +
     '  {{biz}}\n' +
     '{{/baz.1.bez}}\n',
-  'templates/06_dotted-array-param-inner-includer.fpt': // 32
+  'templates/06_dotted-array-param-inner-includer.fpt': // 43
     '{{> templates/06-dotted-array-param-inner(\n' +
     '  baz: {\n' +
     '    bez: {\n' +
@@ -353,7 +364,7 @@ var templates1 = {
     '    }\n' +
     '  }\n' +
     ') }}\n',
-  'templates/06_dotted-array-param-middle-includer.fpt': // 33
+  'templates/06_dotted-array-param-middle-includer.fpt': // 44
     '{{> templates/06-dotted-array-param-middle(\n' +
     '  baz: {\n' +
     '    bez: [\n' +
@@ -375,7 +386,7 @@ var templates1 = {
     '    ]\n' +
     '  }\n' +
     ') }}\n',
-  'templates/06_dotted-array-param-outer-includer.fpt': // 34
+  'templates/06_dotted-array-param-outer-includer.fpt': // 45
     '{{> templates/06-dotted-array-param-outer(\n' +
     '  baz: [\n' +
     '    {\n' +
@@ -519,7 +530,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/03-include-self-w-condition', templates1['templates/03-include-self-w-condition.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer.fpt': // 19
+    case 'templates/04_nested-param-same-name-as-non-param-includer.fpt': // 23
       feplet = new Feplet(
         {
           bez: 'hack',
@@ -529,7 +540,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param', templates1['templates/04-nested-param-same-name-as-non-param.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': // 20
+    case 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': // 24
       feplet = new Feplet(
         {
           bez: 'hack',
@@ -539,7 +550,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param', templates1['templates/04-nested-param-same-name-as-non-param.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': // 21
+    case 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': // 25
       feplet = new Feplet(
         {
           biz: 'hack',
@@ -549,7 +560,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_deep', templates1['templates/04-nested-param-same-name-as-non-param_deep.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': // 22
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': // 26
       feplet = new Feplet(
         {
           biz: {
@@ -560,7 +571,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-inner', templates1['templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': // 23
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': // 27
       feplet = new Feplet(
         {
           biz: {
@@ -571,7 +582,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-inner', templates1['templates/04-nested-param-same-name-as-non-param_dotted-inner.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': // 24
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': // 28
       feplet = new Feplet(
         {
           bez: {
@@ -584,7 +595,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-middle', templates1['templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt']);
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': // 25
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': // 29
       feplet = new Feplet(
         {
           bez: {
@@ -602,17 +613,17 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/04-nested-param-same-name-as-non-param_dotted-middle', templates1['templates/04-nested-param-same-name-as-non-param_dotted-middle.fpt']);
       break;
 
-    case 'templates/05_dotted-param-includer.fpt': // 26
+    case 'templates/05_dotted-param-includer.fpt': // 34
       feplet = new Feplet({});
       feplet.registerPartial('templates/05-dotted-param', templates1['templates/05-dotted-param.fpt']);
       break;
 
-    case 'templates/05_dotted-param-includer_array.fpt': // 27
+    case 'templates/05_dotted-param-includer_array.fpt': // 35
       feplet = new Feplet({});
       feplet.registerPartial('templates/05-dotted-param', templates1['templates/05-dotted-param.fpt']);
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param.fpt': // 28
+    case 'templates/05_dotted-param-includer_nested-in-non-param.fpt': // 36
       feplet = new Feplet(
         {
           baz: {
@@ -623,7 +634,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/05-dotted-param_nested-in-non-param', templates1['templates/05-dotted-param_nested-in-non-param.fpt']);
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': // 29
+    case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': // 37
       feplet = new Feplet(
         {
           baz: {
@@ -634,7 +645,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/05-dotted-param_nested-in-non-param', templates1['templates/05-dotted-param_nested-in-non-param.fpt']);
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param_aside.fpt': // 30
+    case 'templates/05_dotted-param-includer_nested-in-non-param_aside.fpt': // 38
       feplet = new Feplet(
         {
           baz: {
@@ -645,7 +656,7 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/05-dotted-param_nested-in-non-param_aside', templates1['templates/05-dotted-param_nested-in-non-param_aside.fpt']);
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param_nested.fpt': // 31
+    case 'templates/05_dotted-param-includer_nested-in-non-param_nested.fpt': // 39
       feplet = new Feplet(
         {
           baz: {
@@ -656,17 +667,17 @@ Object.keys(templates1).forEach(function (template) {
       feplet.registerPartial('templates/05-dotted-param_nested-in-non-param_nested', templates1['templates/05-dotted-param_nested-in-non-param_nested.fpt']);
       break;
 
-    case 'templates/06_dotted-array-param-inner-includer.fpt': // 32
+    case 'templates/06_dotted-array-param-inner-includer.fpt': // 43
       feplet = new Feplet({});
       feplet.registerPartial('templates/06-dotted-array-param-inner', templates1['templates/06-dotted-array-param-inner.fpt']);
       break;
 
-    case 'templates/06_dotted-array-param-middle-includer.fpt': // 33
+    case 'templates/06_dotted-array-param-middle-includer.fpt': // 44
       feplet = new Feplet({});
       feplet.registerPartial('templates/06-dotted-array-param-middle', templates1['templates/06-dotted-array-param-middle.fpt']);
       break;
 
-    case 'templates/06_dotted-array-param-outer-includer.fpt': // 34
+    case 'templates/06_dotted-array-param-outer-includer.fpt': // 45
       feplet = new Feplet({});
       feplet.registerPartial('templates/06-dotted-array-param-outer', templates1['templates/06-dotted-array-param-outer.fpt']);
       break;
@@ -733,82 +744,82 @@ Object.keys(templates1).forEach(function (template) {
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">No\\n\\nfoo\\nMESSAGE\\n  No\\n\\nfoo\\nMESSAGE\\n  bar\\n  MESSAGE\\n  bar\\n  MESSAGE\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer.fpt': // 19
+    case 'templates/04_nested-param-same-name-as-non-param-includer.fpt': // 23
       contentParagraph.innerHTML = ++i + '. Renders a nested parameter variable differently than a non-parameter variable of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack heck\\n  hick hock\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': // 20
+    case 'templates/04_nested-param-same-name-as-non-param-includer_array.fpt': // 24
       contentParagraph.innerHTML = ++i + '. Renders an array of nested parameter variables differently from non-parameter variables of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack heck\\n  hick hock\\n  huck hyck\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': // 21
+    case 'templates/04_nested-param-same-name-as-non-param-includer_deep.fpt': // 25
       contentParagraph.innerHTML = ++i + '. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack heck\\n  hick hock\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': // 22
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner.fpt': // 26
       contentParagraph.innerHTML = ++i + '. Renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack\\n    heck\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': // 23
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-inner_array.fpt': // 27
       contentParagraph.innerHTML = ++i + '. Renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">hack\\n    heck\\n    hick\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': // 24
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle.fpt': // 28
       contentParagraph.innerHTML = ++i + '. Renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n    heck\\n</span>\'<br>';
       break;
 
-    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': // 25
+    case 'templates/04_nested-param-same-name-as-non-param-includer_dotted-middle_array.fpt': // 29
       contentParagraph.innerHTML = ++i + '. Renders a moderately nested array of dot.notation parameters differently than non-parameter variables of the same name:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n  heck\\n    hick\\n    hock\\n</span>\'<br>';
       break;
 
-    case 'templates/05_dotted-param-includer.fpt': // 26
+    case 'templates/05_dotted-param-includer.fpt': // 34
       contentParagraph.innerHTML = ++i + '. Renders a top-level dot.notation parameter that nests more tags:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n</span>\'<br>';
       break;
 
-    case 'templates/05_dotted-param-includer_array.fpt': // 27
+    case 'templates/05_dotted-param-includer_array.fpt': // 35
       contentParagraph.innerHTML = ++i + '. Renders an array of top-level dot.notation parameters that nest more tags:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n  heck\\n</span>\'<br>';
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param.fpt': // 28
+    case 'templates/05_dotted-param-includer_nested-in-non-param.fpt': // 36
       contentParagraph.innerHTML = ++i + '. Renders a dot.notation parameter nested within a non-parameter:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n    heck\\n</span>\'<br>';
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': // 29
+    case 'templates/05_dotted-param-includer_nested-in-non-param_array.fpt': // 37
       contentParagraph.innerHTML = ++i + '. Renders an array of dot.notation parameters nested within a non-parameter:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  hack\\n    heck\\n    hick\\n</span>\'<br>';
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param_aside.fpt': // 30
+    case 'templates/05_dotted-param-includer_nested-in-non-param_aside.fpt': // 38
       contentParagraph.innerHTML = ++i + '. Renders dot.notation parameters nested aside each other within a non-parameter:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">    heck\\n    hick\\n</span>\'<br>';
       break;
 
-    case 'templates/05_dotted-param-includer_nested-in-non-param_nested.fpt': // 31
+    case 'templates/05_dotted-param-includer_nested-in-non-param_nested.fpt': // 39
       contentParagraph.innerHTML = ++i + '. Renders dot.notation parameter nested within another within a non-parameter:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">    heck\\n</span>\'<br>';
       break;
 
-    case 'templates/06_dotted-array-param-inner-includer.fpt': // 32
+    case 'templates/06_dotted-array-param-inner-includer.fpt': // 43
       contentParagraph.innerHTML = ++i + '. Renders a deeply nested dot.notation parameter containing an array:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">    heck\\n</span>\'<br>';
       break;
 
-    case 'templates/06_dotted-array-param-middle-includer.fpt': // 33
+    case 'templates/06_dotted-array-param-middle-includer.fpt': // 44
       contentParagraph.innerHTML = ++i + '. Renders a moderately nested dot.notation parameter containing an array:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">    heck\\n</span>\'<br>';
       break;
 
-    case 'templates/06_dotted-array-param-outer-includer.fpt': // 34
+    case 'templates/06_dotted-array-param-outer-includer.fpt': // 45
       contentParagraph.innerHTML = ++i + '. Renders a top-level dot.notation parameter containing an array:<br>';
       contentParagraph.innerHTML += 'expect to equal \'<span class="expect">  heck\\n</span>\'<br>';
       break;

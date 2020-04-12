@@ -1,1 +1,1 @@
-{{> 02-stylemod-atom:foo1|foo2(message: '2') }}
+{{> 02-stylemod-atom.fpt:foo1|foo2(message: '1') }}

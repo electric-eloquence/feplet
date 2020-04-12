@@ -1,1 +1,1 @@
-{{> 04-nested-param-same-name-as-non-param(baz: { bez: 'hick', biz: 'hock' }) }}
+{{> 04-nested-param-same-name-as-non-param.fpt(baz: { bez: 'hick', biz: 'hock' }) }}

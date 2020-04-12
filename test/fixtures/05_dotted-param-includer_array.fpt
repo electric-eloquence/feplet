@@ -1,4 +1,4 @@
-{{> 05-dotted-param(
+{{> 05-dotted-param.fpt(
   baz: {
     bez: [
       {

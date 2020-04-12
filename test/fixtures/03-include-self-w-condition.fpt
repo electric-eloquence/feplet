@@ -1,8 +1,8 @@
-{{> 00_nested-includer }}
-{{> 00-base(title: 'foo') }}
+{{> 00_nested-includer.fpt }}
+{{> 00-base.fpt(title: 'foo') }}
 {{# foo }}
-  {{> 03-include-self-w-condition(bar: true) }}
+  {{> 03-include-self-w-condition.fpt(bar: true) }}
 {{/ foo }}
 {{# bar }}
-  {{> 00-base(title: 'bar') }}
+  {{> 00-base.fpt(title: 'bar') }}
 {{/ bar }}
