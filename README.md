@@ -120,13 +120,13 @@ Also for browsers (ES5):
 [snyk-image]: https://snyk.io/test/github/electric-eloquence/feplet/master/badge.svg
 [snyk-url]: https://snyk.io/test/github/electric-eloquence/feplet/master
 
-[linux-image]: https://github.com/electric-eloquence/feplet/workflows/Linux%20build/badge.svg?branch=dev
+[linux-image]: https://github.com/electric-eloquence/feplet/workflows/Linux%20build/badge.svg?branch=master
 [linux-url]: https://github.com/electric-eloquence/feplet/actions?query=workflow%3A"Linux+build"
 
-[mac-image]: https://github.com/electric-eloquence/feplet/workflows/Mac%20build/badge.svg?branch=dev
+[mac-image]: https://github.com/electric-eloquence/feplet/workflows/Mac%20build/badge.svg?branch=master
 [mac-url]: https://github.com/electric-eloquence/feplet/actions?query=workflow%3A"Mac+build"
 
-[windows-image]: https://github.com/electric-eloquence/feplet/workflows/Windows%20build/badge.svg?branch=dev
+[windows-image]: https://github.com/electric-eloquence/feplet/workflows/Windows%20build/badge.svg?branch=master
 [windows-url]: https://github.com/electric-eloquence/feplet/actions?query=workflow%3A"Windows+build"
 
 [coveralls-image]: https://img.shields.io/coveralls/electric-eloquence/feplet/master.svg
