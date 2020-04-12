@@ -9,7 +9,7 @@
     "lint": "eslint run && eslint src && eslint test",
     "serve": "node run/serve.js",
     "start": "npm run watch & npm run serve",
-    "test": "nyc --exclude lib --exclude test mocha test/*.js",
+    "test": "nyc --exclude lib --exclude test mocha test/{amd,main}.js",
     "watch": "nodemon --watch src -e js --exec 'npm run bundle'",
     "wdio": "node test/wdio-es5 && node test/wdio-es6.js"
   },
