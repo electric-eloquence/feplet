@@ -10,7 +10,8 @@
     "serve": "node run/serve.js",
     "start": "npm run watch & npm run serve",
     "test": "nyc --exclude lib --exclude test mocha test/*.js",
-    "watch": "nodemon --watch src -e js --exec 'npm run bundle'"
+    "watch": "nodemon --watch src -e js --exec 'npm run bundle'",
+    "wdio": "node test/wdio-es5 && node test/wdio-es6.js"
   },
   "husky": {
     "hooks": {
