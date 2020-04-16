@@ -157,8 +157,8 @@ module.exports = function (Feplet) {
         expect(render).to.equal(expectation[i]);
       });
 
-      it('25. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
-', function () {
+      it('25. Renders a more deeply nested parameter variable differently than a non-parameter variable of the same \
+name', function () {
         const i = 25;
         const render = Feplet.render(template[templateName[i]], context[i], clone(partial[i]));
         expect(render).to.equal(expectation[i]);
@@ -392,7 +392,7 @@ the same name', function () {
         expect(render).to.equal(expectation[i]);
       });
 
-      it('25. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same \
+      it('25. Renders a more deeply nested parameter variable differently than a non-parameter variable of the same \
 name', function () {
         const i = 25;
         const feplet = new Feplet(context[i]);
