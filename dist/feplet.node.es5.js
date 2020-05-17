@@ -976,7 +976,7 @@ METHODS: {
   var preProcessContextKeys = function preProcessContextKeys(context) {
     /* istanbul ignore if */
     if (!context) {
-      return {};
+      return [];
     }
 
     var contextObjKeys = Object.keys(context);
@@ -1013,7 +1013,7 @@ METHODS: {
       dataKeys = _dataKeysCollect4.dataKeys;
     }
 
-    var contextKeys;
+    var contextKeys = [];
 
     if (dataKeys.length) {
       var contextKeysItr;

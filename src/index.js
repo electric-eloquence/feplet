@@ -1026,7 +1026,7 @@ METHODS: {
   var preProcessContextKeys = function (context) {
     /* istanbul ignore if */
     if (!context) {
-      return {};
+      return [];
     }
 
     const contextObjKeys = Object.keys(context);
@@ -1058,7 +1058,7 @@ METHODS: {
       }));
     }
 
-    let contextKeys;
+    let contextKeys = [];
 
     if (dataKeys.length) {
       let contextKeysItr;
