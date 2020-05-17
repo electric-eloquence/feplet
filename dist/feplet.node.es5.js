@@ -955,7 +955,9 @@ PARAMS_APPLIER: {
       }, options);
       var compilationWithUnicodes = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsWithUnicodes), partialText, optionsWithUnicodes);
       partials[partialFull] = compilationWithUnicodes.render(paramsObj);
-    } else if (partialFull !== partialShort && !partials[partialFull]) {
+    }
+
+    if (partialFull !== partialShort && !partials[partialFull]) {
       partials[partialFull] = partials[partialShort];
     }
 

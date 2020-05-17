@@ -995,7 +995,8 @@ PARAMS_APPLIER: {
       );
       partials[partialFull] = compilationWithUnicodes.render(paramsObj);
     }
-    else if (partialFull !== partialShort && !partials[partialFull]) {
+
+    if (partialFull !== partialShort && !partials[partialFull]) {
       partials[partialFull] = partials[partialShort];
     }
 
