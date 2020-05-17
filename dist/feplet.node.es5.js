@@ -853,7 +853,7 @@ PARAMS_APPLIER: {
     /* istanbul ignore if */
 
 
-    if (partialShort === partialFull || !partials[partialShort]) {
+    if (partialFull === partialShort || !partials[partialShort]) {
       return partialsWithParamsAdd(args);
     }
 
@@ -954,8 +954,13 @@ PARAMS_APPLIER: {
         delimiters: delimiterUnicodes
       }, options);
       var compilationWithUnicodes = hogan.generate(hogan.parse(hogan.scan(partialText, delimiterUnicodes), partialText, optionsWithUnicodes), partialText, optionsWithUnicodes);
-      partials[partialFull] = compilationWithUnicodes.render(paramsObj); // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
+      partials[partialFull] = compilationWithUnicodes.render(paramsObj);
+    } else if (partialFull !== partialShort && !partials[partialFull]) {
+      partials[partialFull] = partials[partialShort];
+    }
 
+    if (delimiterUnicodes && partialText !== partialText_ || !Object.keys(partialsComp[partialFull]).length) {
+      // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
       var parseArr = hogan.parse(hogan.scan(partials[partialFull], options.delimiters), partials[partialFull], options);
       partialsComp[partialFull] = {
         parseArr: parseArr,
