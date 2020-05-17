@@ -572,6 +572,45 @@ the same name', function () {
         expect(render).to.equal('foo\nbar\n');
       });
 
+      // Tests the fix to a bug where a partial called wtih a parameter, but with no tag corresponding to the parameter
+      // would return an empty value.
+      it('preProcessPartialParams() populates partials and partialsComp where the partial does not have a tag that \
+correlates to the param', function () {
+        const partialName = 'footbarf';
+        const partialText = '{{ foot }}{{ barf }}'; // Be sure not to use tags used by any fixtures.
+        const partialWithParamName = `${partialName}(foo: 'bar')`;
+        const partials = {};
+        const partialsComp = {};
+        partials[partialName] = partialText;
+        partials[partialWithParamName] = '';
+        partialsComp[partialName] = hogan.compile(partials[partialName]);
+        partialsComp[partialWithParamName] = {};
+
+        const templateText = `{{> ${partialWithParamName} }}`;
+        const preProcess = Feplet.preProcessPartialParams(templateText, null, partials, partialsComp);
+        const render = Feplet.render(
+          templateText,
+          {
+            foot: 'foot',
+            barf: 'barf'
+          },
+          partials,
+          partialsComp
+        );
+
+        expect(preProcess).to.have.property('compilation');
+        expect(preProcess).to.have.property('_contextKeys');
+        expect(preProcess).to.have.property('partials');
+        expect(preProcess).to.have.property('partialsComp');
+        expect(preProcess.partials[partialName]).to.equal(partialText);
+        expect(preProcess.partials[partialWithParamName]).to.equal(partialText);
+        expect(preProcess.partialsComp[partialName]).to.have.property('parseArr');
+        expect(preProcess.partialsComp[partialName]).to.have.property('compilation');
+        expect(preProcess.partialsComp[partialWithParamName]).to.have.property('parseArr');
+        expect(preProcess.partialsComp[partialWithParamName]).to.have.property('compilation');
+        expect(render).to.equal('footbarf');
+      });
+
       // DEPRECATED.
       // TODO: To be removed.
       it('compile() accepts partialsComp arg where its keyed values are hogan.compile() objects', function () {
