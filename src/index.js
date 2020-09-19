@@ -729,7 +729,7 @@ PARAMS_APPLIER: {
 
     const parseObjKey = parseObjKeysItrn.value;
     const tagParse = parseObj[parseObjKey];
-    let partialText;
+    let partialText = partialText_;
     let delimiterUnicodes;
 
     if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
@@ -769,36 +769,54 @@ PARAMS_APPLIER: {
         paramsObjNew = paramsObj;
       }
 
-      if (tagParse.length) {
-        let tagParseItr;
-        let tagParseItrn;
+      const _this = this;
 
-        if (tagParse.length === 1) {
-          tagParseItr = {
-            next: () => {return {done: true};}
-          };
-          tagParseItrn = {
-            value: tagParse[0]
-          };
-        }
-        else {
-          tagParseItr = tagParse[Symbol.iterator]();
-          tagParseItrn = tagParseItr.next();
-        }
+      ({
+        delimiterUnicodes,
+        partialText
+      } = tagParse.reduce(
+        (dataStructures, parseObj) => {
+          const {
+            contextKeys,
+            paramKeys,
+            paramsObj
+          } = dataStructures;
+          let {
+            delimiterUnicodes,
+            partialText
+          } = dataStructures;
 
-        ({
-          delimiterUnicodes,
-          partialText
-        } = paramsApply({ // eslint-disable-line no-use-before-define
+          ({
+            delimiterUnicodes,
+            partialText
+          } = paramsApply.call( // eslint-disable-line no-use-before-define
+            _this,
+            {
+              contextKeys,
+              delimiterUnicodes_: delimiterUnicodes,
+              paramKeys,
+              paramsObj,
+              parseObj,
+              partialText
+            }
+          ));
+
+          return {
+            contextKeys,
+            delimiterUnicodes,
+            paramKeys,
+            paramsObj,
+            partialText
+          };
+        },
+        {
           contextKeys,
+          delimiterUnicodes: delimiterUnicodes_,
           paramKeys: paramKeysNew,
           paramsObj: paramsObjNew,
-          partialParseItr: tagParseItr,
-          partialParseItrn: tagParseItrn,
-          //partialShort, // For debugging.
-          partialText_
-        }));
-      }
+          partialText
+        }
+      ));
     }
     else {
       ({
@@ -827,26 +845,18 @@ PARAMS_APPLIER: {
   var paramsApply = function (args) {
     const {
       contextKeys,
-      delimiterUnicodes_,
       paramKeys,
       paramsObj,
-      partialParseItr,
-      partialParseItrn,
+      parseObj,
       //partialShort, // For debugging.
-      partialText_
+    } = args;
+    let {
+      delimiterUnicodes_,
+      partialText
     } = args;
 
-    if (partialParseItrn.done) {
-      return {
-        delimiterUnicodes: delimiterUnicodes_,
-        partialText: partialText_
-      };
-    }
-
-    const parseObj = partialParseItrn.value;
     const parseObjKeys = Object.keys(parseObj);
     let delimiterUnicodes;
-    let partialText;
 
     if (parseObjKeys.length) {
       // At this point, parseObjKeys.length is always > 1.
@@ -857,22 +867,23 @@ PARAMS_APPLIER: {
         partialText
       } = paramsApplyToParseObj({
         contextKeys,
-        delimiterUnicodes_,
+        delimiterUnicodes_: delimiterUnicodes,
         paramKeys,
         paramsObj,
         parseObj,
         parseObjKeysItr,
         parseObjKeysItrn,
         //partialShort, // For debugging.
-        partialText_
+        partialText_: partialText
       }));
     }
 
-    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
-    args.partialParseItrn = partialParseItr.next();
-    args.partialText_ = partialText || partialText_;
+    delimiterUnicodes = delimiterUnicodes || delimiterUnicodes_;
 
-    return paramsApply(args);
+    return {
+      delimiterUnicodes,
+      partialText
+    };
   };
 
   var partialsWithParamsAdd = function (args) {
@@ -886,7 +897,7 @@ PARAMS_APPLIER: {
     } = args;
 
     const partialFull = compilation.partials[partialsKey].name;
-    //const partialFull = compilation.partials[partialsKeysItrn.value].name;
+    const _this = this;
     let styleModClasses;
     let styleModifierMatch;
 
@@ -945,7 +956,6 @@ PARAMS_APPLIER: {
       paramsObj.styleModifier = styleModClasses;
     }
 
-    const _this = this;
     let dataKeys;
 
     ({dataKeys} = Object.keys(paramsObj).reduce(
@@ -990,36 +1000,52 @@ PARAMS_APPLIER: {
       partialParseArr = partialsComp[partialShort].parseArr;
     }
 
-    if (partialParseArr.length) {
-      let partialParseItr;
-      let partialParseItrn;
+    ({
+      delimiterUnicodes,
+      partialText
+    } = partialParseArr.reduce(
+      (dataStructures, parseObj) => {
+        const {
+          contextKeys,
+          paramKeys,
+          paramsObj
+        } = dataStructures;
+        let {
+          delimiterUnicodes,
+          partialText
+        } = dataStructures;
 
-      if (partialParseArr.length === 1) {
-        partialParseItr = {
-          next: () => {return {done: true};}
-        };
-        partialParseItrn = {
-          value: partialParseArr[0]
-        };
-      }
-      else {
-        partialParseItr = partialParseArr[Symbol.iterator]();
-        partialParseItrn = partialParseItr.next();
-      }
+        ({
+          delimiterUnicodes,
+          partialText
+        } = paramsApply.call(
+          _this,
+          {
+            contextKeys,
+            delimiterUnicodes_: delimiterUnicodes,
+            paramKeys,
+            paramsObj,
+            parseObj,
+            partialText
+          }
+        ));
 
-      ({
-        delimiterUnicodes,
-        partialText
-      } = paramsApply({
+        return {
+          contextKeys,
+          delimiterUnicodes,
+          paramKeys,
+          paramsObj,
+          partialText
+        };
+      },
+      {
         contextKeys,
+        delimiterUnicodes,
         paramKeys,
         paramsObj,
-        partialParseItr,
-        partialParseItrn,
-        //partialShort, // For debugging.
-        partialText_
-      }));
-    }
+        partialText: partialText_
+      }
+    ));
 
     if (delimiterUnicodes && partialText !== partialText_) {
       // First, render with unicode delimiters.

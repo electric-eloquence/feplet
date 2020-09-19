@@ -677,7 +677,7 @@ PARAMS_APPLIER: {
 
     var parseObjKey = parseObjKeysItrn.value;
     var tagParse = parseObj[parseObjKey];
-    var partialText;
+    var partialText = partialText_;
     var delimiterUnicodes;
 
     if (parseObjKey === 'nodes' && Array.isArray(tagParse)) {
@@ -714,40 +714,44 @@ PARAMS_APPLIER: {
         paramsObjNew = paramsObj;
       }
 
-      if (tagParse.length) {
-        var tagParseItr;
-        var tagParseItrn;
+      var _this = this;
 
-        if (tagParse.length === 1) {
-          tagParseItr = {
-            next: function next() {
-              return {
-                done: true
-              };
-            }
-          };
-          tagParseItrn = {
-            value: tagParse[0]
-          };
-        } else {
-          tagParseItr = tagParse[Symbol.iterator]();
-          tagParseItrn = tagParseItr.next();
-        }
+      var _tagParse$reduce = tagParse.reduce(function (dataStructures, parseObj) {
+        var contextKeys = dataStructures.contextKeys,
+            paramKeys = dataStructures.paramKeys,
+            paramsObj = dataStructures.paramsObj;
+        var delimiterUnicodes = dataStructures.delimiterUnicodes,
+            partialText = dataStructures.partialText;
 
-        var _paramsApply = paramsApply({
-          // eslint-disable-line no-use-before-define
+        var _paramsApply$call = paramsApply.call( // eslint-disable-line no-use-before-define
+        _this, {
           contextKeys: contextKeys,
-          paramKeys: paramKeysNew,
-          paramsObj: paramsObjNew,
-          partialParseItr: tagParseItr,
-          partialParseItrn: tagParseItrn,
-          //partialShort, // For debugging.
-          partialText_: partialText_
+          delimiterUnicodes_: delimiterUnicodes,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          parseObj: parseObj,
+          partialText: partialText
         });
 
-        delimiterUnicodes = _paramsApply.delimiterUnicodes;
-        partialText = _paramsApply.partialText;
-      }
+        delimiterUnicodes = _paramsApply$call.delimiterUnicodes;
+        partialText = _paramsApply$call.partialText;
+        return {
+          contextKeys: contextKeys,
+          delimiterUnicodes: delimiterUnicodes,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          partialText: partialText
+        };
+      }, {
+        contextKeys: contextKeys,
+        delimiterUnicodes: delimiterUnicodes_,
+        paramKeys: paramKeysNew,
+        paramsObj: paramsObjNew,
+        partialText: partialText
+      });
+
+      delimiterUnicodes = _tagParse$reduce.delimiterUnicodes;
+      partialText = _tagParse$reduce.partialText;
     } else {
       var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
         contextKeys: contextKeys,
@@ -773,24 +777,13 @@ PARAMS_APPLIER: {
 
   var paramsApply = function paramsApply(args) {
     var contextKeys = args.contextKeys,
-        delimiterUnicodes_ = args.delimiterUnicodes_,
         paramKeys = args.paramKeys,
         paramsObj = args.paramsObj,
-        partialParseItr = args.partialParseItr,
-        partialParseItrn = args.partialParseItrn,
-        partialText_ = args.partialText_;
-
-    if (partialParseItrn.done) {
-      return {
-        delimiterUnicodes: delimiterUnicodes_,
-        partialText: partialText_
-      };
-    }
-
-    var parseObj = partialParseItrn.value;
+        parseObj = args.parseObj;
+    var delimiterUnicodes_ = args.delimiterUnicodes_,
+        partialText = args.partialText;
     var parseObjKeys = Object.keys(parseObj);
     var delimiterUnicodes;
-    var partialText;
 
     if (parseObjKeys.length) {
       // At this point, parseObjKeys.length is always > 1.
@@ -799,24 +792,25 @@ PARAMS_APPLIER: {
 
       var _paramsApplyToParseOb = paramsApplyToParseObj({
         contextKeys: contextKeys,
-        delimiterUnicodes_: delimiterUnicodes_,
+        delimiterUnicodes_: delimiterUnicodes,
         paramKeys: paramKeys,
         paramsObj: paramsObj,
         parseObj: parseObj,
         parseObjKeysItr: parseObjKeysItr,
         parseObjKeysItrn: parseObjKeysItrn,
         //partialShort, // For debugging.
-        partialText_: partialText_
+        partialText_: partialText
       });
 
       delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
       partialText = _paramsApplyToParseOb.partialText;
     }
 
-    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
-    args.partialParseItrn = partialParseItr.next();
-    args.partialText_ = partialText || partialText_;
-    return paramsApply(args);
+    delimiterUnicodes = delimiterUnicodes || delimiterUnicodes_;
+    return {
+      delimiterUnicodes: delimiterUnicodes,
+      partialText: partialText
+    };
   };
 
   var partialsWithParamsAdd = function partialsWithParamsAdd(args) {
@@ -826,7 +820,9 @@ PARAMS_APPLIER: {
         partialsComp = args.partialsComp,
         partialsKey = args.partialsKey,
         options = args.options;
-    var partialFull = compilation.partials[partialsKey].name; //const partialFull = compilation.partials[partialsKeysItrn.value].name;
+    var partialFull = compilation.partials[partialsKey].name;
+
+    var _this = this;
 
     var styleModClasses;
     var styleModifierMatch;
@@ -891,8 +887,6 @@ PARAMS_APPLIER: {
       paramsObj.styleModifier = styleModClasses;
     }
 
-    var _this = this;
-
     var dataKeys;
 
     var _Object$keys$reduce3 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
@@ -931,39 +925,41 @@ PARAMS_APPLIER: {
       partialParseArr = partialsComp[partialShort].parseArr;
     }
 
-    if (partialParseArr.length) {
-      var partialParseItr;
-      var partialParseItrn;
+    var _partialParseArr$redu = partialParseArr.reduce(function (dataStructures, parseObj) {
+      var contextKeys = dataStructures.contextKeys,
+          paramKeys = dataStructures.paramKeys,
+          paramsObj = dataStructures.paramsObj;
+      var delimiterUnicodes = dataStructures.delimiterUnicodes,
+          partialText = dataStructures.partialText;
 
-      if (partialParseArr.length === 1) {
-        partialParseItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        partialParseItrn = {
-          value: partialParseArr[0]
-        };
-      } else {
-        partialParseItr = partialParseArr[Symbol.iterator]();
-        partialParseItrn = partialParseItr.next();
-      }
-
-      var _paramsApply2 = paramsApply({
+      var _paramsApply$call2 = paramsApply.call(_this, {
         contextKeys: contextKeys,
+        delimiterUnicodes_: delimiterUnicodes,
         paramKeys: paramKeys,
         paramsObj: paramsObj,
-        partialParseItr: partialParseItr,
-        partialParseItrn: partialParseItrn,
-        //partialShort, // For debugging.
-        partialText_: partialText_
+        parseObj: parseObj,
+        partialText: partialText
       });
 
-      delimiterUnicodes = _paramsApply2.delimiterUnicodes;
-      partialText = _paramsApply2.partialText;
-    }
+      delimiterUnicodes = _paramsApply$call2.delimiterUnicodes;
+      partialText = _paramsApply$call2.partialText;
+      return {
+        contextKeys: contextKeys,
+        delimiterUnicodes: delimiterUnicodes,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        partialText: partialText
+      };
+    }, {
+      contextKeys: contextKeys,
+      delimiterUnicodes: delimiterUnicodes,
+      paramKeys: paramKeys,
+      paramsObj: paramsObj,
+      partialText: partialText_
+    });
+
+    delimiterUnicodes = _partialParseArr$redu.delimiterUnicodes;
+    partialText = _partialParseArr$redu.partialText;
 
     if (delimiterUnicodes && partialText !== partialText_) {
       // First, render with unicode delimiters.
