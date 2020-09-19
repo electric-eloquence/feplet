@@ -806,9 +806,8 @@ PARAMS_APPLIER: {
       partialText = _paramsApplyToParseOb.partialText;
     }
 
-    delimiterUnicodes = delimiterUnicodes || delimiterUnicodes_;
     return {
-      delimiterUnicodes: delimiterUnicodes,
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText
     };
   };

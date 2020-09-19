@@ -878,10 +878,8 @@ PARAMS_APPLIER: {
       }));
     }
 
-    delimiterUnicodes = delimiterUnicodes || delimiterUnicodes_;
-
     return {
-      delimiterUnicodes,
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText
     };
   };
