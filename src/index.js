@@ -76,45 +76,6 @@ HELPERS: {
     }
   };
 
-  var partialIteratorRegister = function (partialKey, dataStructures, addlArgs) {
-    const {
-      partials,
-      partialsComp
-    } = dataStructures;
-    const {options} = addlArgs;
-
-    return registerPartial( // eslint-disable-line no-use-before-define
-      partialKey,
-      partials[partialKey],
-      null,
-      partials,
-      partialsComp,
-      options
-    );
-  };
-
-  var partialParamsIteratorPreProcess = function (partialKey, dataStructures, addlArgs) {
-    const {
-      contextKeys,
-      partials,
-      partialsComp
-    } = dataStructures;
-    const {
-      context,
-      options
-    } = addlArgs;
-
-    return preProcessPartialParams( // eslint-disable-line no-use-before-define
-      partials[partialKey],
-      partialsComp[partialKey].compilation,
-      partials,
-      partialsComp,
-      contextKeys,
-      context,
-      options
-    );
-  };
-
   var styleModifierExtract = function (args) {
     const {
       partialName
@@ -1237,31 +1198,60 @@ METHODS: {
 
   var compile = function (text, options_, partials_, partialsComp_, contextKeys_, context) {
     const options = options_ || this.options || {};
+    const _this = this;
     let compilation = hogan.compile(text, options);
     let contextKeys = contextKeys_ || (this && this.contextKeys);
     let _contextKeys;
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
-    const partialsKeys = Object.keys(partials);
-    const partialsKeysItr = partialsKeys[Symbol.iterator]();
-    const partialsKeysItrn = partialsKeysItr.next();
-
     ({
       _contextKeys,
       partials,
       partialsComp
-    } = dataAppendViaIterator(
-      partialsKeysItr,
-      partialsKeysItrn,
-      {
-        contextKeys,
-        partials,
-        partialsComp
+    } = Object.keys(partials).reduce(
+      (dataStructures, partialKey) => {
+        const {
+          context,
+          contextKeys,
+          options
+        } = dataStructures;
+        let {
+          _contextKeys,
+          partials,
+          partialsComp
+        } = dataStructures;
+
+        ({
+          _contextKeys,
+          partials,
+          partialsComp
+        } = preProcessPartialParams.call(
+          _this,
+          partials[partialKey],
+          partialsComp[partialKey].compilation,
+          partials,
+          partialsComp,
+          contextKeys,
+          context,
+          options
+        ));
+
+        return {
+          context,
+          contextKeys,
+          _contextKeys,
+          partials,
+          partialsComp,
+          options
+        };
       },
-      partialParamsIteratorPreProcess,
       {
         context,
+        contextKeys,
+        _contextKeys,
+        partials,
+        partialsComp,
         options
       }
     ));
@@ -1318,25 +1308,36 @@ METHODS: {
     const context = context_ || this.context || {};
     const contextKeys = contextKeys_ || (this && this.contextKeys);
     const options = options_ || this.options || {};
+    const _this = this;
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
-
-    const partialsKeys = Object.keys(partials);
-    const partialsKeysItr = partialsKeys[Symbol.iterator]();
-    const partialsKeysItrn = partialsKeysItr.next();
 
     ({
       partials,
       partialsComp
-    } = dataAppendViaIterator(
-      partialsKeysItr,
-      partialsKeysItrn,
+    } = Object.keys(partials).reduce(
+      (dataStructures, partialKey) => {
+        const {
+          partials,
+          partialsComp,
+          options
+        } = dataStructures;
+
+        return registerPartial.call(
+          _this,
+          partialKey,
+          partials[partialKey],
+          null,
+          partials,
+          partialsComp,
+          options
+        );
+      },
       {
         partials,
-        partialsComp
-      },
-      partialIteratorRegister,
-      {options}
+        partialsComp,
+        options
+      }
     ));
 
     let compilation;

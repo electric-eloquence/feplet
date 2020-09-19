@@ -67,24 +67,6 @@ HELPERS: {
     }
   };
 
-  var partialIteratorRegister = function partialIteratorRegister(partialKey, dataStructures, addlArgs) {
-    var partials = dataStructures.partials,
-        partialsComp = dataStructures.partialsComp;
-    var options = addlArgs.options;
-    return registerPartial( // eslint-disable-line no-use-before-define
-    partialKey, partials[partialKey], null, partials, partialsComp, options);
-  };
-
-  var partialParamsIteratorPreProcess = function partialParamsIteratorPreProcess(partialKey, dataStructures, addlArgs) {
-    var contextKeys = dataStructures.contextKeys,
-        partials = dataStructures.partials,
-        partialsComp = dataStructures.partialsComp;
-    var context = addlArgs.context,
-        options = addlArgs.options;
-    return preProcessPartialParams( // eslint-disable-line no-use-before-define
-    partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
-  };
-
   var styleModifierExtract = function styleModifierExtract(args) {
     var partialName = args.partialName;
     var styleModClasses = ''; // eslint-disable-next-line no-useless-escape
@@ -1181,6 +1163,9 @@ METHODS: {
 
   var compile = function compile(text, options_, partials_, partialsComp_, contextKeys_, context) {
     var options = options_ || this.options || {};
+
+    var _this = this;
+
     var compilation = hogan.compile(text, options);
     var contextKeys = contextKeys_ || this && this.contextKeys;
 
@@ -1188,22 +1173,40 @@ METHODS: {
 
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    var partialsKeys = Object.keys(partials);
-    var partialsKeysItr = partialsKeys[Symbol.iterator]();
-    var partialsKeysItrn = partialsKeysItr.next();
 
-    var _dataAppendViaIterato3 = dataAppendViaIterator(partialsKeysItr, partialsKeysItrn, {
-      contextKeys: contextKeys,
-      partials: partials,
-      partialsComp: partialsComp
-    }, partialParamsIteratorPreProcess, {
+    var _Object$keys$reduce = Object.keys(partials).reduce(function (dataStructures, partialKey) {
+      var context = dataStructures.context,
+          contextKeys = dataStructures.contextKeys,
+          options = dataStructures.options;
+      var _contextKeys = dataStructures._contextKeys,
+          partials = dataStructures.partials,
+          partialsComp = dataStructures.partialsComp;
+
+      var _preProcessPartialPar2 = preProcessPartialParams.call(_this, partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
+
+      _contextKeys = _preProcessPartialPar2._contextKeys;
+      partials = _preProcessPartialPar2.partials;
+      partialsComp = _preProcessPartialPar2.partialsComp;
+      return {
+        context: context,
+        contextKeys: contextKeys,
+        _contextKeys: _contextKeys,
+        partials: partials,
+        partialsComp: partialsComp,
+        options: options
+      };
+    }, {
       context: context,
+      contextKeys: contextKeys,
+      _contextKeys: _contextKeys,
+      partials: partials,
+      partialsComp: partialsComp,
       options: options
     });
 
-    _contextKeys = _dataAppendViaIterato3._contextKeys;
-    partials = _dataAppendViaIterato3.partials;
-    partialsComp = _dataAppendViaIterato3.partialsComp;
+    _contextKeys = _Object$keys$reduce._contextKeys;
+    partials = _Object$keys$reduce.partials;
+    partialsComp = _Object$keys$reduce.partialsComp;
 
     if (_contextKeys) {
       contextKeys = _contextKeys;
@@ -1252,21 +1255,25 @@ METHODS: {
     var context = context_ || this.context || {};
     var contextKeys = contextKeys_ || this && this.contextKeys;
     var options = options_ || this.options || {};
+
+    var _this = this;
+
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    var partialsKeys = Object.keys(partials);
-    var partialsKeysItr = partialsKeys[Symbol.iterator]();
-    var partialsKeysItrn = partialsKeysItr.next();
 
-    var _dataAppendViaIterato4 = dataAppendViaIterator(partialsKeysItr, partialsKeysItrn, {
+    var _Object$keys$reduce2 = Object.keys(partials).reduce(function (dataStructures, partialKey) {
+      var partials = dataStructures.partials,
+          partialsComp = dataStructures.partialsComp,
+          options = dataStructures.options;
+      return registerPartial.call(_this, partialKey, partials[partialKey], null, partials, partialsComp, options);
+    }, {
       partials: partials,
-      partialsComp: partialsComp
-    }, partialIteratorRegister, {
+      partialsComp: partialsComp,
       options: options
     });
 
-    partials = _dataAppendViaIterato4.partials;
-    partialsComp = _dataAppendViaIterato4.partialsComp;
+    partials = _Object$keys$reduce2.partials;
+    partialsComp = _Object$keys$reduce2.partialsComp;
     var compilation;
 
     if (Object.keys(partialsComp).length) {
