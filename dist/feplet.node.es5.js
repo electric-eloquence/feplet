@@ -831,24 +831,15 @@ PARAMS_APPLIER: {
         contextKeys = args.contextKeys,
         partials = args.partials,
         partialsComp = args.partialsComp,
-        partialsKeysItr = args.partialsKeysItr,
-        partialsKeysItrn = args.partialsKeysItrn,
+        partialsKey = args.partialsKey,
         options = args.options;
+    var partialFull = compilation.partials[partialsKey].name; //const partialFull = compilation.partials[partialsKeysItrn.value].name;
 
-    if (partialsKeysItrn.done) {
-      return {
-        partials: partials,
-        partialsComp: partialsComp
-      };
-    }
-
-    var partialFull = compilation.partials[partialsKeysItrn.value].name;
     var styleModClasses;
     var styleModifierMatch;
-    args.partialsKeysItrn = partialsKeysItr.next();
 
     if (partials[partialFull]) {
-      return partialsWithParamsAdd(args);
+      return args;
     }
 
     var paramsMatch = partialFull.match(paramRegex);
@@ -875,13 +866,13 @@ PARAMS_APPLIER: {
 
           /* istanbul ignore next */
 
-          return partialsWithParamsAdd(args);
+          return args;
         }
         /* istanbul ignore if */
 
 
         if (!paramsObj || paramsObj.constructor !== Object) {
-          return partialsWithParamsAdd(args);
+          return args;
         }
       }
     } else {
@@ -900,7 +891,7 @@ PARAMS_APPLIER: {
 
 
     if (partialFull === partialShort || !partials[partialShort]) {
-      return partialsWithParamsAdd(args);
+      return args;
     }
 
     if (styleModClasses) {
@@ -1008,7 +999,7 @@ PARAMS_APPLIER: {
       };
     }
 
-    return partialsWithParamsAdd(args);
+    return args;
   };
 }
 
@@ -1115,43 +1106,42 @@ METHODS: {
       }
     }
 
+    var _this = this;
+
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
+    partialsKeys.reduce(function (dataStructures, partialsKey) {
+      var compilation = dataStructures.compilation,
+          contextKeys = dataStructures.contextKeys,
+          options = dataStructures.options;
+      var partials = dataStructures.partials,
+          partialsComp = dataStructures.partialsComp;
 
-    if (partialsKeys.length) {
-      var partialsKeysItr;
-      var partialsKeysItrn;
-
-      if (partialsKeys.length === 1) {
-        partialsKeysItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        partialsKeysItrn = {
-          value: partialsKeys[0]
-        };
-      } else {
-        partialsKeysItr = partialsKeys[Symbol.iterator]();
-        partialsKeysItrn = partialsKeysItr.next();
-      }
-
-      var _partialsWithParamsAd = partialsWithParamsAdd({
+      var _partialsWithParamsAd = partialsWithParamsAdd.call(_this, {
         compilation: compilation,
         contextKeys: contextKeys,
         partials: partials,
         partialsComp: partialsComp,
-        partialsKeysItr: partialsKeysItr,
-        partialsKeysItrn: partialsKeysItrn,
+        partialsKey: partialsKey,
         options: options
       });
 
       partials = _partialsWithParamsAd.partials;
       partialsComp = _partialsWithParamsAd.partialsComp;
-    }
-
+      return {
+        compilation: compilation,
+        contextKeys: contextKeys,
+        partials: partials,
+        partialsComp: partialsComp,
+        options: options
+      };
+    }, {
+      compilation: compilation,
+      contextKeys: contextKeys,
+      partials: partials,
+      partialsComp: partialsComp,
+      options: options
+    });
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
@@ -1174,7 +1164,7 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _Object$keys$reduce = Object.keys(partials).reduce(function (dataStructures, partialKey) {
+    var _Object$keys$reduce = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
       var context = dataStructures.context,
           contextKeys = dataStructures.contextKeys,
           options = dataStructures.options;
@@ -1182,7 +1172,7 @@ METHODS: {
           partials = dataStructures.partials,
           partialsComp = dataStructures.partialsComp;
 
-      var _preProcessPartialPar2 = preProcessPartialParams.call(_this, partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
+      var _preProcessPartialPar2 = preProcessPartialParams.call(_this, partials[partialsKey], partialsComp[partialsKey].compilation, partials, partialsComp, contextKeys, context, options);
 
       _contextKeys = _preProcessPartialPar2._contextKeys;
       partials = _preProcessPartialPar2.partials;
@@ -1261,11 +1251,11 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _Object$keys$reduce2 = Object.keys(partials).reduce(function (dataStructures, partialKey) {
+    var _Object$keys$reduce2 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
       var partials = dataStructures.partials,
           partialsComp = dataStructures.partialsComp,
           options = dataStructures.options;
-      return registerPartial.call(_this, partialKey, partials[partialKey], null, partials, partialsComp, options);
+      return registerPartial.call(_this, partialsKey, partials[partialsKey], null, partials, partialsComp, options);
     }, {
       partials: partials,
       partialsComp: partialsComp,

@@ -871,26 +871,17 @@ PARAMS_APPLIER: {
       contextKeys,
       partials,
       partialsComp,
-      partialsKeysItr,
-      partialsKeysItrn,
+      partialsKey,
       options
     } = args;
 
-    if (partialsKeysItrn.done) {
-      return {
-        partials,
-        partialsComp
-      };
-    }
-
-    const partialFull = compilation.partials[partialsKeysItrn.value].name;
+    const partialFull = compilation.partials[partialsKey].name;
+    //const partialFull = compilation.partials[partialsKeysItrn.value].name;
     let styleModClasses;
     let styleModifierMatch;
 
-    args.partialsKeysItrn = partialsKeysItr.next();
-
     if (partials[partialFull]) {
-      return partialsWithParamsAdd(args);
+      return args;
     }
 
     const paramsMatch = partialFull.match(paramRegex);
@@ -915,12 +906,12 @@ PARAMS_APPLIER: {
           /* istanbul ignore next */
           console.error(err); // eslint-disable-line no-console
           /* istanbul ignore next */
-          return partialsWithParamsAdd(args);
+          return args;
         }
 
         /* istanbul ignore if */
         if (!paramsObj || paramsObj.constructor !== Object) {
-          return partialsWithParamsAdd(args);
+          return args;
         }
       }
     }
@@ -937,7 +928,7 @@ PARAMS_APPLIER: {
 
     /* istanbul ignore if */
     if (partialFull === partialShort || !partials[partialShort]) {
-      return partialsWithParamsAdd(args);
+      return args;
     }
 
     if (styleModClasses) {
@@ -1056,7 +1047,7 @@ PARAMS_APPLIER: {
       };
     }
 
-    return partialsWithParamsAdd(args);
+    return args;
   };
 }
 
@@ -1154,39 +1145,53 @@ METHODS: {
       }
     }
 
+    const _this = this;
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
-    if (partialsKeys.length) {
-      let partialsKeysItr;
-      let partialsKeysItrn;
+    partialsKeys.reduce(
+      (dataStructures, partialsKey) => {
+        const {
+          compilation,
+          contextKeys,
+          options
+        } = dataStructures;
+        let {
+          partials,
+          partialsComp
+        } = dataStructures;
 
-      if (partialsKeys.length === 1) {
-        partialsKeysItr = {
-          next: () => {return {done: true};}
-        };
-        partialsKeysItrn = {
-          value: partialsKeys[0]
-        };
-      }
-      else {
-        partialsKeysItr = partialsKeys[Symbol.iterator]();
-        partialsKeysItrn = partialsKeysItr.next();
-      }
+        ({
+          partials,
+          partialsComp
+        } = partialsWithParamsAdd.call(
+          _this,
+          {
+            compilation,
+            contextKeys,
+            partials,
+            partialsComp,
+            partialsKey,
+            options
+          }
+        ));
 
-      ({
-        partials,
-        partialsComp
-      } = partialsWithParamsAdd({
+        return {
+          compilation,
+          contextKeys,
+          partials,
+          partialsComp,
+          options
+        };
+      },
+      {
         compilation,
         contextKeys,
         partials,
         partialsComp,
-        partialsKeysItr,
-        partialsKeysItrn,
         options
-      }));
-    }
+      }
+    );
 
     return {
       compilation,
@@ -1210,7 +1215,7 @@ METHODS: {
       partials,
       partialsComp
     } = Object.keys(partials).reduce(
-      (dataStructures, partialKey) => {
+      (dataStructures, partialsKey) => {
         const {
           context,
           contextKeys,
@@ -1228,8 +1233,8 @@ METHODS: {
           partialsComp
         } = preProcessPartialParams.call(
           _this,
-          partials[partialKey],
-          partialsComp[partialKey].compilation,
+          partials[partialsKey],
+          partialsComp[partialsKey].compilation,
           partials,
           partialsComp,
           contextKeys,
@@ -1316,7 +1321,7 @@ METHODS: {
       partials,
       partialsComp
     } = Object.keys(partials).reduce(
-      (dataStructures, partialKey) => {
+      (dataStructures, partialsKey) => {
         const {
           partials,
           partialsComp,
@@ -1325,8 +1330,8 @@ METHODS: {
 
         return registerPartial.call(
           _this,
-          partialKey,
-          partials[partialKey],
+          partialsKey,
+          partials[partialsKey],
           null,
           partials,
           partialsComp,
