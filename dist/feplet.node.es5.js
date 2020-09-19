@@ -389,7 +389,7 @@ COLLECTORS: {
   var dataKeysGetFromDataObj = function dataKeysGetFromDataObj(dataObjItem, dataKeys_, addlArgs) {
     var incrementValue = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
     var dataObjNestedObj = addlArgs.dataObjNestedObj,
-        key = addlArgs.key,
+        dataKey = addlArgs.dataKey,
         parentObjAsStr = addlArgs.parentObjAsStr,
         partialShort = addlArgs.partialShort;
     var dataObjItemKeys = Object.keys(dataObjItem);
@@ -419,9 +419,9 @@ COLLECTORS: {
 
       if (dataObjDeeperItrn.value) {
         if (Array.isArray(dataObjNestedObj)) {
-          parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(incrementValue) : "".concat(key, ".").concat(incrementValue);
+          parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey, ".").concat(incrementValue) : "".concat(dataKey, ".").concat(incrementValue);
         } else {
-          parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key;
+          parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey) : dataKey;
         }
 
         var parentObjSplit = parentObjAsStrNew.split('.'); // eslint-disable-next-line no-use-before-define
@@ -432,21 +432,40 @@ COLLECTORS: {
         });
 
         dataKeys = _dataKeysWithDotNotat.dataKeys;
-      } // Clone args object for recursion deeper into dataObj.
+      }
 
+      var _this = this;
 
-      var argsDeeper = {
-        dataKeys_: dataKeys,
-        dataObjShallowItr: dataObjDeeperItr,
-        dataObjShallowItrn: dataObjDeeperItrn,
+      var _Object$keys$reduce = Object.keys(dataObjItem).reduce(function (dataStructures, dataKey) {
+        var dataKeys = dataStructures.dataKeys,
+            dataObj = dataStructures.dataObj,
+            parentObjAsStr = dataStructures.parentObjAsStr,
+            partialShort = dataStructures.partialShort;
+
+        var _dataKeysCollect$call = dataKeysCollect.call( // eslint-disable-line no-use-before-define
+        _this, {
+          dataKey: dataKey,
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr,
+          partialShort: partialShort
+        });
+
+        dataKeys = _dataKeysCollect$call.dataKeys;
+        return {
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr,
+          partialShort: partialShort
+        };
+      }, {
+        dataKeys: dataKeys,
         dataObj: dataObjItem,
         parentObjAsStr: parentObjAsStrNew,
         partialShort: partialShort
-      };
+      });
 
-      var _dataKeysCollect = dataKeysCollect(argsDeeper);
-
-      dataKeys = _dataKeysCollect.dataKeys;
+      dataKeys = _Object$keys$reduce.dataKeys;
     }
 
     return {
@@ -494,28 +513,19 @@ COLLECTORS: {
   };
 
   var dataKeysCollect = function dataKeysCollect(args) {
-    var dataKeys_ = args.dataKeys_,
-        dataObjShallowItrn = args.dataObjShallowItrn,
+    var dataKey = args.dataKey,
         dataObj = args.dataObj,
         parentObjAsStr = args.parentObjAsStr,
         partialShort = args.partialShort;
-    var dataKeys = dataKeys_;
+    var dataKeys = args.dataKeys;
 
-    if (dataObjShallowItrn.done) {
-      return {
-        dataKeys: dataKeys
-      };
-    }
-
-    var key = dataObjShallowItrn.value;
-
-    if (!dataKeys.includes(key) && !parentObjAsStr) {
-      dataKeys.push(key);
+    if (!dataKeys.includes(dataKey) && !parentObjAsStr) {
+      dataKeys.push(dataKey);
     } // Recurse deeper into dataObj if this property is an instance of Object.
 
 
-    if (dataObj[key] instanceof Object) {
-      var dataObjNestedObj = dataObj[key];
+    if (dataObj[dataKey] instanceof Object) {
+      var dataObjNestedObj = dataObj[dataKey];
 
       if (Array.isArray(dataObjNestedObj)) {
         var dataObjNestedObjItr = dataObjNestedObj[Symbol.iterator]();
@@ -526,7 +536,7 @@ COLLECTORS: {
           dataKeys: dataKeys
         }, dataKeysGetFromDataObj, {
           dataObjNestedObj: dataObjNestedObj,
-          key: key,
+          dataKey: dataKey,
           parentObjAsStr: parentObjAsStr,
           partialShort: partialShort
         });
@@ -537,7 +547,7 @@ COLLECTORS: {
           dataKeys: dataKeys
         }, {
           dataObjNestedObj: dataObjNestedObj,
-          key: key,
+          dataKey: dataKey,
           parentObjAsStr: parentObjAsStr,
           partialShort: partialShort
         });
@@ -547,8 +557,8 @@ COLLECTORS: {
     } else {
       var parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-      if (!parentObjSplit.includes(key)) {
-        parentObjSplit.push(key);
+      if (!parentObjSplit.includes(dataKey)) {
+        parentObjSplit.push(dataKey);
       }
 
       var _dataKeysWithDotNotat2 = dataKeysWithDotNotationAdd({
@@ -559,50 +569,43 @@ COLLECTORS: {
       dataKeys = _dataKeysWithDotNotat2.dataKeys;
     }
 
-    args.dataKeys_ = dataKeys;
-    args.dataObjShallowItrn = args.dataObjShallowItr.next();
-    return dataKeysCollect(args);
+    return args;
   };
 }
 
 PARAMS_APPLIER: {
   // Declaring with const effectively makes this function private to this block.
   var dataKeysGetFromParamsObj = function dataKeysGetFromParamsObj(paramsObj, dataKeys_) {
-    var paramsObjKeys = Object.keys(paramsObj);
+    var _this = this;
+
     var dataKeys = dataKeys_.dataKeys;
 
-    if (paramsObjKeys.length) {
-      var paramsObjShallowItr;
-      var paramsObjShallowItrn;
+    var _Object$keys$reduce2 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
+      var dataKeys = dataStructures.dataKeys,
+          dataObj = dataStructures.dataObj,
+          parentObjAsStr = dataStructures.parentObjAsStr;
 
-      if (paramsObjKeys.length === 1) {
-        paramsObjShallowItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        paramsObjShallowItrn = {
-          value: paramsObjKeys[0]
-        };
-      } else {
-        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-        paramsObjShallowItrn = paramsObjShallowItr.next();
-      }
-
-      var _dataKeysCollect2 = dataKeysCollect({
-        dataKeys_: dataKeys,
-        dataObjShallowItr: paramsObjShallowItr,
-        dataObjShallowItrn: paramsObjShallowItrn,
-        dataObj: paramsObj,
-        parentObjAsStr: '' //partialShort // For debugging.
-
+      var _dataKeysCollect$call2 = dataKeysCollect.call(_this, {
+        dataKey: dataKey,
+        dataKeys: dataKeys,
+        dataObj: dataObj,
+        parentObjAsStr: parentObjAsStr
       });
 
-      dataKeys = _dataKeysCollect2.dataKeys;
-    }
+      dataKeys = _dataKeysCollect$call2.dataKeys;
+      return {
+        dataKeys: dataKeys,
+        dataObj: dataObj,
+        parentObjAsStr: parentObjAsStr
+      };
+    }, {
+      dataKeys: dataKeys,
+      dataObj: paramsObj,
+      parentObjAsStr: '' //partialShort // For debugging.
 
+    });
+
+    dataKeys = _Object$keys$reduce2.dataKeys;
     return {
       dataKeys: dataKeys
     };
@@ -888,41 +891,36 @@ PARAMS_APPLIER: {
       paramsObj.styleModifier = styleModClasses;
     }
 
-    var paramsObjKeys = Object.keys(paramsObj);
+    var _this = this;
+
     var dataKeys;
 
-    if (paramsObjKeys.length) {
-      var paramsObjShallowItr;
-      var paramsObjShallowItrn;
+    var _Object$keys$reduce3 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
+      var dataKeys = dataStructures.dataKeys,
+          dataObj = dataStructures.dataObj,
+          parentObjAsStr = dataStructures.parentObjAsStr;
 
-      if (paramsObjKeys.length === 1) {
-        paramsObjShallowItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        paramsObjShallowItrn = {
-          value: paramsObjKeys[0]
-        };
-      } else {
-        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-        paramsObjShallowItrn = paramsObjShallowItr.next();
-      }
-
-      var _dataKeysCollect3 = dataKeysCollect({
-        dataKeys_: [],
-        dataObjShallowItr: paramsObjShallowItr,
-        dataObjShallowItrn: paramsObjShallowItrn,
-        dataObj: paramsObj,
-        parentObjAsStr: '' //partialShort // For debugging.
-
+      var _dataKeysCollect$call3 = dataKeysCollect.call(_this, {
+        dataKey: dataKey,
+        dataKeys: dataKeys,
+        dataObj: dataObj,
+        parentObjAsStr: parentObjAsStr
       });
 
-      dataKeys = _dataKeysCollect3.dataKeys;
-    }
+      dataKeys = _dataKeysCollect$call3.dataKeys;
+      return {
+        dataKeys: dataKeys,
+        dataObj: dataObj,
+        parentObjAsStr: parentObjAsStr
+      };
+    }, {
+      dataKeys: [],
+      dataObj: paramsObj,
+      parentObjAsStr: '' //partialShort // For debugging.
 
+    });
+
+    dataKeys = _Object$keys$reduce3.dataKeys;
     var paramKeys = dataKeys;
     var partialText_ = partials[partialShort] || '';
     var delimiterUnicodes;
@@ -1000,47 +998,38 @@ METHODS: {
       return [];
     }
 
-    var contextObjKeys = Object.keys(context);
+    var _this = this;
+
     var dataKeys = [];
 
-    if (contextObjKeys.length) {
-      var dataObjShallowItr;
-      var dataObjShallowItrn;
+    var _Object$keys$reduce4 = Object.keys(context).reduce(function (dataStructures, dataKey) {
+      var dataKeys = dataStructures.dataKeys,
+          dataObj = dataStructures.dataObj,
+          parentObjAsStr = dataStructures.parentObjAsStr;
 
-      if (contextObjKeys.length === 1) {
-        dataObjShallowItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        dataObjShallowItrn = {
-          value: contextObjKeys[0]
-        };
-      } else {
-        dataObjShallowItr = contextObjKeys[Symbol.iterator]();
-        dataObjShallowItrn = dataObjShallowItr.next();
-      }
-
-      var _dataKeysCollect4 = dataKeysCollect({
-        dataKeys_: [],
-        dataObjShallowItr: dataObjShallowItr,
-        dataObjShallowItrn: dataObjShallowItrn,
-        dataObj: context,
-        parentObjAsStr: ''
+      var _dataKeysCollect$call4 = dataKeysCollect.call(_this, {
+        dataKey: dataKey,
+        dataKeys: dataKeys,
+        dataObj: dataObj,
+        parentObjAsStr: parentObjAsStr
       });
 
-      dataKeys = _dataKeysCollect4.dataKeys;
-    }
+      dataKeys = _dataKeysCollect$call4.dataKeys;
+      return {
+        dataKeys: dataKeys,
+        dataObj: dataObj,
+        parentObjAsStr: parentObjAsStr
+      };
+    }, {
+      dataKeys: dataKeys,
+      dataObj: context,
+      parentObjAsStr: ''
+    });
 
+    dataKeys = _Object$keys$reduce4.dataKeys;
     var contextKeys = [];
 
     if (dataKeys.length) {
-      var _this = this;
-
-      contextKeys = dataKeys.slice();
-
       var _dataKeys$reduce = dataKeys.reduce(function (dataStructures, contextKey) {
         var contextKeys = dataStructures.contextKeys;
 
@@ -1054,7 +1043,7 @@ METHODS: {
           contextKeys: contextKeys
         };
       }, {
-        contextKeys: contextKeys
+        contextKeys: dataKeys.slice()
       });
 
       contextKeys = _dataKeys$reduce.contextKeys;
@@ -1148,7 +1137,7 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _Object$keys$reduce = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
+    var _Object$keys$reduce5 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
       var context = dataStructures.context,
           contextKeys = dataStructures.contextKeys,
           options = dataStructures.options;
@@ -1178,9 +1167,9 @@ METHODS: {
       options: options
     });
 
-    _contextKeys = _Object$keys$reduce._contextKeys;
-    partials = _Object$keys$reduce.partials;
-    partialsComp = _Object$keys$reduce.partialsComp;
+    _contextKeys = _Object$keys$reduce5._contextKeys;
+    partials = _Object$keys$reduce5.partials;
+    partialsComp = _Object$keys$reduce5.partialsComp;
 
     if (_contextKeys) {
       contextKeys = _contextKeys;
@@ -1235,7 +1224,7 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _Object$keys$reduce2 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
+    var _Object$keys$reduce6 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
       var partials = dataStructures.partials,
           partialsComp = dataStructures.partialsComp,
           options = dataStructures.options;
@@ -1246,8 +1235,8 @@ METHODS: {
       options: options
     });
 
-    partials = _Object$keys$reduce2.partials;
-    partialsComp = _Object$keys$reduce2.partialsComp;
+    partials = _Object$keys$reduce6.partials;
+    partialsComp = _Object$keys$reduce6.partialsComp;
     var compilation;
 
     if (Object.keys(partialsComp).length) {

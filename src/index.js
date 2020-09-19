@@ -420,7 +420,7 @@ COLLECTORS: {
   const dataKeysGetFromDataObj = function (dataObjItem, dataKeys_, addlArgs, incrementValue = 0) {
     const {
       dataObjNestedObj,
-      key,
+      dataKey,
       parentObjAsStr,
       partialShort
     } = addlArgs;
@@ -449,10 +449,10 @@ COLLECTORS: {
 
       if (dataObjDeeperItrn.value) {
         if (Array.isArray(dataObjNestedObj)) {
-          parentObjAsStrNew += parentObjAsStr ? `.${key}.${incrementValue}` : `${key}.${incrementValue}`;
+          parentObjAsStrNew += parentObjAsStr ? `.${dataKey}.${incrementValue}` : `${dataKey}.${incrementValue}`;
         }
         else {
-          parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
+          parentObjAsStrNew += parentObjAsStr ? `.${dataKey}` : dataKey;
         }
 
         const parentObjSplit = parentObjAsStrNew.split('.');
@@ -461,17 +461,42 @@ COLLECTORS: {
         ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
       }
 
-      // Clone args object for recursion deeper into dataObj.
-      const argsDeeper = {
-        dataKeys_: dataKeys,
-        dataObjShallowItr: dataObjDeeperItr,
-        dataObjShallowItrn: dataObjDeeperItrn,
-        dataObj: dataObjItem,
-        parentObjAsStr: parentObjAsStrNew,
-        partialShort
-      };
+      const _this = this;
 
-      ({dataKeys} = dataKeysCollect(argsDeeper)); // eslint-disable-line no-use-before-define
+      ({dataKeys} = Object.keys(dataObjItem).reduce(
+        (dataStructures, dataKey) => {
+          let {
+            dataKeys,
+            dataObj,
+            parentObjAsStr,
+            partialShort
+          } = dataStructures;
+
+          ({dataKeys} = dataKeysCollect.call( // eslint-disable-line no-use-before-define
+            _this,
+            {
+              dataKey,
+              dataKeys,
+              dataObj,
+              parentObjAsStr,
+              partialShort
+            }
+          ));
+
+          return {
+            dataKeys,
+            dataObj,
+            parentObjAsStr,
+            partialShort
+          };
+        },
+        {
+          dataKeys,
+          dataObj: dataObjItem,
+          parentObjAsStr: parentObjAsStrNew,
+          partialShort
+        }
+      ));
     }
 
     return {dataKeys};
@@ -523,29 +548,22 @@ COLLECTORS: {
 
   var dataKeysCollect = function (args) {
     const {
-      dataKeys_,
-      //dataObjShallowItr, // For debugging.
-      dataObjShallowItrn,
+      dataKey,
       dataObj,
       parentObjAsStr,
       partialShort
     } = args;
+    let {
+      dataKeys
+    } = args;
 
-    let dataKeys = dataKeys_;
-
-    if (dataObjShallowItrn.done) {
-      return {dataKeys};
-    }
-
-    const key = dataObjShallowItrn.value;
-
-    if (!dataKeys.includes(key) && !parentObjAsStr) {
-      dataKeys.push(key);
+    if (!dataKeys.includes(dataKey) && !parentObjAsStr) {
+      dataKeys.push(dataKey);
     }
 
     // Recurse deeper into dataObj if this property is an instance of Object.
-    if (dataObj[key] instanceof Object) {
-      const dataObjNestedObj = dataObj[key];
+    if (dataObj[dataKey] instanceof Object) {
+      const dataObjNestedObj = dataObj[dataKey];
 
       if (Array.isArray(dataObjNestedObj)) {
         const dataObjNestedObjItr = dataObjNestedObj[Symbol.iterator]();
@@ -558,7 +576,7 @@ COLLECTORS: {
           dataKeysGetFromDataObj,
           {
             dataObjNestedObj,
-            key,
+            dataKey,
             parentObjAsStr,
             partialShort
           }
@@ -570,7 +588,7 @@ COLLECTORS: {
           {dataKeys},
           {
             dataObjNestedObj,
-            key,
+            dataKey,
             parentObjAsStr,
             partialShort
           }
@@ -580,52 +598,54 @@ COLLECTORS: {
     else {
       const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
 
-      if (!parentObjSplit.includes(key)) {
-        parentObjSplit.push(key);
+      if (!parentObjSplit.includes(dataKey)) {
+        parentObjSplit.push(dataKey);
       }
 
       ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
     }
 
-    args.dataKeys_ = dataKeys;
-    args.dataObjShallowItrn = args.dataObjShallowItr.next();
-
-    return dataKeysCollect(args);
+    return args;
   };
 }
 
 PARAMS_APPLIER: {
   // Declaring with const effectively makes this function private to this block.
   const dataKeysGetFromParamsObj = function (paramsObj, dataKeys_) {
-    const paramsObjKeys = Object.keys(paramsObj);
+    const _this = this;
     let {dataKeys} = dataKeys_;
 
-    if (paramsObjKeys.length) {
-      let paramsObjShallowItr;
-      let paramsObjShallowItrn;
+    ({dataKeys} = Object.keys(paramsObj).reduce(
+      (dataStructures, dataKey) => {
+        let {
+          dataKeys,
+          dataObj,
+          parentObjAsStr
+        } = dataStructures;
 
-      if (paramsObjKeys.length === 1) {
-        paramsObjShallowItr = {
-          next: () => {return {done: true};}
-        };
-        paramsObjShallowItrn = {
-          value: paramsObjKeys[0]
-        };
-      }
-      else {
-        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-        paramsObjShallowItrn = paramsObjShallowItr.next();
-      }
+        ({dataKeys} = dataKeysCollect.call(
+          _this,
+          {
+            dataKey,
+            dataKeys,
+            dataObj,
+            parentObjAsStr
+          }
+        ));
 
-      ({dataKeys} = dataKeysCollect({
-        dataKeys_: dataKeys,
-        dataObjShallowItr: paramsObjShallowItr,
-        dataObjShallowItrn: paramsObjShallowItrn,
+        return {
+          dataKeys,
+          dataObj,
+          parentObjAsStr
+        };
+      },
+      {
+        dataKeys,
         dataObj: paramsObj,
         parentObjAsStr: '',
         //partialShort // For debugging.
-      }));
-    }
+      }
+    ));
 
     return {dataKeys};
   };
@@ -925,35 +945,40 @@ PARAMS_APPLIER: {
       paramsObj.styleModifier = styleModClasses;
     }
 
-    const paramsObjKeys = Object.keys(paramsObj);
+    const _this = this;
     let dataKeys;
 
-    if (paramsObjKeys.length) {
-      let paramsObjShallowItr;
-      let paramsObjShallowItrn;
+    ({dataKeys} = Object.keys(paramsObj).reduce(
+      (dataStructures, dataKey) => {
+        let {
+          dataKeys,
+          dataObj,
+          parentObjAsStr
+        } = dataStructures;
 
-      if (paramsObjKeys.length === 1) {
-        paramsObjShallowItr = {
-          next: () => {return {done: true};}
-        };
-        paramsObjShallowItrn = {
-          value: paramsObjKeys[0]
-        };
-      }
-      else {
-        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-        paramsObjShallowItrn = paramsObjShallowItr.next();
-      }
+        ({dataKeys} = dataKeysCollect.call(
+          _this,
+          {
+            dataKey,
+            dataKeys,
+            dataObj,
+            parentObjAsStr
+          }
+        ));
 
-      ({dataKeys} = dataKeysCollect({
-        dataKeys_: [],
-        dataObjShallowItr: paramsObjShallowItr,
-        dataObjShallowItrn: paramsObjShallowItrn,
+        return {
+          dataKeys,
+          dataObj,
+          parentObjAsStr
+        };
+      },
+      {
+        dataKeys: [],
         dataObj: paramsObj,
         parentObjAsStr: '',
         //partialShort // For debugging.
-      }));
-    }
+      }
+    ));
 
     const paramKeys = dataKeys;
     const partialText_ = partials[partialShort] || '';
@@ -1048,41 +1073,43 @@ METHODS: {
       return [];
     }
 
-    const contextObjKeys = Object.keys(context);
+    const _this = this;
     let dataKeys = [];
 
-    if (contextObjKeys.length) {
-      let dataObjShallowItr;
-      let dataObjShallowItrn;
+    ({dataKeys} = Object.keys(context).reduce(
+      (dataStructures, dataKey) => {
+        let {
+          dataKeys,
+          dataObj,
+          parentObjAsStr
+        } = dataStructures;
 
-      if (contextObjKeys.length === 1) {
-        dataObjShallowItr = {
-          next: () => {return {done: true};}
-        };
-        dataObjShallowItrn = {
-          value: contextObjKeys[0]
-        };
-      }
-      else {
-        dataObjShallowItr = contextObjKeys[Symbol.iterator]();
-        dataObjShallowItrn = dataObjShallowItr.next();
-      }
+        ({dataKeys} = dataKeysCollect.call(
+          _this,
+          {
+            dataKey,
+            dataKeys,
+            dataObj,
+            parentObjAsStr
+          }
+        ));
 
-      ({dataKeys} = dataKeysCollect({
-        dataKeys_: [],
-        dataObjShallowItr,
-        dataObjShallowItrn,
+        return {
+          dataKeys,
+          dataObj,
+          parentObjAsStr
+        };
+      },
+      {
+        dataKeys,
         dataObj: context,
         parentObjAsStr: '',
-      }));
-    }
+      }
+    ));
 
     let contextKeys = [];
 
     if (dataKeys.length) {
-      const _this = this;
-      contextKeys = dataKeys.slice();
-
       ({contextKeys} = dataKeys.reduce(
         (dataStructures, contextKey) => {
           let {contextKeys} = dataStructures;
@@ -1098,7 +1125,7 @@ METHODS: {
           return {contextKeys};
         },
         {
-          contextKeys
+          contextKeys: dataKeys.slice()
         }
       ));
     }
