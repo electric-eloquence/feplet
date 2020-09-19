@@ -455,30 +455,20 @@ COLLECTORS: {
   };
 
   var contextKeysCollect = function contextKeysCollect(args) {
-    var contextKeys_ = args.contextKeys_,
-        contextKeysItr = args.contextKeysItr,
-        contextKeysItrn = args.contextKeysItrn;
-
-    if (contextKeysItrn.done) {
-      return {
-        contextKeys: contextKeys_
-      };
-    }
-
-    var contextKey = contextKeysItrn.value;
+    var contextKey = args.contextKey,
+        contextKeys = args.contextKeys;
     var contextKeySplit = contextKey.split('.');
 
     while (contextKeySplit.length > 1) {
       contextKeySplit.shift();
       var contextKeyNew = contextKeySplit.join('.');
 
-      if (!contextKeys_.includes(contextKeyNew)) {
-        contextKeys_.push(contextKeyNew);
+      if (!contextKeys.includes(contextKeyNew)) {
+        contextKeys.push(contextKeyNew);
       }
     }
 
-    args.contextKeysItrn = contextKeysItr.next();
-    return contextKeysCollect(args);
+    return args;
   };
 
   var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
@@ -1047,33 +1037,27 @@ METHODS: {
     var contextKeys = [];
 
     if (dataKeys.length) {
-      var contextKeysItr;
-      var contextKeysItrn;
+      var _this = this;
 
-      if (dataKeys.length === 1) {
-        contextKeysItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
+      contextKeys = dataKeys.slice();
+
+      var _dataKeys$reduce = dataKeys.reduce(function (dataStructures, contextKey) {
+        var contextKeys = dataStructures.contextKeys;
+
+        var _contextKeysCollect$c = contextKeysCollect.call(_this, {
+          contextKey: contextKey,
+          contextKeys: contextKeys
+        });
+
+        contextKeys = _contextKeysCollect$c.contextKeys;
+        return {
+          contextKeys: contextKeys
         };
-        contextKeysItrn = {
-          value: dataKeys[0]
-        };
-      } else {
-        contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
-
-        contextKeysItrn = contextKeysItr.next();
-      }
-
-      var _contextKeysCollect = contextKeysCollect({
-        contextKeys_: dataKeys,
-        contextKeysItr: contextKeysItr,
-        contextKeysItrn: contextKeysItrn
+      }, {
+        contextKeys: contextKeys
       });
 
-      contextKeys = _contextKeysCollect.contextKeys;
+      contextKeys = _dataKeys$reduce.contextKeys;
     }
 
     return contextKeys;

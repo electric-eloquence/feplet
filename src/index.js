@@ -479,18 +479,10 @@ COLLECTORS: {
 
   var contextKeysCollect = function (args) {
     const {
-      contextKeys_,
-      contextKeysItr,
-      contextKeysItrn
+      contextKey,
+      contextKeys
     } = args;
 
-    if (contextKeysItrn.done) {
-      return {
-        contextKeys: contextKeys_
-      };
-    }
-
-    const contextKey = contextKeysItrn.value;
     const contextKeySplit = contextKey.split('.');
 
     while (contextKeySplit.length > 1) {
@@ -498,14 +490,12 @@ COLLECTORS: {
 
       const contextKeyNew = contextKeySplit.join('.');
 
-      if (!contextKeys_.includes(contextKeyNew)) {
-        contextKeys_.push(contextKeyNew);
+      if (!contextKeys.includes(contextKeyNew)) {
+        contextKeys.push(contextKeyNew);
       }
     }
 
-    args.contextKeysItrn = contextKeysItr.next();
-
-    return contextKeysCollect(args);
+    return args;
   };
 
   var dataKeysWithDotNotationAdd = function (args) {
@@ -1090,27 +1080,27 @@ METHODS: {
     let contextKeys = [];
 
     if (dataKeys.length) {
-      let contextKeysItr;
-      let contextKeysItrn;
+      const _this = this;
+      contextKeys = dataKeys.slice();
 
-      if (dataKeys.length === 1) {
-        contextKeysItr = {
-          next: () => {return {done: true};}
-        };
-        contextKeysItrn = {
-          value: dataKeys[0]
-        };
-      }
-      else {
-        contextKeysItr = dataKeys.slice()[Symbol.iterator](); // Cloned so .next() doesn't recompute added values.
-        contextKeysItrn = contextKeysItr.next();
-      }
+      ({contextKeys} = dataKeys.reduce(
+        (dataStructures, contextKey) => {
+          let {contextKeys} = dataStructures;
 
-      ({contextKeys} = contextKeysCollect({
-        contextKeys_: dataKeys,
-        contextKeysItr,
-        contextKeysItrn
-      }));
+          ({contextKeys} = contextKeysCollect.call(
+            _this,
+            {
+              contextKey,
+              contextKeys
+            }
+          ));
+
+          return {contextKeys};
+        },
+        {
+          contextKeys
+        }
+      ));
     }
 
     return contextKeys;
