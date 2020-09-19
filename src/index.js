@@ -22,172 +22,26 @@ const jsonEval = require('json-eval');
 
 const paramRegex = /\([\S\s]*\)/;
 
-COLLECTORS: {
-  var contextKeysCollect = function (args) {
-    const {
-      contextKeys_,
-      contextKeysItr,
-      contextKeysItrn
-    } = args;
-
-    if (contextKeysItrn.done) {
-      return {
-        contextKeys: contextKeys_
-      };
-    }
-
-    const contextKey = contextKeysItrn.value;
-    const contextKeySplit = contextKey.split('.');
-
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-
-      const contextKeyNew = contextKeySplit.join('.');
-
-      if (!contextKeys_.includes(contextKeyNew)) {
-        contextKeys_.push(contextKeyNew);
-      }
-    }
-
-    args.contextKeysItrn = contextKeysItr.next();
-
-    return contextKeysCollect(args);
-  };
-
-  var dataKeysWithDotNotationAdd = function (args) {
-    const {
-      dataKeys,
-      parentObjSplit
-    } = args;
-
-    let i = 0;
-    let itemNext;
-    let dataKey = parentObjSplit[i];
-
-    // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
-    // loop at index 1.
-    while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
-      dataKey += `.${itemNext}`;
-
-      if (!dataKeys.includes(dataKey)) {
-        dataKeys.push(dataKey);
-      }
-    }
-
-    return {dataKeys};
-  };
-
-  var dataKeysCollect = function (args) {
-    const {
-      dataKeys_,
-      //dataObjShallowItr, // For debugging.
-      dataObjShallowItrn,
-      dataObj,
-      parentObjAsStr,
-      //partialShort // For debugging.
-    } = args;
-
-    let dataKeys = dataKeys_;
-
-    if (dataObjShallowItrn.done) {
-      return {dataKeys};
-    }
-
-    const key = dataObjShallowItrn.value;
-
-    if (!dataKeys.includes(key) && !parentObjAsStr) {
-      dataKeys.push(key);
-    }
-
-    // Recurse deeper into dataObj if this property is an instance of Object.
-    if (dataObj[key] instanceof Object) {
-      const dataObjNestedObj = dataObj[key];
-      let l = 1;
-
-      if (Array.isArray(dataObjNestedObj)) {
-        l = dataObjNestedObj.length;
-      }
-
-      for (let i = 0; i < l; i++) {
-        let dataObjItem;
-
-        if (Array.isArray(dataObjNestedObj)) {
-          // Recursion into an Array.
-          dataObjItem = dataObjNestedObj[i];
-        }
-        else {
-          // Recursion into a plain Object.
-          dataObjItem = dataObjNestedObj;
-        }
-
-        if (dataObjItem && dataObjItem.constructor === Object) {
-          const dataObjItemKeys = Object.keys(dataObjItem);
-
-          if (dataObjItemKeys.length) {
-            let dataObjDeeperItr;
-            let dataObjDeeperItrn;
-
-            if (dataObjItemKeys.length === 1) {
-              dataObjDeeperItr = {
-                next: () => {return {done: true};}
-              };
-              dataObjDeeperItrn = {
-                value: dataObjItemKeys[0]
-              };
-            }
-            else {
-              dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
-              dataObjDeeperItrn = dataObjDeeperItr.next();
-            }
-
-            let parentObjAsStrNew = parentObjAsStr;
-
-            if (dataObjDeeperItrn.value) {
-              if (Array.isArray(dataObjNestedObj)) {
-                parentObjAsStrNew += parentObjAsStr ? `.${key}.${i}` : `${key}.${i}`;
-              }
-              else {
-                parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
-              }
-
-              const parentObjSplit = parentObjAsStrNew.split('.');
-
-              ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
-            }
-
-            // Clone args object for recursion deeper into dataObj.
-            const argsDeeper = {
-              dataKeys_: dataKeys,
-              dataObjShallowItr: dataObjDeeperItr,
-              dataObjShallowItrn: dataObjDeeperItrn,
-              dataObj: dataObjItem,
-              parentObjAsStr: parentObjAsStrNew,
-              partialShort: args.partialShort
-            };
-
-            ({dataKeys} = dataKeysCollect(argsDeeper));
-          }
-        }
-      }
-    }
-    else {
-      const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
-
-      if (!parentObjSplit.includes(key)) {
-        parentObjSplit.push(key);
-      }
-
-      ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
-    }
-
-    args.dataKeys_ = dataKeys;
-    args.dataObjShallowItrn = args.dataObjShallowItr.next();
-
-    return dataKeysCollect(args);
-  };
-}
-
 HELPERS: {
+  var dataAppendViaIterator =
+  function (iterator, iteration, dataStructures_, dataAppendFunction, addlArgs = {}, incrementValue = 0) {
+    if (iteration.done) {
+      return dataStructures_;
+    }
+
+    const value = iteration.value;
+    const dataStructures = dataAppendFunction(value, dataStructures_, addlArgs, incrementValue);
+
+    return dataAppendViaIterator(
+      iterator,
+      iterator.next(),
+      dataStructures,
+      dataAppendFunction,
+      addlArgs,
+      incrementValue + 1
+    );
+  };
+
   var paramsObjDotNotationParse = function (args) {
     const {
       paramsObjPart,
@@ -220,6 +74,45 @@ HELPERS: {
       // Ok to return null because we only need keys, not values.
       return null;
     }
+  };
+
+  var partialIteratorRegister = function (partialKey, dataStructures, addlArgs) {
+    const {
+      partials,
+      partialsComp
+    } = dataStructures;
+    const {options} = addlArgs;
+
+    return registerPartial( // eslint-disable-line no-use-before-define
+      partialKey,
+      partials[partialKey],
+      null,
+      partials,
+      partialsComp,
+      options
+    );
+  };
+
+  var partialParamsIteratorPreProcess = function (partialKey, dataStructures, addlArgs) {
+    const {
+      contextKeys,
+      partials,
+      partialsComp
+    } = dataStructures;
+    const {
+      context,
+      options
+    } = addlArgs;
+
+    return preProcessPartialParams( // eslint-disable-line no-use-before-define
+      partials[partialKey],
+      partialsComp[partialKey].compilation,
+      partials,
+      partialsComp,
+      contextKeys,
+      context,
+      options
+    );
   };
 
   var styleModifierExtract = function (args) {
@@ -359,7 +252,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0002';
-        //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
       }
 
       switch (parseObj.tag) {
@@ -397,7 +290,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0003';
-        //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
       }
 
       return {
@@ -463,7 +356,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0002';
-        //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
       }
 
       partialText += '/';
@@ -486,7 +379,7 @@ HELPERS: {
 
       while (i--) {
         partialText += '\u0003';
-        //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
       }
 
       return {
@@ -561,7 +454,231 @@ HELPERS: {
   }
 }
 
+COLLECTORS: {
+  // Declaring with const effectively makes this function private to this block.
+  const dataKeysGetFromDataObj = function (dataObjItem, dataKeys_, addlArgs, incrementValue = 0) {
+    const {
+      dataObjNestedObj,
+      key,
+      parentObjAsStr,
+      partialShort
+    } = addlArgs;
+
+    const dataObjItemKeys = Object.keys(dataObjItem);
+    let {dataKeys} = dataKeys_;
+
+    if (dataObjItemKeys.length) {
+      let dataObjDeeperItr;
+      let dataObjDeeperItrn;
+
+      if (dataObjItemKeys.length === 1) {
+        dataObjDeeperItr = {
+          next: () => {return {done: true};}
+        };
+        dataObjDeeperItrn = {
+          value: dataObjItemKeys[0]
+        };
+      }
+      else {
+        dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
+        dataObjDeeperItrn = dataObjDeeperItr.next();
+      }
+
+      let parentObjAsStrNew = parentObjAsStr;
+
+      if (dataObjDeeperItrn.value) {
+        if (Array.isArray(dataObjNestedObj)) {
+          parentObjAsStrNew += parentObjAsStr ? `.${key}.${incrementValue}` : `${key}.${incrementValue}`;
+        }
+        else {
+          parentObjAsStrNew += parentObjAsStr ? `.${key}` : key;
+        }
+
+        const parentObjSplit = parentObjAsStrNew.split('.');
+
+        // eslint-disable-next-line no-use-before-define
+        ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
+      }
+
+      // Clone args object for recursion deeper into dataObj.
+      const argsDeeper = {
+        dataKeys_: dataKeys,
+        dataObjShallowItr: dataObjDeeperItr,
+        dataObjShallowItrn: dataObjDeeperItrn,
+        dataObj: dataObjItem,
+        parentObjAsStr: parentObjAsStrNew,
+        partialShort
+      };
+
+      ({dataKeys} = dataKeysCollect(argsDeeper)); // eslint-disable-line no-use-before-define
+    }
+
+    return {dataKeys};
+  };
+
+  var contextKeysCollect = function (args) {
+    const {
+      contextKeys_,
+      contextKeysItr,
+      contextKeysItrn
+    } = args;
+
+    if (contextKeysItrn.done) {
+      return {
+        contextKeys: contextKeys_
+      };
+    }
+
+    const contextKey = contextKeysItrn.value;
+    const contextKeySplit = contextKey.split('.');
+
+    while (contextKeySplit.length > 1) {
+      contextKeySplit.shift();
+
+      const contextKeyNew = contextKeySplit.join('.');
+
+      if (!contextKeys_.includes(contextKeyNew)) {
+        contextKeys_.push(contextKeyNew);
+      }
+    }
+
+    args.contextKeysItrn = contextKeysItr.next();
+
+    return contextKeysCollect(args);
+  };
+
+  var dataKeysWithDotNotationAdd = function (args) {
+    const {
+      dataKeys,
+      parentObjSplit
+    } = args;
+
+    let i = 0;
+    let itemNext;
+    let dataKey = parentObjSplit[i];
+
+    // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
+    // loop at index 1.
+    while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
+      dataKey += `.${itemNext}`;
+
+      if (!dataKeys.includes(dataKey)) {
+        dataKeys.push(dataKey);
+      }
+    }
+
+    return {dataKeys};
+  };
+
+  var dataKeysCollect = function (args) {
+    const {
+      dataKeys_,
+      //dataObjShallowItr, // For debugging.
+      dataObjShallowItrn,
+      dataObj,
+      parentObjAsStr,
+      partialShort
+    } = args;
+
+    let dataKeys = dataKeys_;
+
+    if (dataObjShallowItrn.done) {
+      return {dataKeys};
+    }
+
+    const key = dataObjShallowItrn.value;
+
+    if (!dataKeys.includes(key) && !parentObjAsStr) {
+      dataKeys.push(key);
+    }
+
+    // Recurse deeper into dataObj if this property is an instance of Object.
+    if (dataObj[key] instanceof Object) {
+      const dataObjNestedObj = dataObj[key];
+
+      if (Array.isArray(dataObjNestedObj)) {
+        const dataObjNestedObjItr = dataObjNestedObj[Symbol.iterator]();
+        const dataObjNestedObjItrn = dataObjNestedObjItr.next();
+
+        ({dataKeys} = dataAppendViaIterator( // eslint-disable-line no-use-before-define
+          dataObjNestedObjItr,
+          dataObjNestedObjItrn,
+          {dataKeys},
+          dataKeysGetFromDataObj,
+          {
+            dataObjNestedObj,
+            key,
+            parentObjAsStr,
+            partialShort
+          }
+        ));
+      }
+      else {
+        ({dataKeys} = dataKeysGetFromDataObj(
+          dataObjNestedObj,
+          {dataKeys},
+          {
+            dataObjNestedObj,
+            key,
+            parentObjAsStr,
+            partialShort
+          }
+        ));
+      }
+    }
+    else {
+      const parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
+
+      if (!parentObjSplit.includes(key)) {
+        parentObjSplit.push(key);
+      }
+
+      ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
+    }
+
+    args.dataKeys_ = dataKeys;
+    args.dataObjShallowItrn = args.dataObjShallowItr.next();
+
+    return dataKeysCollect(args);
+  };
+}
+
 PARAMS_APPLIER: {
+  // Declaring with const effectively makes this function private to this block.
+  const dataKeysGetFromParamsObj = function (paramsObj, dataKeys_) {
+    const paramsObjKeys = Object.keys(paramsObj);
+    let {dataKeys} = dataKeys_;
+
+    if (paramsObjKeys.length) {
+      let paramsObjShallowItr;
+      let paramsObjShallowItrn;
+
+      if (paramsObjKeys.length === 1) {
+        paramsObjShallowItr = {
+          next: () => {return {done: true};}
+        };
+        paramsObjShallowItrn = {
+          value: paramsObjKeys[0]
+        };
+      }
+      else {
+        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
+        paramsObjShallowItrn = paramsObjShallowItr.next();
+      }
+
+      ({dataKeys} = dataKeysCollect({
+        dataKeys_: dataKeys,
+        dataObjShallowItr: paramsObjShallowItr,
+        dataObjShallowItrn: paramsObjShallowItrn,
+        dataObj: paramsObj,
+        parentObjAsStr: '',
+        //partialShort // For debugging.
+      }));
+    }
+
+    return {dataKeys};
+  };
+
   var paramsApplyByKeyArrays = function (args) {
     const {
       contextKeys,
@@ -596,19 +713,21 @@ PARAMS_APPLIER: {
     }
 
     if (!delimiterUnicodes_ && otag && ctag) {
-      delimiterUnicodes = '';
+      const delimiterOpen = otag.split('').reduce((acc) => {
+        let retVal = acc + '\u0002';
+        //retVal = retVal.slice(0, -1) + '֍'; // For debugging.
 
-      for (let i = 0, l = otag.length; i < l; i++) {
-        delimiterUnicodes += '\u0002';
-        //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
-      }
+        return retVal;
+      }, '');
 
-      delimiterUnicodes += ' ';
+      const delimiterClose = ctag.split('').reduce((acc) => {
+        let retVal = acc + '\u0003';
+        //retVal = retVal.slice(0, -1) + '֎'; // For debugging.
 
-      for (let i = 0, l = ctag.length; i < l; i++) {
-        delimiterUnicodes += '\u0003';
-        //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
-      }
+        return retVal;
+      }, '');
+
+      delimiterUnicodes = delimiterOpen + ' ' + delimiterClose;
     }
 
     return {
@@ -653,52 +772,25 @@ PARAMS_APPLIER: {
       let paramsObjNew;
 
       if (paramsWithDotNotation instanceof Object) {
-        let l = 1;
-
         if (Array.isArray(paramsWithDotNotation)) {
-          l = paramsWithDotNotation.length;
+          const paramsWithDotNotationItr = paramsWithDotNotation[Symbol.iterator]();
+          const paramsWithDotNotationItrn = paramsWithDotNotationItr.next();
+
+          ({dataKeys} = dataAppendViaIterator(
+            paramsWithDotNotationItr,
+            paramsWithDotNotationItrn,
+            {dataKeys},
+            dataKeysGetFromParamsObj
+          ));
+        }
+        else {
+          ({dataKeys} = dataKeysGetFromParamsObj(
+            paramsWithDotNotation,
+            {dataKeys}
+          ));
         }
 
-        for (let i = 0; i < l; i++) {
-          if (Array.isArray(paramsWithDotNotation)) {
-            // Recursion into an Array.
-            paramsObjNew = paramsWithDotNotation[i];
-          }
-          else {
-            // Recursion into a plain Object.
-            paramsObjNew = paramsWithDotNotation;
-          }
-
-          const paramsObjKeys = Object.keys(paramsObjNew);
-
-          if (paramsObjKeys.length) {
-            let paramsObjShallowItr;
-            let paramsObjShallowItrn;
-
-            if (paramsObjKeys.length === 1) {
-              paramsObjShallowItr = {
-                next: () => {return {done: true};}
-              };
-              paramsObjShallowItrn = {
-                value: paramsObjKeys[0]
-              };
-            }
-            else {
-              paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-              paramsObjShallowItrn = paramsObjShallowItr.next();
-            }
-
-            ({dataKeys} = dataKeysCollect({
-              dataKeys_: [],
-              dataObjShallowItr: paramsObjShallowItr,
-              dataObjShallowItrn: paramsObjShallowItrn,
-              dataObj: paramsObjNew,
-              parentObjAsStr: '',
-              //partialShort // For debugging.
-            }));
-          }
-        }
-
+        paramsObjNew = paramsWithDotNotation;
         paramKeysNew = paramKeys.concat(dataKeys);
       }
       else {
@@ -930,22 +1022,6 @@ PARAMS_APPLIER: {
     if (partialsComp[partialShort].parseArr) {
       partialParseArr = partialsComp[partialShort].parseArr;
     }
-    // DEPRECATED.
-    // TODO: This accommodates old usage of partialsComp. To be removed.
-    else {
-      partialParseArr = hogan.parse(
-        hogan.scan(
-          partials[partialShort],
-          options.delimiters
-        ),
-        partials[partialShort],
-        options
-      );
-      partialsComp[partialShort] = {
-        parseArr: partialParseArr,
-        compilation: partialsComp[partialShort]
-      };
-    }
 
     if (partialParseArr.length) {
       let partialParseItr;
@@ -1098,16 +1174,16 @@ METHODS: {
 
     // First, check if we still need to preprocess contextKeys because .render() was called statically.
     if (typeof contextKeys === 'undefined') {
-      let hasParam = false;
+      const hasParam = partialsKeys.reduce((acc, partialsKey) => {
+        const partialFull = compilation.partials[partialsKey].name;
 
-      for (let i = 0, l = partialsKeys.length; i < l; i++) {
-        const partialFull = compilation.partials[partialsKeys[i]].name;
-        hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
-
-        if (hasParam) {
-          break;
+        if (paramRegex.test(partialFull) || partialFull.includes(':')) {
+          return acc + 1;
         }
-      }
+        else {
+          return acc;
+        }
+      }, 0);
 
       if (hasParam) {
         contextKeys = _contextKeys = preProcessContextKeys(context);
@@ -1168,42 +1244,27 @@ METHODS: {
     let partialsComp = partialsComp_ || this.partialsComp || {};
 
     const partialsKeys = Object.keys(partials);
+    const partialsKeysItr = partialsKeys[Symbol.iterator]();
+    const partialsKeysItrn = partialsKeysItr.next();
 
-    // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
-    for (let i = 0, l = partialsKeys.length; i < l; i++) {
-      const partialKey = partialsKeys[i];
-
-      // DEPRECATED.
-      // TODO: This accommodates old usage of partialsComp. To be removed.
-      if (!partialsComp[partialKey].compilation) {
-        const parseArr = hogan.parse(
-          hogan.scan(
-            partials[partialKey],
-            options.delimiters
-          ),
-          partials[partialKey],
-          options
-        );
-        partialsComp[partialKey] = {
-          parseArr,
-          compilation: partialsComp[partialKey]
-        };
-      }
-
-      ({
-        _contextKeys,
+    ({
+      _contextKeys,
+      partials,
+      partialsComp
+    } = dataAppendViaIterator(
+      partialsKeysItr,
+      partialsKeysItrn,
+      {
+        contextKeys,
         partials,
         partialsComp
-      } = preProcessPartialParams(
-        partials[partialKey],
-        partialsComp[partialKey].compilation,
-        partials,
-        partialsComp,
-        contextKeys,
+      },
+      partialParamsIteratorPreProcess,
+      {
         context,
         options
-      ));
-    }
+      }
+    ));
 
     if (_contextKeys) {
       contextKeys = _contextKeys;
@@ -1259,19 +1320,24 @@ METHODS: {
     const options = options_ || this.options || {};
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
-    let partialsKeys = Object.keys(partials);
 
-    // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
-    for (let i = 0, l = partialsKeys.length; i < l; i++) {
-      const partialKey = partialsKeys[i];
+    const partialsKeys = Object.keys(partials);
+    const partialsKeysItr = partialsKeys[Symbol.iterator]();
+    const partialsKeysItrn = partialsKeysItr.next();
 
-      if (!partialsComp[partialKey]) {
-        ({
-          partials,
-          partialsComp
-        } = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp, options));
-      }
-    }
+    ({
+      partials,
+      partialsComp
+    } = dataAppendViaIterator(
+      partialsKeysItr,
+      partialsKeysItrn,
+      {
+        partials,
+        partialsComp
+      },
+      partialIteratorRegister,
+      {options}
+    ));
 
     let compilation;
 

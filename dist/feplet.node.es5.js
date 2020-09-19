@@ -22,175 +22,20 @@ var jsonEval = require('json-eval');
 
 var paramRegex = /\([\S\s]*\)/;
 
-COLLECTORS: {
-  var contextKeysCollect = function contextKeysCollect(args) {
-    var contextKeys_ = args.contextKeys_,
-        contextKeysItr = args.contextKeysItr,
-        contextKeysItrn = args.contextKeysItrn;
-
-    if (contextKeysItrn.done) {
-      return {
-        contextKeys: contextKeys_
-      };
-    }
-
-    var contextKey = contextKeysItrn.value;
-    var contextKeySplit = contextKey.split('.');
-
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-      var contextKeyNew = contextKeySplit.join('.');
-
-      if (!contextKeys_.includes(contextKeyNew)) {
-        contextKeys_.push(contextKeyNew);
-      }
-    }
-
-    args.contextKeysItrn = contextKeysItr.next();
-    return contextKeysCollect(args);
-  };
-
-  var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
-    var dataKeys = args.dataKeys,
-        parentObjSplit = args.parentObjSplit;
-    var i = 0;
-    var itemNext;
-    var dataKey = parentObjSplit[i]; // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
-    // loop at index 1.
-
-    while (itemNext = parentObjSplit[++i]) {
-      // eslint-disable-line no-cond-assign
-      dataKey += ".".concat(itemNext);
-
-      if (!dataKeys.includes(dataKey)) {
-        dataKeys.push(dataKey);
-      }
-    }
-
-    return {
-      dataKeys: dataKeys
-    };
-  };
-
-  var dataKeysCollect = function dataKeysCollect(args) {
-    var dataKeys_ = args.dataKeys_,
-        dataObjShallowItrn = args.dataObjShallowItrn,
-        dataObj = args.dataObj,
-        parentObjAsStr = args.parentObjAsStr;
-    var dataKeys = dataKeys_;
-
-    if (dataObjShallowItrn.done) {
-      return {
-        dataKeys: dataKeys
-      };
-    }
-
-    var key = dataObjShallowItrn.value;
-
-    if (!dataKeys.includes(key) && !parentObjAsStr) {
-      dataKeys.push(key);
-    } // Recurse deeper into dataObj if this property is an instance of Object.
-
-
-    if (dataObj[key] instanceof Object) {
-      var dataObjNestedObj = dataObj[key];
-      var l = 1;
-
-      if (Array.isArray(dataObjNestedObj)) {
-        l = dataObjNestedObj.length;
-      }
-
-      for (var i = 0; i < l; i++) {
-        var dataObjItem = void 0;
-
-        if (Array.isArray(dataObjNestedObj)) {
-          // Recursion into an Array.
-          dataObjItem = dataObjNestedObj[i];
-        } else {
-          // Recursion into a plain Object.
-          dataObjItem = dataObjNestedObj;
-        }
-
-        if (dataObjItem && dataObjItem.constructor === Object) {
-          var dataObjItemKeys = Object.keys(dataObjItem);
-
-          if (dataObjItemKeys.length) {
-            var dataObjDeeperItr = void 0;
-            var dataObjDeeperItrn = void 0;
-
-            if (dataObjItemKeys.length === 1) {
-              dataObjDeeperItr = {
-                next: function next() {
-                  return {
-                    done: true
-                  };
-                }
-              };
-              dataObjDeeperItrn = {
-                value: dataObjItemKeys[0]
-              };
-            } else {
-              dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
-              dataObjDeeperItrn = dataObjDeeperItr.next();
-            }
-
-            var parentObjAsStrNew = parentObjAsStr;
-
-            if (dataObjDeeperItrn.value) {
-              if (Array.isArray(dataObjNestedObj)) {
-                parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(i) : "".concat(key, ".").concat(i);
-              } else {
-                parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key;
-              }
-
-              var parentObjSplit = parentObjAsStrNew.split('.');
-
-              var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
-                dataKeys: dataKeys,
-                parentObjSplit: parentObjSplit
-              });
-
-              dataKeys = _dataKeysWithDotNotat.dataKeys;
-            } // Clone args object for recursion deeper into dataObj.
-
-
-            var argsDeeper = {
-              dataKeys_: dataKeys,
-              dataObjShallowItr: dataObjDeeperItr,
-              dataObjShallowItrn: dataObjDeeperItrn,
-              dataObj: dataObjItem,
-              parentObjAsStr: parentObjAsStrNew,
-              partialShort: args.partialShort
-            };
-
-            var _dataKeysCollect = dataKeysCollect(argsDeeper);
-
-            dataKeys = _dataKeysCollect.dataKeys;
-          }
-        }
-      }
-    } else {
-      var _parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
-
-      if (!_parentObjSplit.includes(key)) {
-        _parentObjSplit.push(key);
-      }
-
-      var _dataKeysWithDotNotat2 = dataKeysWithDotNotationAdd({
-        dataKeys: dataKeys,
-        parentObjSplit: _parentObjSplit
-      });
-
-      dataKeys = _dataKeysWithDotNotat2.dataKeys;
-    }
-
-    args.dataKeys_ = dataKeys;
-    args.dataObjShallowItrn = args.dataObjShallowItr.next();
-    return dataKeysCollect(args);
-  };
-}
-
 HELPERS: {
+  var dataAppendViaIterator = function dataAppendViaIterator(iterator, iteration, dataStructures_, dataAppendFunction) {
+    var addlArgs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    var incrementValue = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+
+    if (iteration.done) {
+      return dataStructures_;
+    }
+
+    var value = iteration.value;
+    var dataStructures = dataAppendFunction(value, dataStructures_, addlArgs, incrementValue);
+    return dataAppendViaIterator(iterator, iterator.next(), dataStructures, dataAppendFunction, addlArgs, incrementValue + 1);
+  };
+
   var paramsObjDotNotationParse = function paramsObjDotNotationParse(args) {
     var paramsObjPart = args.paramsObjPart,
         parseObjTagName = args.parseObjTagName;
@@ -220,6 +65,24 @@ HELPERS: {
       // Ok to return null because we only need keys, not values.
       return null;
     }
+  };
+
+  var partialIteratorRegister = function partialIteratorRegister(partialKey, dataStructures, addlArgs) {
+    var partials = dataStructures.partials,
+        partialsComp = dataStructures.partialsComp;
+    var options = addlArgs.options;
+    return registerPartial( // eslint-disable-line no-use-before-define
+    partialKey, partials[partialKey], null, partials, partialsComp, options);
+  };
+
+  var partialParamsIteratorPreProcess = function partialParamsIteratorPreProcess(partialKey, dataStructures, addlArgs) {
+    var contextKeys = dataStructures.contextKeys,
+        partials = dataStructures.partials,
+        partialsComp = dataStructures.partialsComp;
+    var context = addlArgs.context,
+        options = addlArgs.options;
+    return preProcessPartialParams( // eslint-disable-line no-use-before-define
+    partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
   };
 
   var styleModifierExtract = function styleModifierExtract(args) {
@@ -345,7 +208,7 @@ HELPERS: {
       i = parseObj.otag.length;
 
       while (i--) {
-        partialText += "\x02"; //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        partialText += "\x02"; //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
       }
 
       switch (parseObj.tag) {
@@ -383,7 +246,7 @@ HELPERS: {
       i = parseObj.ctag.length;
 
       while (i--) {
-        partialText += "\x03"; //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        partialText += "\x03"; //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
       }
 
       return {
@@ -443,7 +306,7 @@ HELPERS: {
       i = parseObj.otag.length;
 
       while (i--) {
-        partialText += "\x02"; //partialText = partialText.slice(0, -1) + 'Ü'; // For debugging.
+        partialText += "\x02"; //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
       }
 
       partialText += '/';
@@ -465,7 +328,7 @@ HELPERS: {
       i = parseObj.ctag.length;
 
       while (i--) {
-        partialText += "\x03"; //partialText = partialText.slice(0, -1) + 'ü'; // For debugging.
+        partialText += "\x03"; //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
       }
 
       return {
@@ -539,7 +402,240 @@ HELPERS: {
   }
 }
 
+COLLECTORS: {
+  // Declaring with const effectively makes this function private to this block.
+  var dataKeysGetFromDataObj = function dataKeysGetFromDataObj(dataObjItem, dataKeys_, addlArgs) {
+    var incrementValue = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+    var dataObjNestedObj = addlArgs.dataObjNestedObj,
+        key = addlArgs.key,
+        parentObjAsStr = addlArgs.parentObjAsStr,
+        partialShort = addlArgs.partialShort;
+    var dataObjItemKeys = Object.keys(dataObjItem);
+    var dataKeys = dataKeys_.dataKeys;
+
+    if (dataObjItemKeys.length) {
+      var dataObjDeeperItr;
+      var dataObjDeeperItrn;
+
+      if (dataObjItemKeys.length === 1) {
+        dataObjDeeperItr = {
+          next: function next() {
+            return {
+              done: true
+            };
+          }
+        };
+        dataObjDeeperItrn = {
+          value: dataObjItemKeys[0]
+        };
+      } else {
+        dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
+        dataObjDeeperItrn = dataObjDeeperItr.next();
+      }
+
+      var parentObjAsStrNew = parentObjAsStr;
+
+      if (dataObjDeeperItrn.value) {
+        if (Array.isArray(dataObjNestedObj)) {
+          parentObjAsStrNew += parentObjAsStr ? ".".concat(key, ".").concat(incrementValue) : "".concat(key, ".").concat(incrementValue);
+        } else {
+          parentObjAsStrNew += parentObjAsStr ? ".".concat(key) : key;
+        }
+
+        var parentObjSplit = parentObjAsStrNew.split('.'); // eslint-disable-next-line no-use-before-define
+
+        var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
+          dataKeys: dataKeys,
+          parentObjSplit: parentObjSplit
+        });
+
+        dataKeys = _dataKeysWithDotNotat.dataKeys;
+      } // Clone args object for recursion deeper into dataObj.
+
+
+      var argsDeeper = {
+        dataKeys_: dataKeys,
+        dataObjShallowItr: dataObjDeeperItr,
+        dataObjShallowItrn: dataObjDeeperItrn,
+        dataObj: dataObjItem,
+        parentObjAsStr: parentObjAsStrNew,
+        partialShort: partialShort
+      };
+
+      var _dataKeysCollect = dataKeysCollect(argsDeeper);
+
+      dataKeys = _dataKeysCollect.dataKeys;
+    }
+
+    return {
+      dataKeys: dataKeys
+    };
+  };
+
+  var contextKeysCollect = function contextKeysCollect(args) {
+    var contextKeys_ = args.contextKeys_,
+        contextKeysItr = args.contextKeysItr,
+        contextKeysItrn = args.contextKeysItrn;
+
+    if (contextKeysItrn.done) {
+      return {
+        contextKeys: contextKeys_
+      };
+    }
+
+    var contextKey = contextKeysItrn.value;
+    var contextKeySplit = contextKey.split('.');
+
+    while (contextKeySplit.length > 1) {
+      contextKeySplit.shift();
+      var contextKeyNew = contextKeySplit.join('.');
+
+      if (!contextKeys_.includes(contextKeyNew)) {
+        contextKeys_.push(contextKeyNew);
+      }
+    }
+
+    args.contextKeysItrn = contextKeysItr.next();
+    return contextKeysCollect(args);
+  };
+
+  var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
+    var dataKeys = args.dataKeys,
+        parentObjSplit = args.parentObjSplit;
+    var i = 0;
+    var itemNext;
+    var dataKey = parentObjSplit[i]; // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
+    // loop at index 1.
+
+    while (itemNext = parentObjSplit[++i]) {
+      // eslint-disable-line no-cond-assign
+      dataKey += ".".concat(itemNext);
+
+      if (!dataKeys.includes(dataKey)) {
+        dataKeys.push(dataKey);
+      }
+    }
+
+    return {
+      dataKeys: dataKeys
+    };
+  };
+
+  var dataKeysCollect = function dataKeysCollect(args) {
+    var dataKeys_ = args.dataKeys_,
+        dataObjShallowItrn = args.dataObjShallowItrn,
+        dataObj = args.dataObj,
+        parentObjAsStr = args.parentObjAsStr,
+        partialShort = args.partialShort;
+    var dataKeys = dataKeys_;
+
+    if (dataObjShallowItrn.done) {
+      return {
+        dataKeys: dataKeys
+      };
+    }
+
+    var key = dataObjShallowItrn.value;
+
+    if (!dataKeys.includes(key) && !parentObjAsStr) {
+      dataKeys.push(key);
+    } // Recurse deeper into dataObj if this property is an instance of Object.
+
+
+    if (dataObj[key] instanceof Object) {
+      var dataObjNestedObj = dataObj[key];
+
+      if (Array.isArray(dataObjNestedObj)) {
+        var dataObjNestedObjItr = dataObjNestedObj[Symbol.iterator]();
+        var dataObjNestedObjItrn = dataObjNestedObjItr.next();
+
+        var _dataAppendViaIterato = dataAppendViaIterator( // eslint-disable-line no-use-before-define
+        dataObjNestedObjItr, dataObjNestedObjItrn, {
+          dataKeys: dataKeys
+        }, dataKeysGetFromDataObj, {
+          dataObjNestedObj: dataObjNestedObj,
+          key: key,
+          parentObjAsStr: parentObjAsStr,
+          partialShort: partialShort
+        });
+
+        dataKeys = _dataAppendViaIterato.dataKeys;
+      } else {
+        var _dataKeysGetFromDataO = dataKeysGetFromDataObj(dataObjNestedObj, {
+          dataKeys: dataKeys
+        }, {
+          dataObjNestedObj: dataObjNestedObj,
+          key: key,
+          parentObjAsStr: parentObjAsStr,
+          partialShort: partialShort
+        });
+
+        dataKeys = _dataKeysGetFromDataO.dataKeys;
+      }
+    } else {
+      var parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
+
+      if (!parentObjSplit.includes(key)) {
+        parentObjSplit.push(key);
+      }
+
+      var _dataKeysWithDotNotat2 = dataKeysWithDotNotationAdd({
+        dataKeys: dataKeys,
+        parentObjSplit: parentObjSplit
+      });
+
+      dataKeys = _dataKeysWithDotNotat2.dataKeys;
+    }
+
+    args.dataKeys_ = dataKeys;
+    args.dataObjShallowItrn = args.dataObjShallowItr.next();
+    return dataKeysCollect(args);
+  };
+}
+
 PARAMS_APPLIER: {
+  // Declaring with const effectively makes this function private to this block.
+  var dataKeysGetFromParamsObj = function dataKeysGetFromParamsObj(paramsObj, dataKeys_) {
+    var paramsObjKeys = Object.keys(paramsObj);
+    var dataKeys = dataKeys_.dataKeys;
+
+    if (paramsObjKeys.length) {
+      var paramsObjShallowItr;
+      var paramsObjShallowItrn;
+
+      if (paramsObjKeys.length === 1) {
+        paramsObjShallowItr = {
+          next: function next() {
+            return {
+              done: true
+            };
+          }
+        };
+        paramsObjShallowItrn = {
+          value: paramsObjKeys[0]
+        };
+      } else {
+        paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
+        paramsObjShallowItrn = paramsObjShallowItr.next();
+      }
+
+      var _dataKeysCollect2 = dataKeysCollect({
+        dataKeys_: dataKeys,
+        dataObjShallowItr: paramsObjShallowItr,
+        dataObjShallowItrn: paramsObjShallowItrn,
+        dataObj: paramsObj,
+        parentObjAsStr: '' //partialShort // For debugging.
+
+      });
+
+      dataKeys = _dataKeysCollect2.dataKeys;
+    }
+
+    return {
+      dataKeys: dataKeys
+    };
+  };
+
   var paramsApplyByKeyArrays = function paramsApplyByKeyArrays(args) {
     var contextKeys = args.contextKeys,
         delimiterUnicodes_ = args.delimiterUnicodes_,
@@ -568,17 +664,17 @@ PARAMS_APPLIER: {
     }
 
     if (!delimiterUnicodes_ && otag && ctag) {
-      delimiterUnicodes = '';
+      var delimiterOpen = otag.split('').reduce(function (acc) {
+        var retVal = acc + "\x02"; //retVal = retVal.slice(0, -1) + '֍'; // For debugging.
 
-      for (var i = 0, l = otag.length; i < l; i++) {
-        delimiterUnicodes += "\x02"; //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'Ü'; // For debugging.
-      }
+        return retVal;
+      }, '');
+      var delimiterClose = ctag.split('').reduce(function (acc) {
+        var retVal = acc + "\x03"; //retVal = retVal.slice(0, -1) + '֎'; // For debugging.
 
-      delimiterUnicodes += ' ';
-
-      for (var _i = 0, _l = ctag.length; _i < _l; _i++) {
-        delimiterUnicodes += "\x03"; //delimiterUnicodes = delimiterUnicodes.slice(0, -1) + 'ü'; // For debugging.
-      }
+        return retVal;
+      }, '');
+      delimiterUnicodes = delimiterOpen + ' ' + delimiterClose;
     }
 
     return {
@@ -619,56 +715,24 @@ PARAMS_APPLIER: {
       var paramsObjNew;
 
       if (paramsWithDotNotation instanceof Object) {
-        var l = 1;
-
         if (Array.isArray(paramsWithDotNotation)) {
-          l = paramsWithDotNotation.length;
+          var paramsWithDotNotationItr = paramsWithDotNotation[Symbol.iterator]();
+          var paramsWithDotNotationItrn = paramsWithDotNotationItr.next();
+
+          var _dataAppendViaIterato2 = dataAppendViaIterator(paramsWithDotNotationItr, paramsWithDotNotationItrn, {
+            dataKeys: dataKeys
+          }, dataKeysGetFromParamsObj);
+
+          dataKeys = _dataAppendViaIterato2.dataKeys;
+        } else {
+          var _dataKeysGetFromParam = dataKeysGetFromParamsObj(paramsWithDotNotation, {
+            dataKeys: dataKeys
+          });
+
+          dataKeys = _dataKeysGetFromParam.dataKeys;
         }
 
-        for (var i = 0; i < l; i++) {
-          if (Array.isArray(paramsWithDotNotation)) {
-            // Recursion into an Array.
-            paramsObjNew = paramsWithDotNotation[i];
-          } else {
-            // Recursion into a plain Object.
-            paramsObjNew = paramsWithDotNotation;
-          }
-
-          var paramsObjKeys = Object.keys(paramsObjNew);
-
-          if (paramsObjKeys.length) {
-            var paramsObjShallowItr = void 0;
-            var paramsObjShallowItrn = void 0;
-
-            if (paramsObjKeys.length === 1) {
-              paramsObjShallowItr = {
-                next: function next() {
-                  return {
-                    done: true
-                  };
-                }
-              };
-              paramsObjShallowItrn = {
-                value: paramsObjKeys[0]
-              };
-            } else {
-              paramsObjShallowItr = paramsObjKeys[Symbol.iterator]();
-              paramsObjShallowItrn = paramsObjShallowItr.next();
-            }
-
-            var _dataKeysCollect2 = dataKeysCollect({
-              dataKeys_: [],
-              dataObjShallowItr: paramsObjShallowItr,
-              dataObjShallowItrn: paramsObjShallowItrn,
-              dataObj: paramsObjNew,
-              parentObjAsStr: '' //partialShort // For debugging.
-
-            });
-
-            dataKeys = _dataKeysCollect2.dataKeys;
-          }
-        }
-
+        paramsObjNew = paramsWithDotNotation;
         paramKeysNew = paramKeys.concat(dataKeys);
       } else {
         paramKeysNew = paramKeys;
@@ -904,15 +968,7 @@ PARAMS_APPLIER: {
 
     if (partialsComp[partialShort].parseArr) {
       partialParseArr = partialsComp[partialShort].parseArr;
-    } // DEPRECATED.
-    // TODO: This accommodates old usage of partialsComp. To be removed.
-    else {
-        partialParseArr = hogan.parse(hogan.scan(partials[partialShort], options.delimiters), partials[partialShort], options);
-        partialsComp[partialShort] = {
-          parseArr: partialParseArr,
-          compilation: partialsComp[partialShort]
-        };
-      }
+    }
 
     if (partialParseArr.length) {
       var partialParseItr;
@@ -1060,16 +1116,15 @@ METHODS: {
 
 
     if (typeof contextKeys === 'undefined') {
-      var hasParam = false;
+      var hasParam = partialsKeys.reduce(function (acc, partialsKey) {
+        var partialFull = compilation.partials[partialsKey].name;
 
-      for (var i = 0, l = partialsKeys.length; i < l; i++) {
-        var partialFull = compilation.partials[partialsKeys[i]].name;
-        hasParam = paramRegex.test(partialFull) || partialFull.includes(':');
-
-        if (hasParam) {
-          break;
+        if (paramRegex.test(partialFull) || partialFull.includes(':')) {
+          return acc + 1;
+        } else {
+          return acc;
         }
-      }
+      }, 0);
 
       if (hasParam) {
         contextKeys = _contextKeys = preProcessContextKeys(context);
@@ -1133,34 +1188,30 @@ METHODS: {
 
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    var partialsKeys = Object.keys(partials); // Using for because .preProcessPartialParams() is an exposed non-recursive method that does not accept an iterator.
+    var partialsKeys = Object.keys(partials);
+    var partialsKeysItr = partialsKeys[Symbol.iterator]();
+    var partialsKeysItrn = partialsKeysItr.next();
 
-    for (var i = 0, l = partialsKeys.length; i < l; i++) {
-      var partialKey = partialsKeys[i]; // DEPRECATED.
-      // TODO: This accommodates old usage of partialsComp. To be removed.
+    var _dataAppendViaIterato3 = dataAppendViaIterator(partialsKeysItr, partialsKeysItrn, {
+      contextKeys: contextKeys,
+      partials: partials,
+      partialsComp: partialsComp
+    }, partialParamsIteratorPreProcess, {
+      context: context,
+      options: options
+    });
 
-      if (!partialsComp[partialKey].compilation) {
-        var parseArr = hogan.parse(hogan.scan(partials[partialKey], options.delimiters), partials[partialKey], options);
-        partialsComp[partialKey] = {
-          parseArr: parseArr,
-          compilation: partialsComp[partialKey]
-        };
-      }
-
-      var _preProcessPartialPar = preProcessPartialParams(partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
-
-      _contextKeys = _preProcessPartialPar._contextKeys;
-      partials = _preProcessPartialPar.partials;
-      partialsComp = _preProcessPartialPar.partialsComp;
-    }
+    _contextKeys = _dataAppendViaIterato3._contextKeys;
+    partials = _dataAppendViaIterato3.partials;
+    partialsComp = _dataAppendViaIterato3.partialsComp;
 
     if (_contextKeys) {
       contextKeys = _contextKeys;
     }
 
-    var _preProcessPartialPar2 = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context, options);
+    var _preProcessPartialPar = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context, options);
 
-    compilation = _preProcessPartialPar2.compilation;
+    compilation = _preProcessPartialPar.compilation;
     return compilation;
   };
 
@@ -1203,19 +1254,19 @@ METHODS: {
     var options = options_ || this.options || {};
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    var partialsKeys = Object.keys(partials); // Using for loop because .registerPartial() is an exposed non-recursive method that does not accept an iterator.
+    var partialsKeys = Object.keys(partials);
+    var partialsKeysItr = partialsKeys[Symbol.iterator]();
+    var partialsKeysItrn = partialsKeysItr.next();
 
-    for (var i = 0, l = partialsKeys.length; i < l; i++) {
-      var partialKey = partialsKeys[i];
+    var _dataAppendViaIterato4 = dataAppendViaIterator(partialsKeysItr, partialsKeysItrn, {
+      partials: partials,
+      partialsComp: partialsComp
+    }, partialIteratorRegister, {
+      options: options
+    });
 
-      if (!partialsComp[partialKey]) {
-        var _registerPartial = registerPartial(partialKey, partials[partialKey], null, partials, partialsComp, options);
-
-        partials = _registerPartial.partials;
-        partialsComp = _registerPartial.partialsComp;
-      }
-    }
-
+    partials = _dataAppendViaIterato4.partials;
+    partialsComp = _dataAppendViaIterato4.partialsComp;
     var compilation;
 
     if (Object.keys(partialsComp).length) {
