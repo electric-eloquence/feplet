@@ -23,25 +23,6 @@ const jsonEval = require('json-eval');
 const paramRegex = /\([\S\s]*\)/;
 
 HELPERS: {
-  var dataAppendViaIterator =
-  function (iterator, iteration, dataStructures_, dataAppendFunction, addlArgs = {}, incrementValue = 0) {
-    if (iteration.done) {
-      return dataStructures_;
-    }
-
-    const value = iteration.value;
-    const dataStructures = dataAppendFunction(value, dataStructures_, addlArgs, incrementValue);
-
-    return dataAppendViaIterator(
-      iterator,
-      iterator.next(),
-      dataStructures,
-      dataAppendFunction,
-      addlArgs,
-      incrementValue + 1
-    );
-  };
-
   var paramsObjDotNotationParse = function (args) {
     const {
       paramsObjPart,
@@ -416,74 +397,6 @@ HELPERS: {
 }
 
 COLLECTORS: {
-  // Declaring with const effectively makes this function private to this block.
-  const dataKeysGetFromDataObj = function (dataObjItem, dataKeys_, addlArgs, incrementValue = 0) {
-    const {
-      dataObjNestedObj,
-      dataKey,
-      parentObjAsStr,
-      partialShort
-    } = addlArgs;
-
-    const dataObjItemKeys = Object.keys(dataObjItem);
-    let {dataKeys} = dataKeys_;
-
-    if (dataObjItemKeys.length) {
-      let parentObjAsStrNew = parentObjAsStr;
-
-      if (Array.isArray(dataObjNestedObj)) {
-        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}.${incrementValue}` : `${dataKey}.${incrementValue}`;
-      }
-      else {
-        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}` : dataKey;
-      }
-
-      const parentObjSplit = parentObjAsStrNew.split('.');
-
-      // eslint-disable-next-line no-use-before-define
-      ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
-
-      const _this = this;
-
-      ({dataKeys} = dataObjItemKeys.reduce(
-        (dataStructures, dataKey) => {
-          let {
-            dataKeys,
-            dataObj,
-            parentObjAsStr,
-            partialShort
-          } = dataStructures;
-
-          ({dataKeys} = dataKeysCollect.call( // eslint-disable-line no-use-before-define
-            _this,
-            {
-              dataKey,
-              dataKeys,
-              dataObj,
-              parentObjAsStr,
-              partialShort
-            }
-          ));
-
-          return {
-            dataKeys,
-            dataObj,
-            parentObjAsStr,
-            partialShort
-          };
-        },
-        {
-          dataKeys,
-          dataObj: dataObjItem,
-          parentObjAsStr: parentObjAsStrNew,
-          partialShort
-        }
-      ));
-    }
-
-    return {dataKeys};
-  };
-
   var contextKeysCollect = function (args) {
     const {
       contextKey,
@@ -528,6 +441,73 @@ COLLECTORS: {
     return {dataKeys};
   };
 
+  // Declaring with const effectively makes this function private to this block.
+  const dataKeysGetFromDataObj = function (dataObjItem, dataKeys_, addlArgs, incrementValue = 0) {
+    const {
+      dataObjNestedObj,
+      dataKey,
+      parentObjAsStr,
+      partialShort
+    } = addlArgs;
+
+    const dataObjItemKeys = Object.keys(dataObjItem);
+    let {dataKeys} = dataKeys_;
+
+    if (dataObjItemKeys.length) {
+      let parentObjAsStrNew = parentObjAsStr;
+
+      if (Array.isArray(dataObjNestedObj)) {
+        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}.${incrementValue}` : `${dataKey}.${incrementValue}`;
+      }
+      else {
+        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}` : dataKey;
+      }
+
+      const parentObjSplit = parentObjAsStrNew.split('.');
+
+      ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
+
+      const _this = this;
+
+      ({dataKeys} = dataObjItemKeys.reduce(
+        (dataStructures, dataKey) => {
+          let {
+            dataKeys,
+            dataObj,
+            parentObjAsStr,
+            partialShort
+          } = dataStructures;
+
+          ({dataKeys} = dataKeysCollect.call( // eslint-disable-line no-use-before-define
+            _this,
+            {
+              dataKey,
+              dataKeys,
+              dataObj,
+              parentObjAsStr,
+              partialShort
+            }
+          ));
+
+          return {
+            dataKeys,
+            dataObj,
+            parentObjAsStr,
+            partialShort
+          };
+        },
+        {
+          dataKeys,
+          dataObj: dataObjItem,
+          parentObjAsStr: parentObjAsStrNew,
+          partialShort
+        }
+      ));
+    }
+
+    return {dataKeys};
+  };
+
   var dataKeysCollect = function (args) {
     const {
       dataKey,
@@ -548,20 +528,28 @@ COLLECTORS: {
       const dataObjNestedObj = dataObj[dataKey];
 
       if (Array.isArray(dataObjNestedObj)) {
-        const dataObjNestedObjItr = dataObjNestedObj[Symbol.iterator]();
-        const dataObjNestedObjItrn = dataObjNestedObjItr.next();
+        const _this = this;
 
-        ({dataKeys} = dataAppendViaIterator( // eslint-disable-line no-use-before-define
-          dataObjNestedObjItr,
-          dataObjNestedObjItrn,
-          {dataKeys},
-          dataKeysGetFromDataObj,
-          {
-            dataObjNestedObj,
-            dataKey,
-            parentObjAsStr,
-            partialShort
-          }
+        ({dataKeys} = dataObjNestedObj.reduce(
+          (dataStructures, dataObjItem, index) => {
+            let {dataKeys} = dataStructures;
+
+            ({dataKeys} = dataKeysGetFromDataObj.call(
+              _this,
+              dataObjItem,
+              {dataKeys},
+              {
+                dataObjNestedObj,
+                dataKey,
+                parentObjAsStr,
+                partialShort
+              },
+              index
+            ));
+
+            return {dataKeys};
+          },
+          {dataKeys}
         ));
       }
       else {
@@ -686,6 +674,78 @@ PARAMS_APPLIER: {
     };
   };
 
+  var paramsApply = function (args) {
+    const {
+      contextKeys,
+      paramKeys,
+      paramsObj,
+      parseObj
+    } = args;
+    let {
+      delimiterUnicodes_,
+      partialText
+    } = args;
+
+    const _this = this;
+    let delimiterUnicodes;
+
+    ({
+      delimiterUnicodes,
+      partialText
+    } = Object.keys(parseObj).reduce(
+      (dataStructures, parseObjKey) => {
+        const {
+          contextKeys,
+          paramKeys,
+          paramsObj,
+          parseObj
+        } = dataStructures;
+        let {
+          delimiterUnicodes,
+          partialText
+        } = dataStructures;
+
+        ({
+          delimiterUnicodes,
+          partialText
+        } = paramsApplyToParseObj.call( // eslint-disable-line no-use-before-define
+          _this,
+          {
+            contextKeys,
+            delimiterUnicodes_: delimiterUnicodes,
+            paramKeys,
+            paramsObj,
+            parseObj,
+            parseObjKey,
+            partialText_: partialText
+          }
+        ));
+
+        return {
+          contextKeys,
+          delimiterUnicodes,
+          paramKeys,
+          paramsObj,
+          parseObj,
+          partialText
+        };
+      },
+      {
+        contextKeys,
+        delimiterUnicodes,
+        paramKeys,
+        paramsObj,
+        parseObj,
+        partialText
+      }
+    ));
+
+    return {
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
+      partialText
+    };
+  };
+
   var paramsApplyToParseObj = function (args) {
     const {
       contextKeys,
@@ -767,7 +827,7 @@ PARAMS_APPLIER: {
           ({
             delimiterUnicodes,
             partialText
-          } = paramsApply.call( // eslint-disable-line no-use-before-define
+          } = paramsApply.call(
             _this,
             {
               contextKeys,
@@ -814,78 +874,6 @@ PARAMS_APPLIER: {
     return {
       delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText || partialText_
-    };
-  };
-
-  var paramsApply = function (args) {
-    const {
-      contextKeys,
-      paramKeys,
-      paramsObj,
-      parseObj
-    } = args;
-    let {
-      delimiterUnicodes_,
-      partialText
-    } = args;
-
-    const _this = this;
-    let delimiterUnicodes;
-
-    ({
-      delimiterUnicodes,
-      partialText
-    } = Object.keys(parseObj).reduce(
-      (dataStructures, parseObjKey) => {
-        const {
-          contextKeys,
-          paramKeys,
-          paramsObj,
-          parseObj
-        } = dataStructures;
-        let {
-          delimiterUnicodes,
-          partialText
-        } = dataStructures;
-
-        ({
-          delimiterUnicodes,
-          partialText
-        } = paramsApplyToParseObj.call(
-          _this,
-          {
-            contextKeys,
-            delimiterUnicodes_: delimiterUnicodes,
-            paramKeys,
-            paramsObj,
-            parseObj,
-            parseObjKey,
-            partialText_: partialText
-          }
-        ));
-
-        return {
-          contextKeys,
-          delimiterUnicodes,
-          paramKeys,
-          paramsObj,
-          parseObj,
-          partialText
-        };
-      },
-      {
-        contextKeys,
-        delimiterUnicodes,
-        paramKeys,
-        paramsObj,
-        parseObj,
-        partialText
-      }
-    ));
-
-    return {
-      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
-      partialText
     };
   };
 

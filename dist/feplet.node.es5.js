@@ -23,19 +23,6 @@ var jsonEval = require('json-eval');
 var paramRegex = /\([\S\s]*\)/;
 
 HELPERS: {
-  var dataAppendViaIterator = function dataAppendViaIterator(iterator, iteration, dataStructures_, dataAppendFunction) {
-    var addlArgs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
-    var incrementValue = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-
-    if (iteration.done) {
-      return dataStructures_;
-    }
-
-    var value = iteration.value;
-    var dataStructures = dataAppendFunction(value, dataStructures_, addlArgs, incrementValue);
-    return dataAppendViaIterator(iterator, iterator.next(), dataStructures, dataAppendFunction, addlArgs, incrementValue + 1);
-  };
-
   var paramsObjDotNotationParse = function paramsObjDotNotationParse(args) {
     var paramsObjPart = args.paramsObjPart,
         parseObjTagName = args.parseObjTagName;
@@ -385,7 +372,46 @@ HELPERS: {
 }
 
 COLLECTORS: {
-  // Declaring with const effectively makes this function private to this block.
+  var contextKeysCollect = function contextKeysCollect(args) {
+    var contextKey = args.contextKey,
+        contextKeys = args.contextKeys;
+    var contextKeySplit = contextKey.split('.');
+
+    while (contextKeySplit.length > 1) {
+      contextKeySplit.shift();
+      var contextKeyNew = contextKeySplit.join('.');
+
+      if (!contextKeys.includes(contextKeyNew)) {
+        contextKeys.push(contextKeyNew);
+      }
+    }
+
+    return args;
+  };
+
+  var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
+    var dataKeys = args.dataKeys,
+        parentObjSplit = args.parentObjSplit;
+    var i = 0;
+    var itemNext;
+    var dataKey = parentObjSplit[i]; // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
+    // loop at index 1.
+
+    while (itemNext = parentObjSplit[++i]) {
+      // eslint-disable-line no-cond-assign
+      dataKey += ".".concat(itemNext);
+
+      if (!dataKeys.includes(dataKey)) {
+        dataKeys.push(dataKey);
+      }
+    }
+
+    return {
+      dataKeys: dataKeys
+    };
+  }; // Declaring with const effectively makes this function private to this block.
+
+
   var dataKeysGetFromDataObj = function dataKeysGetFromDataObj(dataObjItem, dataKeys_, addlArgs) {
     var incrementValue = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
     var dataObjNestedObj = addlArgs.dataObjNestedObj,
@@ -404,7 +430,7 @@ COLLECTORS: {
         parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey) : dataKey;
       }
 
-      var parentObjSplit = parentObjAsStrNew.split('.'); // eslint-disable-next-line no-use-before-define
+      var parentObjSplit = parentObjAsStrNew.split('.');
 
       var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
         dataKeys: dataKeys,
@@ -452,45 +478,6 @@ COLLECTORS: {
     };
   };
 
-  var contextKeysCollect = function contextKeysCollect(args) {
-    var contextKey = args.contextKey,
-        contextKeys = args.contextKeys;
-    var contextKeySplit = contextKey.split('.');
-
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-      var contextKeyNew = contextKeySplit.join('.');
-
-      if (!contextKeys.includes(contextKeyNew)) {
-        contextKeys.push(contextKeyNew);
-      }
-    }
-
-    return args;
-  };
-
-  var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
-    var dataKeys = args.dataKeys,
-        parentObjSplit = args.parentObjSplit;
-    var i = 0;
-    var itemNext;
-    var dataKey = parentObjSplit[i]; // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
-    // loop at index 1.
-
-    while (itemNext = parentObjSplit[++i]) {
-      // eslint-disable-line no-cond-assign
-      dataKey += ".".concat(itemNext);
-
-      if (!dataKeys.includes(dataKey)) {
-        dataKeys.push(dataKey);
-      }
-    }
-
-    return {
-      dataKeys: dataKeys
-    };
-  };
-
   var dataKeysCollect = function dataKeysCollect(args) {
     var dataKey = args.dataKey,
         dataObj = args.dataObj,
@@ -507,22 +494,31 @@ COLLECTORS: {
       var dataObjNestedObj = dataObj[dataKey];
 
       if (Array.isArray(dataObjNestedObj)) {
-        var dataObjNestedObjItr = dataObjNestedObj[Symbol.iterator]();
-        var dataObjNestedObjItrn = dataObjNestedObjItr.next();
+        var _this = this;
 
-        var _dataAppendViaIterato = dataAppendViaIterator( // eslint-disable-line no-use-before-define
-        dataObjNestedObjItr, dataObjNestedObjItrn, {
+        var _dataObjNestedObj$red = dataObjNestedObj.reduce(function (dataStructures, dataObjItem, index) {
+          var dataKeys = dataStructures.dataKeys;
+
+          var _dataKeysGetFromDataO = dataKeysGetFromDataObj.call(_this, dataObjItem, {
+            dataKeys: dataKeys
+          }, {
+            dataObjNestedObj: dataObjNestedObj,
+            dataKey: dataKey,
+            parentObjAsStr: parentObjAsStr,
+            partialShort: partialShort
+          }, index);
+
+          dataKeys = _dataKeysGetFromDataO.dataKeys;
+          return {
+            dataKeys: dataKeys
+          };
+        }, {
           dataKeys: dataKeys
-        }, dataKeysGetFromDataObj, {
-          dataObjNestedObj: dataObjNestedObj,
-          dataKey: dataKey,
-          parentObjAsStr: parentObjAsStr,
-          partialShort: partialShort
         });
 
-        dataKeys = _dataAppendViaIterato.dataKeys;
+        dataKeys = _dataObjNestedObj$red.dataKeys;
       } else {
-        var _dataKeysGetFromDataO = dataKeysGetFromDataObj(dataObjNestedObj, {
+        var _dataKeysGetFromDataO2 = dataKeysGetFromDataObj(dataObjNestedObj, {
           dataKeys: dataKeys
         }, {
           dataObjNestedObj: dataObjNestedObj,
@@ -531,7 +527,7 @@ COLLECTORS: {
           partialShort: partialShort
         });
 
-        dataKeys = _dataKeysGetFromDataO.dataKeys;
+        dataKeys = _dataKeysGetFromDataO2.dataKeys;
       }
     } else {
       var parentObjSplit = parentObjAsStr ? parentObjAsStr.split('.') : [];
@@ -636,6 +632,64 @@ PARAMS_APPLIER: {
     };
   };
 
+  var paramsApply = function paramsApply(args) {
+    var contextKeys = args.contextKeys,
+        paramKeys = args.paramKeys,
+        paramsObj = args.paramsObj,
+        parseObj = args.parseObj;
+    var delimiterUnicodes_ = args.delimiterUnicodes_,
+        partialText = args.partialText;
+
+    var _this = this;
+
+    var delimiterUnicodes;
+
+    var _Object$keys$reduce2 = Object.keys(parseObj).reduce(function (dataStructures, parseObjKey) {
+      var contextKeys = dataStructures.contextKeys,
+          paramKeys = dataStructures.paramKeys,
+          paramsObj = dataStructures.paramsObj,
+          parseObj = dataStructures.parseObj;
+      var delimiterUnicodes = dataStructures.delimiterUnicodes,
+          partialText = dataStructures.partialText;
+
+      var _paramsApplyToParseOb = paramsApplyToParseObj.call( // eslint-disable-line no-use-before-define
+      _this, {
+        contextKeys: contextKeys,
+        delimiterUnicodes_: delimiterUnicodes,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        parseObj: parseObj,
+        parseObjKey: parseObjKey,
+        partialText_: partialText
+      });
+
+      delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
+      partialText = _paramsApplyToParseOb.partialText;
+      return {
+        contextKeys: contextKeys,
+        delimiterUnicodes: delimiterUnicodes,
+        paramKeys: paramKeys,
+        paramsObj: paramsObj,
+        parseObj: parseObj,
+        partialText: partialText
+      };
+    }, {
+      contextKeys: contextKeys,
+      delimiterUnicodes: delimiterUnicodes,
+      paramKeys: paramKeys,
+      paramsObj: paramsObj,
+      parseObj: parseObj,
+      partialText: partialText
+    });
+
+    delimiterUnicodes = _Object$keys$reduce2.delimiterUnicodes;
+    partialText = _Object$keys$reduce2.partialText;
+    return {
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
+      partialText: partialText
+    };
+  };
+
   var paramsApplyToParseObj = function paramsApplyToParseObj(args) {
     var contextKeys = args.contextKeys,
         delimiterUnicodes_ = args.delimiterUnicodes_,
@@ -701,8 +755,7 @@ PARAMS_APPLIER: {
         var delimiterUnicodes = dataStructures.delimiterUnicodes,
             partialText = dataStructures.partialText;
 
-        var _paramsApply$call = paramsApply.call( // eslint-disable-line no-use-before-define
-        _this, {
+        var _paramsApply$call = paramsApply.call(_this, {
           contextKeys: contextKeys,
           delimiterUnicodes_: delimiterUnicodes,
           paramKeys: paramKeys,
@@ -748,63 +801,6 @@ PARAMS_APPLIER: {
     return {
       delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText || partialText_
-    };
-  };
-
-  var paramsApply = function paramsApply(args) {
-    var contextKeys = args.contextKeys,
-        paramKeys = args.paramKeys,
-        paramsObj = args.paramsObj,
-        parseObj = args.parseObj;
-    var delimiterUnicodes_ = args.delimiterUnicodes_,
-        partialText = args.partialText;
-
-    var _this = this;
-
-    var delimiterUnicodes;
-
-    var _Object$keys$reduce2 = Object.keys(parseObj).reduce(function (dataStructures, parseObjKey) {
-      var contextKeys = dataStructures.contextKeys,
-          paramKeys = dataStructures.paramKeys,
-          paramsObj = dataStructures.paramsObj,
-          parseObj = dataStructures.parseObj;
-      var delimiterUnicodes = dataStructures.delimiterUnicodes,
-          partialText = dataStructures.partialText;
-
-      var _paramsApplyToParseOb = paramsApplyToParseObj.call(_this, {
-        contextKeys: contextKeys,
-        delimiterUnicodes_: delimiterUnicodes,
-        paramKeys: paramKeys,
-        paramsObj: paramsObj,
-        parseObj: parseObj,
-        parseObjKey: parseObjKey,
-        partialText_: partialText
-      });
-
-      delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
-      partialText = _paramsApplyToParseOb.partialText;
-      return {
-        contextKeys: contextKeys,
-        delimiterUnicodes: delimiterUnicodes,
-        paramKeys: paramKeys,
-        paramsObj: paramsObj,
-        parseObj: parseObj,
-        partialText: partialText
-      };
-    }, {
-      contextKeys: contextKeys,
-      delimiterUnicodes: delimiterUnicodes,
-      paramKeys: paramKeys,
-      paramsObj: paramsObj,
-      parseObj: parseObj,
-      partialText: partialText
-    });
-
-    delimiterUnicodes = _Object$keys$reduce2.delimiterUnicodes;
-    partialText = _Object$keys$reduce2.partialText;
-    return {
-      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
-      partialText: partialText
     };
   };
 
