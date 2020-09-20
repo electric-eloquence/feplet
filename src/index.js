@@ -429,41 +429,23 @@ COLLECTORS: {
     let {dataKeys} = dataKeys_;
 
     if (dataObjItemKeys.length) {
-      let dataObjDeeperItr;
-      let dataObjDeeperItrn;
-
-      if (dataObjItemKeys.length === 1) {
-        dataObjDeeperItr = {
-          next: () => {return {done: true};}
-        };
-        dataObjDeeperItrn = {
-          value: dataObjItemKeys[0]
-        };
-      }
-      else {
-        dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
-        dataObjDeeperItrn = dataObjDeeperItr.next();
-      }
-
       let parentObjAsStrNew = parentObjAsStr;
 
-      if (dataObjDeeperItrn.value) {
-        if (Array.isArray(dataObjNestedObj)) {
-          parentObjAsStrNew += parentObjAsStr ? `.${dataKey}.${incrementValue}` : `${dataKey}.${incrementValue}`;
-        }
-        else {
-          parentObjAsStrNew += parentObjAsStr ? `.${dataKey}` : dataKey;
-        }
-
-        const parentObjSplit = parentObjAsStrNew.split('.');
-
-        // eslint-disable-next-line no-use-before-define
-        ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
+      if (Array.isArray(dataObjNestedObj)) {
+        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}.${incrementValue}` : `${dataKey}.${incrementValue}`;
       }
+      else {
+        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}` : dataKey;
+      }
+
+      const parentObjSplit = parentObjAsStrNew.split('.');
+
+      // eslint-disable-next-line no-use-before-define
+      ({dataKeys} = dataKeysWithDotNotationAdd({dataKeys, parentObjSplit}));
 
       const _this = this;
 
-      ({dataKeys} = Object.keys(dataObjItem).reduce(
+      ({dataKeys} = dataObjItemKeys.reduce(
         (dataStructures, dataKey) => {
           let {
             dataKeys,

@@ -396,47 +396,26 @@ COLLECTORS: {
     var dataKeys = dataKeys_.dataKeys;
 
     if (dataObjItemKeys.length) {
-      var dataObjDeeperItr;
-      var dataObjDeeperItrn;
-
-      if (dataObjItemKeys.length === 1) {
-        dataObjDeeperItr = {
-          next: function next() {
-            return {
-              done: true
-            };
-          }
-        };
-        dataObjDeeperItrn = {
-          value: dataObjItemKeys[0]
-        };
-      } else {
-        dataObjDeeperItr = dataObjItemKeys[Symbol.iterator]();
-        dataObjDeeperItrn = dataObjDeeperItr.next();
-      }
-
       var parentObjAsStrNew = parentObjAsStr;
 
-      if (dataObjDeeperItrn.value) {
-        if (Array.isArray(dataObjNestedObj)) {
-          parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey, ".").concat(incrementValue) : "".concat(dataKey, ".").concat(incrementValue);
-        } else {
-          parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey) : dataKey;
-        }
-
-        var parentObjSplit = parentObjAsStrNew.split('.'); // eslint-disable-next-line no-use-before-define
-
-        var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
-          dataKeys: dataKeys,
-          parentObjSplit: parentObjSplit
-        });
-
-        dataKeys = _dataKeysWithDotNotat.dataKeys;
+      if (Array.isArray(dataObjNestedObj)) {
+        parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey, ".").concat(incrementValue) : "".concat(dataKey, ".").concat(incrementValue);
+      } else {
+        parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey) : dataKey;
       }
+
+      var parentObjSplit = parentObjAsStrNew.split('.'); // eslint-disable-next-line no-use-before-define
+
+      var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
+        dataKeys: dataKeys,
+        parentObjSplit: parentObjSplit
+      });
+
+      dataKeys = _dataKeysWithDotNotat.dataKeys;
 
       var _this = this;
 
-      var _Object$keys$reduce = Object.keys(dataObjItem).reduce(function (dataStructures, dataKey) {
+      var _dataObjItemKeys$redu = dataObjItemKeys.reduce(function (dataStructures, dataKey) {
         var dataKeys = dataStructures.dataKeys,
             dataObj = dataStructures.dataObj,
             parentObjAsStr = dataStructures.parentObjAsStr,
@@ -465,7 +444,7 @@ COLLECTORS: {
         partialShort: partialShort
       });
 
-      dataKeys = _Object$keys$reduce.dataKeys;
+      dataKeys = _dataObjItemKeys$redu.dataKeys;
     }
 
     return {
@@ -580,7 +559,7 @@ PARAMS_APPLIER: {
 
     var dataKeys = dataKeys_.dataKeys;
 
-    var _Object$keys$reduce2 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
+    var _Object$keys$reduce = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
       var dataKeys = dataStructures.dataKeys,
           dataObj = dataStructures.dataObj,
           parentObjAsStr = dataStructures.parentObjAsStr;
@@ -604,7 +583,7 @@ PARAMS_APPLIER: {
       parentObjAsStr: ''
     });
 
-    dataKeys = _Object$keys$reduce2.dataKeys;
+    dataKeys = _Object$keys$reduce.dataKeys;
     return {
       dataKeys: dataKeys
     };
@@ -784,7 +763,7 @@ PARAMS_APPLIER: {
 
     var delimiterUnicodes;
 
-    var _Object$keys$reduce3 = Object.keys(parseObj).reduce(function (dataStructures, parseObjKey) {
+    var _Object$keys$reduce2 = Object.keys(parseObj).reduce(function (dataStructures, parseObjKey) {
       var contextKeys = dataStructures.contextKeys,
           paramKeys = dataStructures.paramKeys,
           paramsObj = dataStructures.paramsObj,
@@ -821,8 +800,8 @@ PARAMS_APPLIER: {
       partialText: partialText
     });
 
-    delimiterUnicodes = _Object$keys$reduce3.delimiterUnicodes;
-    partialText = _Object$keys$reduce3.partialText;
+    delimiterUnicodes = _Object$keys$reduce2.delimiterUnicodes;
+    partialText = _Object$keys$reduce2.partialText;
     return {
       delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText
@@ -905,7 +884,7 @@ PARAMS_APPLIER: {
 
     var dataKeys;
 
-    var _Object$keys$reduce4 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
+    var _Object$keys$reduce3 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
       var dataKeys = dataStructures.dataKeys,
           dataObj = dataStructures.dataObj,
           parentObjAsStr = dataStructures.parentObjAsStr;
@@ -929,7 +908,7 @@ PARAMS_APPLIER: {
       parentObjAsStr: ''
     });
 
-    dataKeys = _Object$keys$reduce4.dataKeys;
+    dataKeys = _Object$keys$reduce3.dataKeys;
     var paramKeys = dataKeys;
     var partialText_ = partials[partialShort] || '';
     var delimiterUnicodes;
@@ -1013,7 +992,7 @@ METHODS: {
 
     var dataKeys = [];
 
-    var _Object$keys$reduce5 = Object.keys(context).reduce(function (dataStructures, dataKey) {
+    var _Object$keys$reduce4 = Object.keys(context).reduce(function (dataStructures, dataKey) {
       var dataKeys = dataStructures.dataKeys,
           dataObj = dataStructures.dataObj,
           parentObjAsStr = dataStructures.parentObjAsStr;
@@ -1037,7 +1016,7 @@ METHODS: {
       parentObjAsStr: ''
     });
 
-    dataKeys = _Object$keys$reduce5.dataKeys;
+    dataKeys = _Object$keys$reduce4.dataKeys;
     var contextKeys = [];
 
     if (dataKeys.length) {
@@ -1148,7 +1127,7 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _Object$keys$reduce6 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
+    var _Object$keys$reduce5 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
       var context = dataStructures.context,
           contextKeys = dataStructures.contextKeys,
           options = dataStructures.options;
@@ -1178,9 +1157,9 @@ METHODS: {
       options: options
     });
 
-    _contextKeys = _Object$keys$reduce6._contextKeys;
-    partials = _Object$keys$reduce6.partials;
-    partialsComp = _Object$keys$reduce6.partialsComp;
+    _contextKeys = _Object$keys$reduce5._contextKeys;
+    partials = _Object$keys$reduce5.partials;
+    partialsComp = _Object$keys$reduce5.partialsComp;
 
     if (_contextKeys) {
       contextKeys = _contextKeys;
@@ -1235,7 +1214,7 @@ METHODS: {
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
 
-    var _Object$keys$reduce7 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
+    var _Object$keys$reduce6 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
       var partials = dataStructures.partials,
           partialsComp = dataStructures.partialsComp,
           options = dataStructures.options;
@@ -1246,8 +1225,8 @@ METHODS: {
       options: options
     });
 
-    partials = _Object$keys$reduce7.partials;
-    partialsComp = _Object$keys$reduce7.partialsComp;
+    partials = _Object$keys$reduce6.partials;
+    partialsComp = _Object$keys$reduce6.partialsComp;
     var compilation;
 
     if (Object.keys(partialsComp).length) {
