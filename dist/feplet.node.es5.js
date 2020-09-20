@@ -413,19 +413,19 @@ COLLECTORS: {
 
 
   var dataKeysGetFromDataObj = function dataKeysGetFromDataObj(dataObjItem, dataKeys_, addlArgs) {
-    var incrementValue = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+    var index = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
     var dataObjNestedObj = addlArgs.dataObjNestedObj,
         dataKey = addlArgs.dataKey,
         parentObjAsStr = addlArgs.parentObjAsStr,
         partialShort = addlArgs.partialShort;
     var dataObjItemKeys = Object.keys(dataObjItem);
-    var dataKeys = dataKeys_.dataKeys;
+    var dataKeys;
 
     if (dataObjItemKeys.length) {
       var parentObjAsStrNew = parentObjAsStr;
 
       if (Array.isArray(dataObjNestedObj)) {
-        parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey, ".").concat(incrementValue) : "".concat(dataKey, ".").concat(incrementValue);
+        parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey, ".").concat(index) : "".concat(dataKey, ".").concat(index);
       } else {
         parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey) : dataKey;
       }
@@ -433,7 +433,7 @@ COLLECTORS: {
       var parentObjSplit = parentObjAsStrNew.split('.');
 
       var _dataKeysWithDotNotat = dataKeysWithDotNotationAdd({
-        dataKeys: dataKeys,
+        dataKeys: dataKeys_,
         parentObjSplit: parentObjSplit
       });
 
@@ -474,7 +474,7 @@ COLLECTORS: {
     }
 
     return {
-      dataKeys: dataKeys
+      dataKeys: dataKeys || dataKeys_
     };
   };
 
@@ -494,33 +494,31 @@ COLLECTORS: {
       var dataObjNestedObj = dataObj[dataKey];
 
       if (Array.isArray(dataObjNestedObj)) {
-        var _this = this;
+        if (dataObjNestedObj.length) {
+          var _this = this;
 
-        var _dataObjNestedObj$red = dataObjNestedObj.reduce(function (dataStructures, dataObjItem, index) {
-          var dataKeys = dataStructures.dataKeys;
+          var _dataObjNestedObj$red = dataObjNestedObj.reduce(function (dataStructures, dataObjItem, index) {
+            var dataKeys = dataStructures.dataKeys;
 
-          var _dataKeysGetFromDataO = dataKeysGetFromDataObj.call(_this, dataObjItem, {
-            dataKeys: dataKeys
+            var _dataKeysGetFromDataO = dataKeysGetFromDataObj.call(_this, dataObjItem, dataKeys, {
+              dataObjNestedObj: dataObjNestedObj,
+              dataKey: dataKey,
+              parentObjAsStr: parentObjAsStr,
+              partialShort: partialShort
+            }, index);
+
+            dataKeys = _dataKeysGetFromDataO.dataKeys;
+            return {
+              dataKeys: dataKeys
+            };
           }, {
-            dataObjNestedObj: dataObjNestedObj,
-            dataKey: dataKey,
-            parentObjAsStr: parentObjAsStr,
-            partialShort: partialShort
-          }, index);
-
-          dataKeys = _dataKeysGetFromDataO.dataKeys;
-          return {
             dataKeys: dataKeys
-          };
-        }, {
-          dataKeys: dataKeys
-        });
+          });
 
-        dataKeys = _dataObjNestedObj$red.dataKeys;
+          dataKeys = _dataObjNestedObj$red.dataKeys;
+        }
       } else {
-        var _dataKeysGetFromDataO2 = dataKeysGetFromDataObj(dataObjNestedObj, {
-          dataKeys: dataKeys
-        }, {
+        var _dataKeysGetFromDataO2 = dataKeysGetFromDataObj(dataObjNestedObj, dataKeys, {
           dataObjNestedObj: dataObjNestedObj,
           dataKey: dataKey,
           parentObjAsStr: parentObjAsStr,
@@ -551,37 +549,41 @@ COLLECTORS: {
 PARAMS_APPLIER: {
   // Declaring with const effectively makes this function private to this block.
   var dataKeysGetFromParamsObj = function dataKeysGetFromParamsObj(paramsObj, dataKeys_) {
-    var _this = this;
+    var paramsObjKeys = Object.keys(paramsObj);
+    var dataKeys;
 
-    var dataKeys = dataKeys_.dataKeys;
+    if (paramsObjKeys.length) {
+      var _this = this;
 
-    var _Object$keys$reduce = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
-      var dataKeys = dataStructures.dataKeys,
-          dataObj = dataStructures.dataObj,
-          parentObjAsStr = dataStructures.parentObjAsStr;
+      var _paramsObjKeys$reduce = paramsObjKeys.reduce(function (dataStructures, dataKey) {
+        var dataKeys = dataStructures.dataKeys,
+            dataObj = dataStructures.dataObj,
+            parentObjAsStr = dataStructures.parentObjAsStr;
 
-      var _dataKeysCollect$call2 = dataKeysCollect.call(_this, {
-        dataKey: dataKey,
-        dataKeys: dataKeys,
-        dataObj: dataObj,
-        parentObjAsStr: parentObjAsStr
+        var _dataKeysCollect$call2 = dataKeysCollect.call(_this, {
+          dataKey: dataKey,
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr
+        });
+
+        dataKeys = _dataKeysCollect$call2.dataKeys;
+        return {
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr
+        };
+      }, {
+        dataKeys: dataKeys_,
+        dataObj: paramsObj,
+        parentObjAsStr: ''
       });
 
-      dataKeys = _dataKeysCollect$call2.dataKeys;
-      return {
-        dataKeys: dataKeys,
-        dataObj: dataObj,
-        parentObjAsStr: parentObjAsStr
-      };
-    }, {
-      dataKeys: dataKeys,
-      dataObj: paramsObj,
-      parentObjAsStr: ''
-    });
+      dataKeys = _paramsObjKeys$reduce.dataKeys;
+    }
 
-    dataKeys = _Object$keys$reduce.dataKeys;
     return {
-      dataKeys: dataKeys
+      dataKeys: dataKeys || dataKeys_
     };
   };
 
@@ -639,51 +641,54 @@ PARAMS_APPLIER: {
         parseObj = args.parseObj;
     var delimiterUnicodes_ = args.delimiterUnicodes_,
         partialText = args.partialText;
-
-    var _this = this;
-
+    var parseObjKeys = Object.keys(parseObj);
     var delimiterUnicodes;
 
-    var _Object$keys$reduce2 = Object.keys(parseObj).reduce(function (dataStructures, parseObjKey) {
-      var contextKeys = dataStructures.contextKeys,
-          paramKeys = dataStructures.paramKeys,
-          paramsObj = dataStructures.paramsObj,
-          parseObj = dataStructures.parseObj;
-      var delimiterUnicodes = dataStructures.delimiterUnicodes,
-          partialText = dataStructures.partialText;
+    if (parseObjKeys.length) {
+      var _this = this;
 
-      var _paramsApplyToParseOb = paramsApplyToParseObj.call( // eslint-disable-line no-use-before-define
-      _this, {
-        contextKeys: contextKeys,
-        delimiterUnicodes_: delimiterUnicodes,
-        paramKeys: paramKeys,
-        paramsObj: paramsObj,
-        parseObj: parseObj,
-        parseObjKey: parseObjKey,
-        partialText_: partialText
-      });
+      var _parseObjKeys$reduce = parseObjKeys.reduce(function (dataStructures, parseObjKey) {
+        var contextKeys = dataStructures.contextKeys,
+            paramKeys = dataStructures.paramKeys,
+            paramsObj = dataStructures.paramsObj,
+            parseObj = dataStructures.parseObj;
+        var delimiterUnicodes = dataStructures.delimiterUnicodes,
+            partialText = dataStructures.partialText;
 
-      delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
-      partialText = _paramsApplyToParseOb.partialText;
-      return {
+        var _paramsApplyToParseOb = paramsApplyToParseObj.call( // eslint-disable-line no-use-before-define
+        _this, {
+          contextKeys: contextKeys,
+          delimiterUnicodes_: delimiterUnicodes,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          parseObj: parseObj,
+          parseObjKey: parseObjKey,
+          partialText_: partialText
+        });
+
+        delimiterUnicodes = _paramsApplyToParseOb.delimiterUnicodes;
+        partialText = _paramsApplyToParseOb.partialText;
+        return {
+          contextKeys: contextKeys,
+          delimiterUnicodes: delimiterUnicodes,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          parseObj: parseObj,
+          partialText: partialText
+        };
+      }, {
         contextKeys: contextKeys,
         delimiterUnicodes: delimiterUnicodes,
         paramKeys: paramKeys,
         paramsObj: paramsObj,
         parseObj: parseObj,
         partialText: partialText
-      };
-    }, {
-      contextKeys: contextKeys,
-      delimiterUnicodes: delimiterUnicodes,
-      paramKeys: paramKeys,
-      paramsObj: paramsObj,
-      parseObj: parseObj,
-      partialText: partialText
-    });
+      });
 
-    delimiterUnicodes = _Object$keys$reduce2.delimiterUnicodes;
-    partialText = _Object$keys$reduce2.partialText;
+      delimiterUnicodes = _parseObjKeys$reduce.delimiterUnicodes;
+      partialText = _parseObjKeys$reduce.partialText;
+    }
+
     return {
       delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
       partialText: partialText
@@ -713,28 +718,26 @@ PARAMS_APPLIER: {
 
       if (paramsWithDotNotation instanceof Object) {
         if (Array.isArray(paramsWithDotNotation)) {
-          var _this2 = this;
+          if (paramsWithDotNotation.length) {
+            var _this = this;
 
-          var _paramsWithDotNotatio = paramsWithDotNotation.reduce(function (dataStructures, dataObjItem, index) {
-            var dataKeys = dataStructures.dataKeys;
+            var _paramsWithDotNotatio = paramsWithDotNotation.reduce(function (dataStructures, dataObjItem) {
+              var dataKeys = dataStructures.dataKeys;
 
-            var _dataKeysGetFromParam = dataKeysGetFromParamsObj.call(_this2, dataObjItem, {
+              var _dataKeysGetFromParam = dataKeysGetFromParamsObj.call(_this, dataObjItem, dataKeys);
+
+              dataKeys = _dataKeysGetFromParam.dataKeys;
+              return {
+                dataKeys: dataKeys
+              };
+            }, {
               dataKeys: dataKeys
-            }, {}, index);
+            });
 
-            dataKeys = _dataKeysGetFromParam.dataKeys;
-            return {
-              dataKeys: dataKeys
-            };
-          }, {
-            dataKeys: dataKeys
-          });
-
-          dataKeys = _paramsWithDotNotatio.dataKeys;
+            dataKeys = _paramsWithDotNotatio.dataKeys;
+          }
         } else {
-          var _dataKeysGetFromParam2 = dataKeysGetFromParamsObj(paramsWithDotNotation, {
-            dataKeys: dataKeys
-          });
+          var _dataKeysGetFromParam2 = dataKeysGetFromParamsObj(paramsWithDotNotation, dataKeys);
 
           dataKeys = _dataKeysGetFromParam2.dataKeys;
         }
@@ -746,43 +749,45 @@ PARAMS_APPLIER: {
         paramsObjNew = paramsObj;
       }
 
-      var _this = this;
+      if (tagParse.length) {
+        var _this2 = this;
 
-      var _tagParse$reduce = tagParse.reduce(function (dataStructures, parseObj) {
-        var contextKeys = dataStructures.contextKeys,
-            paramKeys = dataStructures.paramKeys,
-            paramsObj = dataStructures.paramsObj;
-        var delimiterUnicodes = dataStructures.delimiterUnicodes,
-            partialText = dataStructures.partialText;
+        var _tagParse$reduce = tagParse.reduce(function (dataStructures, parseObj) {
+          var contextKeys = dataStructures.contextKeys,
+              paramKeys = dataStructures.paramKeys,
+              paramsObj = dataStructures.paramsObj;
+          var delimiterUnicodes = dataStructures.delimiterUnicodes,
+              partialText = dataStructures.partialText;
 
-        var _paramsApply$call = paramsApply.call(_this, {
+          var _paramsApply$call = paramsApply.call(_this2, {
+            contextKeys: contextKeys,
+            delimiterUnicodes_: delimiterUnicodes,
+            paramKeys: paramKeys,
+            paramsObj: paramsObj,
+            parseObj: parseObj,
+            partialText: partialText
+          });
+
+          delimiterUnicodes = _paramsApply$call.delimiterUnicodes;
+          partialText = _paramsApply$call.partialText;
+          return {
+            contextKeys: contextKeys,
+            delimiterUnicodes: delimiterUnicodes,
+            paramKeys: paramKeys,
+            paramsObj: paramsObj,
+            partialText: partialText
+          };
+        }, {
           contextKeys: contextKeys,
-          delimiterUnicodes_: delimiterUnicodes,
-          paramKeys: paramKeys,
-          paramsObj: paramsObj,
-          parseObj: parseObj,
+          delimiterUnicodes: delimiterUnicodes_,
+          paramKeys: paramKeysNew,
+          paramsObj: paramsObjNew,
           partialText: partialText
         });
 
-        delimiterUnicodes = _paramsApply$call.delimiterUnicodes;
-        partialText = _paramsApply$call.partialText;
-        return {
-          contextKeys: contextKeys,
-          delimiterUnicodes: delimiterUnicodes,
-          paramKeys: paramKeys,
-          paramsObj: paramsObj,
-          partialText: partialText
-        };
-      }, {
-        contextKeys: contextKeys,
-        delimiterUnicodes: delimiterUnicodes_,
-        paramKeys: paramKeysNew,
-        paramsObj: paramsObjNew,
-        partialText: partialText
-      });
-
-      delimiterUnicodes = _tagParse$reduce.delimiterUnicodes;
-      partialText = _tagParse$reduce.partialText;
+        delimiterUnicodes = _tagParse$reduce.delimiterUnicodes;
+        partialText = _tagParse$reduce.partialText;
+      }
     } else {
       var _paramsApplyByKeyArra = paramsApplyByKeyArrays({
         contextKeys: contextKeys,
@@ -812,9 +817,6 @@ PARAMS_APPLIER: {
         partialsKey = args.partialsKey,
         options = args.options;
     var partialFull = compilation.partials[partialsKey].name;
-
-    var _this = this;
-
     var styleModClasses;
     var styleModifierMatch;
 
@@ -878,33 +880,39 @@ PARAMS_APPLIER: {
       paramsObj.styleModifier = styleModClasses;
     }
 
+    var paramsObjKeys = Object.keys(paramsObj);
     var dataKeys;
 
-    var _Object$keys$reduce3 = Object.keys(paramsObj).reduce(function (dataStructures, dataKey) {
-      var dataKeys = dataStructures.dataKeys,
-          dataObj = dataStructures.dataObj,
-          parentObjAsStr = dataStructures.parentObjAsStr;
+    if (paramsObjKeys.length) {
+      var _this = this;
 
-      var _dataKeysCollect$call3 = dataKeysCollect.call(_this, {
-        dataKey: dataKey,
-        dataKeys: dataKeys,
-        dataObj: dataObj,
-        parentObjAsStr: parentObjAsStr
+      var _paramsObjKeys$reduce2 = paramsObjKeys.reduce(function (dataStructures, dataKey) {
+        var dataKeys = dataStructures.dataKeys,
+            dataObj = dataStructures.dataObj,
+            parentObjAsStr = dataStructures.parentObjAsStr;
+
+        var _dataKeysCollect$call3 = dataKeysCollect.call(_this, {
+          dataKey: dataKey,
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr
+        });
+
+        dataKeys = _dataKeysCollect$call3.dataKeys;
+        return {
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr
+        };
+      }, {
+        dataKeys: [],
+        dataObj: paramsObj,
+        parentObjAsStr: ''
       });
 
-      dataKeys = _dataKeysCollect$call3.dataKeys;
-      return {
-        dataKeys: dataKeys,
-        dataObj: dataObj,
-        parentObjAsStr: parentObjAsStr
-      };
-    }, {
-      dataKeys: [],
-      dataObj: paramsObj,
-      parentObjAsStr: ''
-    });
+      dataKeys = _paramsObjKeys$reduce2.dataKeys;
+    }
 
-    dataKeys = _Object$keys$reduce3.dataKeys;
     var paramKeys = dataKeys;
     var partialText_ = partials[partialShort] || '';
     var delimiterUnicodes;
@@ -915,41 +923,45 @@ PARAMS_APPLIER: {
       partialParseArr = partialsComp[partialShort].parseArr;
     }
 
-    var _partialParseArr$redu = partialParseArr.reduce(function (dataStructures, parseObj) {
-      var contextKeys = dataStructures.contextKeys,
-          paramKeys = dataStructures.paramKeys,
-          paramsObj = dataStructures.paramsObj;
-      var delimiterUnicodes = dataStructures.delimiterUnicodes,
-          partialText = dataStructures.partialText;
+    if (partialParseArr.length) {
+      var _this3 = this;
 
-      var _paramsApply$call2 = paramsApply.call(_this, {
-        contextKeys: contextKeys,
-        delimiterUnicodes_: delimiterUnicodes,
-        paramKeys: paramKeys,
-        paramsObj: paramsObj,
-        parseObj: parseObj,
-        partialText: partialText
-      });
+      var _partialParseArr$redu = partialParseArr.reduce(function (dataStructures, parseObj) {
+        var contextKeys = dataStructures.contextKeys,
+            paramKeys = dataStructures.paramKeys,
+            paramsObj = dataStructures.paramsObj;
+        var delimiterUnicodes = dataStructures.delimiterUnicodes,
+            partialText = dataStructures.partialText;
 
-      delimiterUnicodes = _paramsApply$call2.delimiterUnicodes;
-      partialText = _paramsApply$call2.partialText;
-      return {
+        var _paramsApply$call2 = paramsApply.call(_this3, {
+          contextKeys: contextKeys,
+          delimiterUnicodes_: delimiterUnicodes,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          parseObj: parseObj,
+          partialText: partialText
+        });
+
+        delimiterUnicodes = _paramsApply$call2.delimiterUnicodes;
+        partialText = _paramsApply$call2.partialText;
+        return {
+          contextKeys: contextKeys,
+          delimiterUnicodes: delimiterUnicodes,
+          paramKeys: paramKeys,
+          paramsObj: paramsObj,
+          partialText: partialText
+        };
+      }, {
         contextKeys: contextKeys,
         delimiterUnicodes: delimiterUnicodes,
         paramKeys: paramKeys,
         paramsObj: paramsObj,
-        partialText: partialText
-      };
-    }, {
-      contextKeys: contextKeys,
-      delimiterUnicodes: delimiterUnicodes,
-      paramKeys: paramKeys,
-      paramsObj: paramsObj,
-      partialText: partialText_
-    });
+        partialText: partialText_
+      });
 
-    delimiterUnicodes = _partialParseArr$redu.delimiterUnicodes;
-    partialText = _partialParseArr$redu.partialText;
+      delimiterUnicodes = _partialParseArr$redu.delimiterUnicodes;
+      partialText = _partialParseArr$redu.partialText;
+    }
 
     if (delimiterUnicodes && partialText !== partialText_) {
       // First, render with unicode delimiters.
@@ -984,42 +996,48 @@ METHODS: {
       return [];
     }
 
-    var _this = this;
-
+    var contextArgKeys = Object.keys(context);
     var dataKeys = [];
 
-    var _Object$keys$reduce4 = Object.keys(context).reduce(function (dataStructures, dataKey) {
-      var dataKeys = dataStructures.dataKeys,
-          dataObj = dataStructures.dataObj,
-          parentObjAsStr = dataStructures.parentObjAsStr;
+    if (contextArgKeys.length) {
+      var _this = this;
 
-      var _dataKeysCollect$call4 = dataKeysCollect.call(_this, {
-        dataKey: dataKey,
+      var _contextArgKeys$reduc = contextArgKeys.reduce(function (dataStructures, dataKey) {
+        var dataKeys = dataStructures.dataKeys,
+            dataObj = dataStructures.dataObj,
+            parentObjAsStr = dataStructures.parentObjAsStr;
+
+        var _dataKeysCollect$call4 = dataKeysCollect.call(_this, {
+          dataKey: dataKey,
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr
+        });
+
+        dataKeys = _dataKeysCollect$call4.dataKeys;
+        return {
+          dataKeys: dataKeys,
+          dataObj: dataObj,
+          parentObjAsStr: parentObjAsStr
+        };
+      }, {
         dataKeys: dataKeys,
-        dataObj: dataObj,
-        parentObjAsStr: parentObjAsStr
+        dataObj: context,
+        parentObjAsStr: ''
       });
 
-      dataKeys = _dataKeysCollect$call4.dataKeys;
-      return {
-        dataKeys: dataKeys,
-        dataObj: dataObj,
-        parentObjAsStr: parentObjAsStr
-      };
-    }, {
-      dataKeys: dataKeys,
-      dataObj: context,
-      parentObjAsStr: ''
-    });
+      dataKeys = _contextArgKeys$reduc.dataKeys;
+    }
 
-    dataKeys = _Object$keys$reduce4.dataKeys;
     var contextKeys = [];
 
     if (dataKeys.length) {
+      var _this4 = this;
+
       var _dataKeys$reduce = dataKeys.reduce(function (dataStructures, contextKey) {
         var contextKeys = dataStructures.contextKeys;
 
-        var _contextKeysCollect$c = contextKeysCollect.call(_this, {
+        var _contextKeysCollect$c = contextKeysCollect.call(_this4, {
           contextKey: contextKey,
           contextKeys: contextKeys
         });
@@ -1047,7 +1065,7 @@ METHODS: {
     var _contextKeys; // First, check if we still need to preprocess contextKeys because .render() was called statically.
 
 
-    if (typeof contextKeys === 'undefined') {
+    if (typeof contextKeys === 'undefined' && partialsKeys.length) {
       var hasParam = partialsKeys.reduce(function (acc, partialsKey) {
         var partialFull = compilation.partials[partialsKey].name;
 
@@ -1065,42 +1083,46 @@ METHODS: {
       }
     }
 
-    var _this = this;
-
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
-    partialsKeys.reduce(function (dataStructures, partialsKey) {
-      var compilation = dataStructures.compilation,
-          contextKeys = dataStructures.contextKeys,
-          options = dataStructures.options;
-      var partials = dataStructures.partials,
-          partialsComp = dataStructures.partialsComp;
 
-      var _partialsWithParamsAd = partialsWithParamsAdd.call(_this, {
+    if (partialsKeys.length) {
+      var _this = this;
+
+      partialsKeys.reduce(function (dataStructures, partialsKey) {
+        var compilation = dataStructures.compilation,
+            contextKeys = dataStructures.contextKeys,
+            options = dataStructures.options;
+        var partials = dataStructures.partials,
+            partialsComp = dataStructures.partialsComp;
+
+        var _partialsWithParamsAd = partialsWithParamsAdd.call(_this, {
+          compilation: compilation,
+          contextKeys: contextKeys,
+          partials: partials,
+          partialsComp: partialsComp,
+          partialsKey: partialsKey,
+          options: options
+        });
+
+        partials = _partialsWithParamsAd.partials;
+        partialsComp = _partialsWithParamsAd.partialsComp;
+        return {
+          compilation: compilation,
+          contextKeys: contextKeys,
+          partials: partials,
+          partialsComp: partialsComp,
+          options: options
+        };
+      }, {
         compilation: compilation,
         contextKeys: contextKeys,
         partials: partials,
         partialsComp: partialsComp,
-        partialsKey: partialsKey,
         options: options
       });
+    }
 
-      partials = _partialsWithParamsAd.partials;
-      partialsComp = _partialsWithParamsAd.partialsComp;
-      return {
-        compilation: compilation,
-        contextKeys: contextKeys,
-        partials: partials,
-        partialsComp: partialsComp,
-        options: options
-      };
-    }, {
-      compilation: compilation,
-      contextKeys: contextKeys,
-      partials: partials,
-      partialsComp: partialsComp,
-      options: options
-    });
     return {
       compilation: compilation,
       _contextKeys: _contextKeys,
@@ -1112,9 +1134,6 @@ METHODS: {
 
   var compile = function compile(text, options_, partials_, partialsComp_, contextKeys_, context) {
     var options = options_ || this.options || {};
-
-    var _this = this;
-
     var compilation = hogan.compile(text, options);
     var contextKeys = contextKeys_ || this && this.contextKeys;
 
@@ -1122,48 +1141,53 @@ METHODS: {
 
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
+    var partialsKeys = Object.keys(partials);
 
-    var _Object$keys$reduce5 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
-      var context = dataStructures.context,
-          contextKeys = dataStructures.contextKeys,
-          options = dataStructures.options;
-      var _contextKeys = dataStructures._contextKeys,
-          partials = dataStructures.partials,
-          partialsComp = dataStructures.partialsComp;
+    if (partialsKeys.length) {
+      var _this = this;
 
-      var _preProcessPartialPar2 = preProcessPartialParams.call(_this, partials[partialsKey], partialsComp[partialsKey].compilation, partials, partialsComp, contextKeys, context, options);
+      var _partialsKeys$reduce = partialsKeys.reduce(function (dataStructures, partialsKey) {
+        var context = dataStructures.context,
+            contextKeys = dataStructures.contextKeys,
+            options = dataStructures.options;
+        var _contextKeys = dataStructures._contextKeys,
+            partials = dataStructures.partials,
+            partialsComp = dataStructures.partialsComp;
 
-      _contextKeys = _preProcessPartialPar2._contextKeys;
-      partials = _preProcessPartialPar2.partials;
-      partialsComp = _preProcessPartialPar2.partialsComp;
-      return {
+        var _preProcessPartialPar = preProcessPartialParams.call(_this, partials[partialsKey], partialsComp[partialsKey].compilation, partials, partialsComp, contextKeys, context, options);
+
+        _contextKeys = _preProcessPartialPar._contextKeys;
+        partials = _preProcessPartialPar.partials;
+        partialsComp = _preProcessPartialPar.partialsComp;
+        return {
+          context: context,
+          contextKeys: contextKeys,
+          _contextKeys: _contextKeys,
+          partials: partials,
+          partialsComp: partialsComp,
+          options: options
+        };
+      }, {
         context: context,
         contextKeys: contextKeys,
         _contextKeys: _contextKeys,
         partials: partials,
         partialsComp: partialsComp,
         options: options
-      };
-    }, {
-      context: context,
-      contextKeys: contextKeys,
-      _contextKeys: _contextKeys,
-      partials: partials,
-      partialsComp: partialsComp,
-      options: options
-    });
+      });
 
-    _contextKeys = _Object$keys$reduce5._contextKeys;
-    partials = _Object$keys$reduce5.partials;
-    partialsComp = _Object$keys$reduce5.partialsComp;
+      _contextKeys = _partialsKeys$reduce._contextKeys;
+      partials = _partialsKeys$reduce.partials;
+      partialsComp = _partialsKeys$reduce.partialsComp;
+    }
 
     if (_contextKeys) {
       contextKeys = _contextKeys;
     }
 
-    var _preProcessPartialPar = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context, options);
+    var _preProcessPartialPar2 = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context, options);
 
-    compilation = _preProcessPartialPar.compilation;
+    compilation = _preProcessPartialPar2.compilation;
     return compilation;
   };
 
@@ -1204,25 +1228,28 @@ METHODS: {
     var context = context_ || this.context || {};
     var contextKeys = contextKeys_ || this && this.contextKeys;
     var options = options_ || this.options || {};
-
-    var _this = this;
-
     var partials = partials_ || this.partials || {};
     var partialsComp = partialsComp_ || this.partialsComp || {};
+    var partialsKeys = Object.keys(partials);
 
-    var _Object$keys$reduce6 = Object.keys(partials).reduce(function (dataStructures, partialsKey) {
-      var partials = dataStructures.partials,
-          partialsComp = dataStructures.partialsComp,
-          options = dataStructures.options;
-      return registerPartial.call(_this, partialsKey, partials[partialsKey], null, partials, partialsComp, options);
-    }, {
-      partials: partials,
-      partialsComp: partialsComp,
-      options: options
-    });
+    if (partialsKeys.length) {
+      var _this = this;
 
-    partials = _Object$keys$reduce6.partials;
-    partialsComp = _Object$keys$reduce6.partialsComp;
+      var _partialsKeys$reduce2 = partialsKeys.reduce(function (dataStructures, partialsKey) {
+        var partials = dataStructures.partials,
+            partialsComp = dataStructures.partialsComp,
+            options = dataStructures.options;
+        return registerPartial.call(_this, partialsKey, partials[partialsKey], null, partials, partialsComp, options);
+      }, {
+        partials: partials,
+        partialsComp: partialsComp,
+        options: options
+      });
+
+      partials = _partialsKeys$reduce2.partials;
+      partialsComp = _partialsKeys$reduce2.partialsComp;
+    }
+
     var compilation;
 
     if (Object.keys(partialsComp).length) {
