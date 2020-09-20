@@ -714,20 +714,11 @@ PARAMS_APPLIER: {
       paramKeys,
       paramsObj,
       parseObj,
-      parseObjKeysItr,
-      parseObjKeysItrn,
+      parseObjKey,
       //partialShort, // For debugging.
       partialText_
     } = args;
 
-    if (parseObjKeysItrn.done) {
-      return {
-        delimiterUnicodes: delimiterUnicodes_,
-        partialText: partialText_
-      };
-    }
-
-    const parseObjKey = parseObjKeysItrn.value;
     const tagParse = parseObj[parseObjKey];
     let partialText = partialText_;
     let delimiterUnicodes;
@@ -835,11 +826,10 @@ PARAMS_APPLIER: {
       }));
     }
 
-    args.delimiterUnicodes_ = delimiterUnicodes || delimiterUnicodes_;
-    args.parseObjKeysItrn = parseObjKeysItr.next();
-    args.partialText_ = partialText || partialText_;
-
-    return paramsApplyToParseObj(args);
+    return {
+      delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
+      partialText: partialText || partialText_
+    };
   };
 
   var paramsApply = function (args) {
@@ -855,28 +845,60 @@ PARAMS_APPLIER: {
       partialText
     } = args;
 
-    const parseObjKeys = Object.keys(parseObj);
+    const _this = this;
     let delimiterUnicodes;
 
-    if (parseObjKeys.length) {
-      // At this point, parseObjKeys.length is always > 1.
-      const parseObjKeysItr = parseObjKeys[Symbol.iterator]();
-      const parseObjKeysItrn = parseObjKeysItr.next();
-      ({
-        delimiterUnicodes,
-        partialText
-      } = paramsApplyToParseObj({
+    ({
+      delimiterUnicodes,
+      partialText
+    } = Object.keys(parseObj).reduce(
+      (dataStructures, parseObjKey) => {
+        const {
+          contextKeys,
+          paramKeys,
+          paramsObj,
+          parseObj
+        } = dataStructures;
+        let {
+          delimiterUnicodes,
+          partialText
+        } = dataStructures;
+
+        ({
+          delimiterUnicodes,
+          partialText
+        } = paramsApplyToParseObj.call(
+          _this,
+          {
+            contextKeys,
+            delimiterUnicodes_: delimiterUnicodes,
+            paramKeys,
+            paramsObj,
+            parseObj,
+            parseObjKey,
+            //partialShort, // For debugging.
+            partialText_: partialText
+          }
+        ));
+
+        return {
+          contextKeys,
+          delimiterUnicodes,
+          paramKeys,
+          paramsObj,
+          parseObj,
+          partialText
+        };
+      },
+      {
         contextKeys,
-        delimiterUnicodes_: delimiterUnicodes,
+        delimiterUnicodes,
         paramKeys,
         paramsObj,
         parseObj,
-        parseObjKeysItr,
-        parseObjKeysItrn,
-        //partialShort, // For debugging.
-        partialText_: partialText
-      }));
-    }
+        partialText
+      }
+    ));
 
     return {
       delimiterUnicodes: delimiterUnicodes || delimiterUnicodes_,
