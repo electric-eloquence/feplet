@@ -601,8 +601,7 @@ PARAMS_APPLIER: {
     }, {
       dataKeys: dataKeys,
       dataObj: paramsObj,
-      parentObjAsStr: '' //partialShort // For debugging.
-
+      parentObjAsStr: ''
     });
 
     dataKeys = _Object$keys$reduce2.dataKeys;
@@ -681,20 +680,30 @@ PARAMS_APPLIER: {
 
       if (paramsWithDotNotation instanceof Object) {
         if (Array.isArray(paramsWithDotNotation)) {
-          var paramsWithDotNotationItr = paramsWithDotNotation[Symbol.iterator]();
-          var paramsWithDotNotationItrn = paramsWithDotNotationItr.next();
+          var _this2 = this;
 
-          var _dataAppendViaIterato2 = dataAppendViaIterator(paramsWithDotNotationItr, paramsWithDotNotationItrn, {
-            dataKeys: dataKeys
-          }, dataKeysGetFromParamsObj);
+          var _paramsWithDotNotatio = paramsWithDotNotation.reduce(function (dataStructures, dataObjItem, index) {
+            var dataKeys = dataStructures.dataKeys;
 
-          dataKeys = _dataAppendViaIterato2.dataKeys;
-        } else {
-          var _dataKeysGetFromParam = dataKeysGetFromParamsObj(paramsWithDotNotation, {
+            var _dataKeysGetFromParam = dataKeysGetFromParamsObj.call(_this2, dataObjItem, {
+              dataKeys: dataKeys
+            }, {}, index);
+
+            dataKeys = _dataKeysGetFromParam.dataKeys;
+            return {
+              dataKeys: dataKeys
+            };
+          }, {
             dataKeys: dataKeys
           });
 
-          dataKeys = _dataKeysGetFromParam.dataKeys;
+          dataKeys = _paramsWithDotNotatio.dataKeys;
+        } else {
+          var _dataKeysGetFromParam2 = dataKeysGetFromParamsObj(paramsWithDotNotation, {
+            dataKeys: dataKeys
+          });
+
+          dataKeys = _dataKeysGetFromParam2.dataKeys;
         }
 
         paramsObjNew = paramsWithDotNotation;
@@ -748,10 +757,8 @@ PARAMS_APPLIER: {
         delimiterUnicodes_: delimiterUnicodes_,
         tagParseVal: tagParse,
         paramKeys: paramKeys,
-        //paramsObj, // For debugging.
         parseObj: parseObj,
         parseObjKey: parseObjKey,
-        //partialShort, // For debugging.
         partialText_: partialText_
       });
 
@@ -792,7 +799,6 @@ PARAMS_APPLIER: {
         paramsObj: paramsObj,
         parseObj: parseObj,
         parseObjKey: parseObjKey,
-        //partialShort, // For debugging.
         partialText_: partialText
       });
 
@@ -920,8 +926,7 @@ PARAMS_APPLIER: {
     }, {
       dataKeys: [],
       dataObj: paramsObj,
-      parentObjAsStr: '' //partialShort // For debugging.
-
+      parentObjAsStr: ''
     });
 
     dataKeys = _Object$keys$reduce4.dataKeys;

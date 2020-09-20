@@ -642,8 +642,7 @@ PARAMS_APPLIER: {
       {
         dataKeys,
         dataObj: paramsObj,
-        parentObjAsStr: '',
-        //partialShort // For debugging.
+        parentObjAsStr: ''
       }
     ));
 
@@ -656,10 +655,8 @@ PARAMS_APPLIER: {
       delimiterUnicodes_,
       tagParseVal,
       paramKeys,
-      //paramsObj, // For debugging.
       parseObj,
       parseObjKey,
-      //partialShort, // For debugging.
       partialText_
     } = args;
 
@@ -715,7 +712,6 @@ PARAMS_APPLIER: {
       paramsObj,
       parseObj,
       parseObjKey,
-      //partialShort, // For debugging.
       partialText_
     } = args;
 
@@ -735,14 +731,23 @@ PARAMS_APPLIER: {
 
       if (paramsWithDotNotation instanceof Object) {
         if (Array.isArray(paramsWithDotNotation)) {
-          const paramsWithDotNotationItr = paramsWithDotNotation[Symbol.iterator]();
-          const paramsWithDotNotationItrn = paramsWithDotNotationItr.next();
+          const _this = this;
 
-          ({dataKeys} = dataAppendViaIterator(
-            paramsWithDotNotationItr,
-            paramsWithDotNotationItrn,
-            {dataKeys},
-            dataKeysGetFromParamsObj
+          ({dataKeys} = paramsWithDotNotation.reduce(
+            (dataStructures, dataObjItem, index) => {
+              let {dataKeys} = dataStructures;
+
+              ({dataKeys} = dataKeysGetFromParamsObj.call(
+                _this,
+                dataObjItem,
+                {dataKeys},
+                {},
+                index
+              ));
+
+              return {dataKeys};
+            },
+            {dataKeys}
           ));
         }
         else {
@@ -818,10 +823,8 @@ PARAMS_APPLIER: {
         delimiterUnicodes_,
         tagParseVal: tagParse,
         paramKeys,
-        //paramsObj, // For debugging.
         parseObj,
         parseObjKey,
-        //partialShort, // For debugging.
         partialText_
       }));
     }
@@ -837,8 +840,7 @@ PARAMS_APPLIER: {
       contextKeys,
       paramKeys,
       paramsObj,
-      parseObj,
-      //partialShort, // For debugging.
+      parseObj
     } = args;
     let {
       delimiterUnicodes_,
@@ -876,7 +878,6 @@ PARAMS_APPLIER: {
             paramsObj,
             parseObj,
             parseObjKey,
-            //partialShort, // For debugging.
             partialText_: partialText
           }
         ));
@@ -1005,8 +1006,7 @@ PARAMS_APPLIER: {
       {
         dataKeys: [],
         dataObj: paramsObj,
-        parentObjAsStr: '',
-        //partialShort // For debugging.
+        parentObjAsStr: ''
       }
     ));
 
