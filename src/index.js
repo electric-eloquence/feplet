@@ -438,15 +438,17 @@ COLLECTORS: {
       dataKeys
     } = args;
 
-    parentObjSplit.reduce((dataKey_, itemNext) => {
-      const dataKey = dataKey_ + '.' + itemNext;
+    if (parentObjSplit.length) {
+      parentObjSplit.reduce((dataKey_, itemNext) => {
+        const dataKey = dataKey_ + '.' + itemNext;
 
-      if (!dataKeys.includes(dataKey)) {
-        dataKeys.push(dataKey);
-      }
+        if (!dataKeys.includes(dataKey)) {
+          dataKeys.push(dataKey);
+        }
 
-      return dataKey;
-    });
+        return dataKey;
+      });
+    }
 
     return {dataKeys};
   };
