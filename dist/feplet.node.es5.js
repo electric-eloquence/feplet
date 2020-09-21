@@ -390,15 +390,19 @@ COLLECTORS: {
   var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
     var parentObjSplit = args.parentObjSplit,
         dataKeys = args.dataKeys;
-    parentObjSplit.reduce(function (dataKey_, itemNext) {
-      var dataKey = dataKey_ + '.' + itemNext;
 
-      if (!dataKeys.includes(dataKey)) {
-        dataKeys.push(dataKey);
-      }
+    if (parentObjSplit.length) {
+      parentObjSplit.reduce(function (dataKey_, itemNext) {
+        var dataKey = dataKey_ + '.' + itemNext;
 
-      return dataKey;
-    });
+        if (!dataKeys.includes(dataKey)) {
+          dataKeys.push(dataKey);
+        }
+
+        return dataKey;
+      });
+    }
+
     return {
       dataKeys: dataKeys
     };
