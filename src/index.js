@@ -96,12 +96,16 @@ HELPERS: {
         partialText_
       } = args;
 
-      let count;
-      let counter = count_;
+      const counter = (function spacesCountInPartialText_(index) {
+        if (/\s/.test(partialText_[index])) {
+          return spacesCountInPartialText_(index + inc);
+        }
+        else {
+          return index;
+        }
+      })(count_);
 
-      while (/\s/.test(partialText_[counter])) {
-        counter += inc;
-      }
+      let count;
 
       if (inc > 0) {
         count = counter - count_;
@@ -187,56 +191,63 @@ HELPERS: {
         space1StopPos,
         //stopPos // For debugging.
       } = openTagData;
-      let i;
-      let partialText = '';
 
-      i = parseObj.otag.length;
+      let partialTextArr = [];
 
-      while (i--) {
-        partialText += '\u0002';
-        //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
-      }
+      partialTextArr[0] = parseObj.otag.replace(/./g, '\u0002');
+      //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
 
       switch (parseObj.tag) {
         case '#':
         case '&':
         case '^':
-          partialText += parseObj.tag;
+          partialTextArr.push(parseObj.tag);
           break;
         case '{':
-          partialText += '&';
+          partialTextArr.push('&');
           break;
       }
 
-      i = space0StartPos;
+      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
+        if (index < space0StopPos) {
+          const indexNew = index + 1;
 
-      while (i < space0StopPos) {
-        i++;
-        partialText += partialText_[i];
-      }
+          partialTextArr_.push(partialText_[indexNew]);
 
-      partialText += parseObj.n;
-      i = space1StartPos;
+          return partialTextSlice(partialTextArr_, indexNew);
+        }
+        else {
+          return partialTextArr_;
+        }
+      })(partialTextArr, space0StartPos);
 
-      while (i < space1StopPos) {
-        i++;
-        partialText += partialText_[i];
-      }
+      partialTextArr.push(parseObj.n);
+
+      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
+        if (index < space1StopPos) {
+          const indexNew = index + 1;
+
+          partialTextArr_.push(partialText_[indexNew]);
+
+          return partialTextSlice(partialTextArr_, indexNew);
+        }
+        else {
+          return partialTextArr_;
+        }
+      })(partialTextArr, space1StartPos);
 
       switch (parseObj.tag) {
         case '{':
-          partialText += ' ';
+          partialTextArr.push(' ');
       }
 
-      i = parseObj.ctag.length;
+      const l = partialTextArr.length;
 
-      while (i--) {
-        partialText += '\u0003';
-        //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
-      }
+      partialTextArr[l] = parseObj.otag.replace(/./g, '\u0003');
+      //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
 
       return {
-        partialText
+        partialText: partialTextArr.join('')
       };
     };
 
@@ -291,41 +302,45 @@ HELPERS: {
         space1StopPos,
         //stopPos // For debugging.
       } = closeTagData;
-      let i;
-      let partialText = '';
 
-      i = parseObj.otag.length;
+      let partialTextArr = [];
 
-      while (i--) {
-        partialText += '\u0002';
-        //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
-      }
+      partialTextArr[0] = parseObj.otag.replace(/./g, '\u0002');
+      //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
 
-      partialText += '/';
-      i = space0StartPos;
+      partialTextArr.push('/');
 
-      while (i < space0StopPos) {
-        partialText += partialText_[i];
-        i++;
-      }
+      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
+        if (index < space0StopPos) {
+          partialTextArr_.push(partialText_[index]);
 
-      partialText += parseObj.n;
-      i = space1StartPos;
+          return partialTextSlice(partialTextArr_, index + 1);
+        }
+        else {
+          return partialTextArr_;
+        }
+      })(partialTextArr, space0StartPos);
 
-      while (i < space1StopPos) {
-        partialText += partialText_[i];
-        i++;
-      }
+      partialTextArr.push(parseObj.n);
 
-      i = parseObj.ctag.length;
+      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
+        if (index < space1StopPos) {
+          partialTextArr_.push(partialText_[index]);
 
-      while (i--) {
-        partialText += '\u0003';
-        //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
-      }
+          return partialTextSlice(partialTextArr_, index + 1);
+        }
+        else {
+          return partialTextArr_;
+        }
+      })(partialTextArr, space1StartPos);
+
+      const l = partialTextArr.length;
+
+      partialTextArr[l] = parseObj.otag.replace(/./g, '\u0003');
+      //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
 
       return {
-        partialText
+        partialText: partialTextArr.join('')
       };
     };
 
@@ -399,44 +414,44 @@ HELPERS: {
 COLLECTORS: {
   var contextKeysCollect = function (args) {
     const {
-      contextKey,
+      contextKey
+    } = args;
+    let {
       contextKeys
     } = args;
 
-    const contextKeySplit = contextKey.split('.');
+    args.contextKeys = (function dotSlice(dottedString, contextKeys_) {
+      const dotIndex = dottedString.indexOf('.');
+      const slicedString = dottedString.slice(dotIndex + 1);
 
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
+      if (dotIndex > -1 && !contextKeys_.includes(slicedString)) {
+        contextKeys_.push(slicedString);
 
-      const contextKeyNew = contextKeySplit.join('.');
-
-      if (!contextKeys.includes(contextKeyNew)) {
-        contextKeys.push(contextKeyNew);
+        return dotSlice(slicedString, contextKeys_);
       }
-    }
+      else {
+        return contextKeys_;
+      }
+    })(contextKey, contextKeys);
 
     return args;
   };
 
   var dataKeysWithDotNotationAdd = function (args) {
     const {
-      dataKeys,
-      parentObjSplit
+      parentObjSplit,
+      dataKeys
     } = args;
 
-    let i = 0;
-    let itemNext;
-    let dataKey = parentObjSplit[i];
-
-    // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
-    // loop at index 1.
-    while (itemNext = parentObjSplit[++i]) { // eslint-disable-line no-cond-assign
-      dataKey += `.${itemNext}`;
+    parentObjSplit.reduce((dataKey_, itemNext) => {
+      const dataKey = dataKey_ + '.' + itemNext;
 
       if (!dataKeys.includes(dataKey)) {
         dataKeys.push(dataKey);
       }
-    }
+
+      return dataKey_;
+    });
 
     return {dataKeys};
   };

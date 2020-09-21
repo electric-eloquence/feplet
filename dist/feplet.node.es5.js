@@ -86,12 +86,16 @@ HELPERS: {
       var count_ = args.count_,
           inc = args.inc,
           partialText_ = args.partialText_;
-      var count;
-      var counter = count_;
 
-      while (/\s/.test(partialText_[counter])) {
-        counter += inc;
-      }
+      var counter = function spacesCountInPartialText_(index) {
+        if (/\s/.test(partialText_[index])) {
+          return spacesCountInPartialText_(index + inc);
+        } else {
+          return index;
+        }
+      }(count_);
+
+      var count;
 
       if (inc > 0) {
         count = counter - count_;
@@ -172,54 +176,53 @@ HELPERS: {
           space0StopPos = openTagData.space0StopPos,
           space1StartPos = openTagData.space1StartPos,
           space1StopPos = openTagData.space1StopPos;
-      var i;
-      var partialText = '';
-      i = parseObj.otag.length;
-
-      while (i--) {
-        partialText += "\x02"; //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
-      }
+      var partialTextArr = [];
+      partialTextArr[0] = parseObj.otag.replace(/./g, "\x02"); //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
 
       switch (parseObj.tag) {
         case '#':
         case '&':
         case '^':
-          partialText += parseObj.tag;
+          partialTextArr.push(parseObj.tag);
           break;
 
         case '{':
-          partialText += '&';
+          partialTextArr.push('&');
           break;
       }
 
-      i = space0StartPos;
+      partialTextArr = function partialTextSlice(partialTextArr_, index) {
+        if (index < space0StopPos) {
+          var indexNew = index + 1;
+          partialTextArr_.push(partialText_[indexNew]);
+          return partialTextSlice(partialTextArr_, indexNew);
+        } else {
+          return partialTextArr_;
+        }
+      }(partialTextArr, space0StartPos);
 
-      while (i < space0StopPos) {
-        i++;
-        partialText += partialText_[i];
-      }
+      partialTextArr.push(parseObj.n);
 
-      partialText += parseObj.n;
-      i = space1StartPos;
-
-      while (i < space1StopPos) {
-        i++;
-        partialText += partialText_[i];
-      }
+      partialTextArr = function partialTextSlice(partialTextArr_, index) {
+        if (index < space1StopPos) {
+          var indexNew = index + 1;
+          partialTextArr_.push(partialText_[indexNew]);
+          return partialTextSlice(partialTextArr_, indexNew);
+        } else {
+          return partialTextArr_;
+        }
+      }(partialTextArr, space1StartPos);
 
       switch (parseObj.tag) {
         case '{':
-          partialText += ' ';
+          partialTextArr.push(' ');
       }
 
-      i = parseObj.ctag.length;
-
-      while (i--) {
-        partialText += "\x03"; //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
-      }
+      var l = partialTextArr.length;
+      partialTextArr[l] = parseObj.otag.replace(/./g, "\x03"); //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
 
       return {
-        partialText: partialText
+        partialText: partialTextArr.join('')
       };
     };
 
@@ -270,38 +273,36 @@ HELPERS: {
           space0StopPos = closeTagData.space0StopPos,
           space1StartPos = closeTagData.space1StartPos,
           space1StopPos = closeTagData.space1StopPos;
-      var i;
-      var partialText = '';
-      i = parseObj.otag.length;
+      var partialTextArr = [];
+      partialTextArr[0] = parseObj.otag.replace(/./g, "\x02"); //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
 
-      while (i--) {
-        partialText += "\x02"; //partialText = partialText.slice(0, -1) + '֍'; // For debugging.
-      }
+      partialTextArr.push('/');
 
-      partialText += '/';
-      i = space0StartPos;
+      partialTextArr = function partialTextSlice(partialTextArr_, index) {
+        if (index < space0StopPos) {
+          partialTextArr_.push(partialText_[index]);
+          return partialTextSlice(partialTextArr_, index + 1);
+        } else {
+          return partialTextArr_;
+        }
+      }(partialTextArr, space0StartPos);
 
-      while (i < space0StopPos) {
-        partialText += partialText_[i];
-        i++;
-      }
+      partialTextArr.push(parseObj.n);
 
-      partialText += parseObj.n;
-      i = space1StartPos;
+      partialTextArr = function partialTextSlice(partialTextArr_, index) {
+        if (index < space1StopPos) {
+          partialTextArr_.push(partialText_[index]);
+          return partialTextSlice(partialTextArr_, index + 1);
+        } else {
+          return partialTextArr_;
+        }
+      }(partialTextArr, space1StartPos);
 
-      while (i < space1StopPos) {
-        partialText += partialText_[i];
-        i++;
-      }
-
-      i = parseObj.ctag.length;
-
-      while (i--) {
-        partialText += "\x03"; //partialText = partialText.slice(0, -1) + '֎'; // For debugging.
-      }
+      var l = partialTextArr.length;
+      partialTextArr[l] = parseObj.otag.replace(/./g, "\x03"); //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
 
       return {
-        partialText: partialText
+        partialText: partialTextArr.join('')
       };
     };
 
@@ -373,39 +374,36 @@ HELPERS: {
 
 COLLECTORS: {
   var contextKeysCollect = function contextKeysCollect(args) {
-    var contextKey = args.contextKey,
-        contextKeys = args.contextKeys;
-    var contextKeySplit = contextKey.split('.');
+    var contextKey = args.contextKey;
+    var contextKeys = args.contextKeys;
 
-    while (contextKeySplit.length > 1) {
-      contextKeySplit.shift();
-      var contextKeyNew = contextKeySplit.join('.');
+    args.contextKeys = function dotSlice(dottedString, contextKeys_) {
+      var dotIndex = dottedString.indexOf('.');
+      var slicedString = dottedString.slice(dotIndex + 1);
 
-      if (!contextKeys.includes(contextKeyNew)) {
-        contextKeys.push(contextKeyNew);
+      if (dotIndex > -1 && !contextKeys_.includes(slicedString)) {
+        contextKeys_.push(slicedString);
+        return dotSlice(slicedString, contextKeys_);
+      } else {
+        return contextKeys_;
       }
-    }
+    }(contextKey, contextKeys);
 
     return args;
   };
 
   var dataKeysWithDotNotationAdd = function dataKeysWithDotNotationAdd(args) {
-    var dataKeys = args.dataKeys,
-        parentObjSplit = args.parentObjSplit;
-    var i = 0;
-    var itemNext;
-    var dataKey = parentObjSplit[i]; // Using assigment as the condition for a while loop to avoid having to perform conditional check for starting a for
-    // loop at index 1.
-
-    while (itemNext = parentObjSplit[++i]) {
-      // eslint-disable-line no-cond-assign
-      dataKey += ".".concat(itemNext);
+    var parentObjSplit = args.parentObjSplit,
+        dataKeys = args.dataKeys;
+    parentObjSplit.reduce(function (dataKey_, itemNext) {
+      var dataKey = dataKey_ + '.' + itemNext;
 
       if (!dataKeys.includes(dataKey)) {
         dataKeys.push(dataKey);
       }
-    }
 
+      return dataKey_;
+    });
     return {
       dataKeys: dataKeys
     };
