@@ -1,15 +1,10 @@
-// For loops are generally replaced by recursion through iterators. This is more verbose, and more difficult to read for
-// the uninitiated, but the idea of recursing on .next() values and terminating on .done values should be easy to grasp.
-// In accordance with the "functional programming" paradigm, this is useful for traversing nested data structures. In
-// addition, since many functions herein add to data structures while recursing through them, we can avoid ambiguity as
-// to whether added values are recomputed as .next() values. (They are.) Plain for, for..of, for..in, and forEach loops,
-// as well as the .map(), .filter(), and .reduce() Array methods, all do this differently. Neither the loop statements
-// nor Array methods inherently imply whether or not recomputation occurs. On the other hand, iterators' .next()
-// unambiguously expresses computation on each call.
-// We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance
-// and readability. It can be argued that iterative loop mutation of variables declared outside the scope of said loops
-// is an eye (and brain) sore to those who've embraced functional programming.
-// Labeled block statements are used to segregate functions into organizational units. We could also achieve this by
+// This package embraces functional programming to the extent that JavaScript allows. The benefits are mainly
+// theoretical and educational. Being able to think functionally will be extremely valuable when working in languages
+// that are purely functional.
+// We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance.
+// Fortunately, the functional master branch does not suffer from performance-loss compared to the more imperative
+// branch.
+// Labeled block statements are used to organize functions into logical divisions. We could also achieve this by
 // breaking this file into multiple files. However, we need to compile our code into ES5 consumable by less modern
 // browsers. Given that this is a relatively small file, it is easier to keep the code in one file.
 'use strict';
