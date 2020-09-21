@@ -9,10 +9,9 @@
 
 ## Powerful under the hood. Simple behind the wheel.
 
-### How is this different from <a href="https://mustache.github.io/mustache.5.html" target="_blank">Mustache</a> (and <a href="https://github.com/twitter/hogan.js#readme" target="_blank">Hogan.js</a>)?
-
-Feplet implements Hogan.js and is mostly compatible with it, and is therefore 
-mostly compatible with Mustache. These are the main differences:
+Feplet mostly adheres to the 
+<a href="https://github.com/mustache/spec" target="_blank">Mustache spec</a>. 
+These are the main differences:
 
 * Feplet does not allow space between an opening delimiter and a command 
   character, such as `#`, `/`, or `>`. For example:
@@ -115,7 +114,12 @@ Also for browsers (ES5):
 </script>
 ```
 
-<h4><a href="https://github.com/electric-eloquence/feplet/blob/master/ABOUT.md">More &raquo;</a></h4>
+### Where does the name come from?
+
+Feplet is the spelled-out sound of a contraction of "Fepper template." 
+(<a href="https://fepper.io" target="blank">Fepper</a> is a contraction of 
+"front end prototyper.") It could also be the diminutive of
+"Fepper." It is very much the engine that drives Fepper.
 
 [snyk-image]: https://snyk.io/test/github/electric-eloquence/feplet/master/badge.svg
 [snyk-url]: https://snyk.io/test/github/electric-eloquence/feplet/master
