@@ -789,15 +789,7 @@ PARAMS_APPLIER: {
 
       if (partialsComp[partialShort].parseArr) {
         partialParseArr = partialsComp[partialShort].parseArr;
-      } // DEPRECATED.
-      // TODO: This accommodates old usage of partialsComp. To be removed.
-      else {
-          partialParseArr = hogan.parse(hogan.scan(partials[partialShort], options.delimiters), partials[partialShort], options);
-          partialsComp[partialShort] = {
-            parseArr: partialParseArr,
-            compilation: partialsComp[partialShort]
-          };
-        }
+      }
 
       var _paramsApply2 = paramsApply({
         contextKeys: contextKeys,
@@ -937,16 +929,7 @@ METHODS: {
     var partialsKeys = Object.keys(partials);
 
     for (var i = 0, l = partialsKeys.length; i < l; i++) {
-      var partialKey = partialsKeys[i]; // DEPRECATED.
-      // TODO: This accommodates old usage of partialsComp. To be removed.
-
-      if (!partialsComp[partialKey].compilation) {
-        var parseArr = hogan.parse(hogan.scan(partials[partialKey], options.delimiters), partials[partialKey], options);
-        partialsComp[partialKey] = {
-          parseArr: parseArr,
-          compilation: partialsComp[partialKey]
-        };
-      }
+      var partialKey = partialsKeys[i];
 
       var _preProcessPartialPar = preProcessPartialParams(partials[partialKey], partialsComp[partialKey].compilation, partials, partialsComp, contextKeys, context, options);
 

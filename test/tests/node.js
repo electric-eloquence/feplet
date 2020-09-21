@@ -539,39 +539,6 @@ the same name', function () {
     });
 
     describe('Additional methods', function () {
-      // DEPRECATED.
-      // TODO: To be removed.
-      it('preProcessPartialParams() accepts partialsComp arg where its keyed values are hogan.compile() objects\
-', function () {
-        const partialName = '01-dotted.fpt';
-        const partials = {};
-        const partialsComp = {};
-        partials[partialName] = template[partialName];
-        partialsComp[partialName] = hogan.compile(partials[partialName]);
-
-        const templateText = template['01_dotted-includer.fpt'];
-        const preProcess = Feplet.preProcessPartialParams(templateText, null, partials, partialsComp);
-        const render = Feplet.render(
-          templateText,
-          {
-            dot: {
-              title: 'foo',
-              message: 'bar'
-            }
-          },
-          partials,
-          partialsComp
-        );
-
-        expect(preProcess).to.have.property('compilation');
-        expect(preProcess).to.have.property('_contextKeys');
-        expect(preProcess).to.have.property('partials');
-        expect(preProcess).to.have.property('partialsComp');
-        expect(preProcess.partialsComp[partialName]).to.have.property('parseArr');
-        expect(preProcess.partialsComp[partialName]).to.have.property('compilation');
-        expect(render).to.equal('foo\nbar\n');
-      });
-
       // Tests the fix to a bug where a partial called wtih a parameter, but with no tag corresponding to the parameter
       // would return an empty value.
       it('preProcessPartialParams() populates partials and partialsComp where the partial does not have a tag that \
@@ -604,42 +571,9 @@ correlates to the param', function () {
         expect(preProcess).to.have.property('partialsComp');
         expect(preProcess.partials[partialName]).to.equal(partialText);
         expect(preProcess.partials[partialWithParamName]).to.equal(partialText);
-        expect(preProcess.partialsComp[partialName]).to.have.property('parseArr');
-        expect(preProcess.partialsComp[partialName]).to.have.property('compilation');
         expect(preProcess.partialsComp[partialWithParamName]).to.have.property('parseArr');
         expect(preProcess.partialsComp[partialWithParamName]).to.have.property('compilation');
         expect(render).to.equal('footbarf');
-      });
-
-      // DEPRECATED.
-      // TODO: To be removed.
-      it('compile() accepts partialsComp arg where its keyed values are hogan.compile() objects', function () {
-        const partialName = '00-base.fpt';
-        const partials = {};
-        const partialsComp = {};
-        partials[partialName] = template[partialName];
-        partialsComp[partialName] = hogan.compile(partials[partialName]);
-
-        const templateText = template['00_base-includer.fpt'];
-        const compilation = Feplet.compile(templateText, null, partials, partialsComp);
-        const render = compilation.render(
-          {
-            title: 'foo',
-            message: 'bar'
-          },
-          partials,
-          null,
-          partialsComp
-        );
-
-        expect(compilation).to.have.property('r');
-        expect(compilation).to.have.property('c');
-        expect(compilation).to.have.property('options');
-        expect(compilation).to.have.property('text');
-        expect(compilation).to.have.property('partials');
-        expect(compilation).to.have.property('subs');
-        expect(compilation).to.have.property('buf');
-        expect(render).to.equal('foo\nbar\n');
       });
 
       // This tests an edge-case and is primarily here for coverage.

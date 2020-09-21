@@ -1,17 +1,17 @@
 # Feplet: a Mustache-compatible template engine.
 
 [![Known Vulnerabilities][snyk-image]][snyk-url]
-[![Mac/Linux Build Status][travis-image]][travis-url]
-[![Windows Build Status][appveyor-image]][appveyor-url]
+[![Linux Build Status][linux-image]][linux-url]
+[![Mac Build Status][mac-image]][mac-url]
+[![Windows Build Status][windows-image]][windows-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![License][license-image]][license-url]
 
 ## Powerful under the hood. Simple behind the wheel.
 
-### How is this different from <a href="https://mustache.github.io/mustache.5.html" target="_blank">Mustache</a> (and <a href="https://github.com/twitter/hogan.js#readme" target="_blank">Hogan.js</a>)?
-
-Feplet implements Hogan.js and is mostly compatible with it, and is therefore 
-mostly compatible with Mustache. These are the main differences:
+Feplet mostly adheres to the 
+<a href="https://github.com/mustache/spec" target="_blank">Mustache spec</a>. 
+These are the main differences:
 
 * Feplet does not allow space between an opening delimiter and a command 
   character, such as `#`, `/`, or `>`. For example:
@@ -114,16 +114,24 @@ Also for browsers (ES5):
 </script>
 ```
 
-<h4><a href="https://github.com/electric-eloquence/feplet/blob/master/ABOUT.md">More &raquo;</a></h4>
+### Where does the name come from?
+
+Feplet is the spelled-out sound of a contraction of "Fepper template." 
+(<a href="https://fepper.io" target="blank">Fepper</a> is a contraction of 
+"front end prototyper.") It could also be the diminutive of
+"Fepper." It is very much the engine that drives Fepper.
 
 [snyk-image]: https://snyk.io/test/github/electric-eloquence/feplet/master/badge.svg
 [snyk-url]: https://snyk.io/test/github/electric-eloquence/feplet/master
 
-[travis-image]: https://img.shields.io/travis/electric-eloquence/feplet/master.svg?label=mac%20%26%20linux
-[travis-url]: https://travis-ci.org/electric-eloquence/feplet
+[linux-image]: https://github.com/electric-eloquence/feplet/workflows/Linux%20build/badge.svg?branch=master
+[linux-url]: https://github.com/electric-eloquence/feplet/actions?query=workflow%3A"Linux+build"
 
-[appveyor-image]: https://img.shields.io/appveyor/ci/e2tha-e/feplet/master.svg?label=windows
-[appveyor-url]: https://ci.appveyor.com/project/e2tha-e/feplet
+[mac-image]: https://github.com/electric-eloquence/feplet/workflows/Mac%20build/badge.svg?branch=master
+[mac-url]: https://github.com/electric-eloquence/feplet/actions?query=workflow%3A"Mac+build"
+
+[windows-image]: https://github.com/electric-eloquence/feplet/workflows/Windows%20build/badge.svg?branch=master
+[windows-url]: https://github.com/electric-eloquence/feplet/actions?query=workflow%3A"Windows+build"
 
 [coveralls-image]: https://img.shields.io/coveralls/electric-eloquence/feplet/master.svg
 [coveralls-url]: https://coveralls.io/r/electric-eloquence/feplet
