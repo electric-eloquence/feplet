@@ -29,7 +29,7 @@ COLLECTORS: {
       }
     }
 
-    return {contextKeysPart: dataKeys};
+    return {contextKeys: dataKeys};
   };
 
   var dataKeysWithDotNotationAdd = function (args) {
@@ -796,7 +796,7 @@ PARAMS_APPLIER: {
       }
 
       /* istanbul ignore if */
-      if (partialShort === partialFull || !partials[partialShort]) {
+      if (partialFull === partialShort || !partials[partialShort]) {
         continue;
       }
 
@@ -870,7 +870,16 @@ PARAMS_APPLIER: {
           optionsWithUnicodes
         );
         partials[partialFull] = compilationWithUnicodes.render(paramsObj);
+      }
 
+      if (partialFull !== partialShort && !partials[partialFull]) {
+        partials[partialFull] = partials[partialShort];
+      }
+
+      if (
+        (delimiterUnicodes && partialText !== partialText_) ||
+        !Object.keys(partialsComp[partialFull]).length
+      ) {
         // Then, write to partialsComp with previous render as partial text and with regular delimiters and options.
         const parseArr = hogan.parse(
           hogan.scan(
@@ -910,15 +919,15 @@ METHODS: {
       parentObjAsStr: '',
     });
 
-    let contextKeysPart = [];
+    let contextKeys = [];
 
     if (dataKeys.length) {
-      ({contextKeysPart} = contextKeysCollect({
+      ({contextKeys} = contextKeysCollect({
         dataKeys
       }));
     }
 
-    return contextKeysPart;
+    return contextKeys;
   };
 
   var preProcessPartialParams =
@@ -1121,7 +1130,7 @@ METHODS: {
   };
 }
 
-// PREPARE FOR EXPORT.
+/* PREPARE FOR EXPORT */
 
 function Feplet(context, partials, partialsComp, contextKeys, options) {
   this.context = context || {};
@@ -1131,7 +1140,7 @@ function Feplet(context, partials, partialsComp, contextKeys, options) {
   this.options = options || {};
 }
 
-// STATIC METHODS.
+/* STATIC METHODS */
 
 Object.assign(Feplet, hogan); // hogan is not a class so the constructor does not get overridden.
 
@@ -1147,7 +1156,7 @@ Feplet.render = render;
 
 Feplet.unregisterPartial = unregisterPartial;
 
-// INSTANCE METHODS.
+/* INSTANCE METHODS */
 
 Feplet.prototype.compile = compile;
 

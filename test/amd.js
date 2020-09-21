@@ -9,7 +9,7 @@ global.define = function () {
 require('../src/index');
 
 const Feplet = defineArgs[0]();
-const tests = require('./tests/tests-node');
+const tests = require('./tests/node');
 
 describe('Feplet', function () {
   describe('via AMD', tests(Feplet));

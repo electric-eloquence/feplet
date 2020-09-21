@@ -1,4 +1,4 @@
-{{> 04-nested-param-same-name-as-non-param_dotted-middle(
+{{> 04-nested-param-same-name-as-non-param_dotted-middle.fpt(
   baz: {
     bez: {
       biz: [

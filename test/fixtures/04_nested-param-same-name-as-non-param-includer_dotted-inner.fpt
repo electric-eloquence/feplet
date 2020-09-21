@@ -1,1 +1,1 @@
-{{> 04-nested-param-same-name-as-non-param_dotted-inner(baz: { bez: { biz: { boz: 'heck' } } }) }}
+{{> 04-nested-param-same-name-as-non-param_dotted-inner.fpt(baz: { bez: { biz: { boz: 'heck' } } }) }}

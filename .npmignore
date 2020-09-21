@@ -1,5 +1,5 @@
 .*
-appveyor.yml
+!.gitkeep
 lib/hogan.js/test/
 run/
 test/

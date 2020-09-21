@@ -1,4 +1,4 @@
-{{> 05-dotted-param_nested-in-non-param(
+{{> 05-dotted-param_nested-in-non-param.fpt(
   biz: {
     boz: [
       {

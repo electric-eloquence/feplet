@@ -1,1 +1,1 @@
-{{> 03-include-self-w-condition(foo: true) }}
+{{> 03-include-self-w-condition.fpt(foo: true) }}

@@ -1,1 +1,1 @@
-{{> 01-dotted(dot: { title: 'foo', message: 'bar' }) }}
+{{> 01-dotted.fpt(dot: { title: 'foo', message: 'bar' }) }}

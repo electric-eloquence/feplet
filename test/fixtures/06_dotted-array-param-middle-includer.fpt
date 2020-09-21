@@ -1,4 +1,4 @@
-{{> 06-dotted-array-param-middle(
+{{> 06-dotted-array-param-middle.fpt(
   baz: {
     bez: [
       {

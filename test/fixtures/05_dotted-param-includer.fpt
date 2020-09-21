@@ -1,1 +1,1 @@
-{{> 05-dotted-param(baz: { bez: { biz: 'hack' } }) }}
+{{> 05-dotted-param.fpt(baz: { bez: { biz: 'hack' } }) }}
