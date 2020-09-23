@@ -39,9 +39,9 @@
     "json-eval": "^1.0.8"
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.0",
-    "@babel/core": "^7.5.4",
-    "@babel/preset-env": "^7.5.4",
+    "@babel/cli": "^7.11.5",
+    "@babel/core": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
     "@wdio/cli": "6.4.7",
     "@wdio/local-runner": "6.4.7",
     "@wdio/mocha-framework": "6.4.7",
