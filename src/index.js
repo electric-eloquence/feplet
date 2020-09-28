@@ -1,6 +1,6 @@
 // This package embraces functional programming to the extent that JavaScript allows. The benefits are mainly
 // theoretical and educational. Being able to think functionally will be extremely valuable when working in languages
-// that are purely functional.
+// that *are* purely functional.
 
 // We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance.
 // Fortunately, the functional master branch does not suffer from performance-loss compared to the more imperative
