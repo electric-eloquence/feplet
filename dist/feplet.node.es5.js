@@ -1,9 +1,8 @@
 // This package embraces functional programming to the extent that JavaScript allows. The benefits are mainly
 // theoretical and educational. Being able to think functionally will be extremely valuable when working in languages
-// that *are* purely functional.
+// that *are* purely functional or paradigms that are strongly functional.
 // We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance.
-// Fortunately, the functional master branch does not suffer from performance-loss compared to the more imperative
-// branch.
+// Fortunately, the functional master branch performs strongly compared to the more imperative branch.
 // Labeled block statements are used to organize functions into logical divisions. We could also achieve this by
 // breaking this file into multiple files. However, we need to compile our code into ES5 consumable by less modern
 // browsers. Given that this is a relatively small file, it is easier to keep the code in one file.
@@ -50,18 +49,24 @@ HELPERS: {
   };
 
   var styleModifierExtract = function styleModifierExtract(args) {
-    var partialName = args.partialName;
-    var styleModClasses = ''; // eslint-disable-next-line no-useless-escape
+    var partialName = args.partialName; // eslint-disable-next-line no-useless-escape
 
     var styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
+    var styleModClasses;
+    var styleModifierMatchNew;
 
     if (styleModifierMatch && styleModifierMatch[1]) {
       styleModClasses = styleModifierMatch[1].replace(/\|/g, ' ').trim();
-      /* istanbul ignore if */
+      /* istanbul ignore else */
 
-      if (!styleModClasses) {
-        styleModifierMatch = null;
+      if (styleModClasses) {
+        styleModifierMatchNew = styleModifierMatch;
+      } else {
+        styleModifierMatchNew = null;
       }
+    } else {
+      styleModClasses = '';
+      styleModifierMatchNew = styleModifierMatch;
     } // Because we search and replace structured object properties to shorten the file prior to minification, we cannot
     // use "styleModifier" or other function substrings as structured object property names. "styleModifier" is also
     // reserved as a property name on paramsObj. Using "styleModClasses" instead.
@@ -69,7 +74,7 @@ HELPERS: {
 
     return {
       styleModClasses: styleModClasses,
-      styleModifierMatch: styleModifierMatch
+      styleModifierMatch: styleModifierMatchNew
     };
   }; // The \u0002 and \u0003 unicodes could be replaced with variables, but it is more clear what they are and what their
   // intent is if left as unicode. They are respectively Start of Text and End of Text characters. Their purpose is to
@@ -106,53 +111,55 @@ HELPERS: {
     var openTagParse = function openTagParse(args) {
       var parseObj = args.parseObj,
           partialText_ = args.partialText_;
-      var startPos;
-      var space0StartPos;
-      var space0StopPos;
-      var space1StartPos;
-      var space1StopPos;
       var stopPos;
-      stopPos = parseObj.i;
 
       switch (parseObj.tag) {
         case '{':
-          stopPos++;
+          stopPos = parseObj.i + 1;
+          break;
+
+        default:
+          stopPos = parseObj.i;
       }
 
-      startPos = stopPos - 1;
-      startPos -= parseObj.ctag.length;
+      var space1StopPos;
 
       switch (parseObj.tag) {
         case '{':
-          startPos--;
+          space1StopPos = stopPos - 1 - parseObj.ctag.length - 1;
+          break;
+
+        default:
+          space1StopPos = stopPos - 1 - parseObj.ctag.length;
       }
 
-      space1StopPos = startPos;
-      startPos -= spacesCount({
-        count_: startPos,
+      var spacesCount1 = spacesCount({
+        count_: space1StopPos,
         inc: -1,
         partialText_: partialText_
       }).count;
-      space1StartPos = startPos;
-      startPos -= parseObj.n.length;
-      space0StopPos = startPos;
-      startPos -= spacesCount({
-        count_: startPos,
+      var space1StartPos = space1StopPos - spacesCount1;
+      var space0StopPos = space1StartPos - parseObj.n.length;
+      var spacesCount0 = spacesCount({
+        count_: space0StopPos,
         inc: -1,
         partialText_: partialText_
       }).count;
-      space0StartPos = startPos;
+      var space0StartPos = space0StopPos - spacesCount0;
+      var startPos;
 
       switch (parseObj.tag) {
         case '#':
         case '&':
         case '^':
         case '{':
-          startPos -= parseObj.tag.length;
+          startPos = space0StartPos - parseObj.tag.length - parseObj.otag.length + 1;
+          break;
+
+        default:
+          startPos = space0StartPos - parseObj.otag.length + 1;
       }
 
-      startPos -= parseObj.otag.length;
-      startPos++;
       return {
         startPos: startPos,
         space0StartPos: space0StartPos,
@@ -171,8 +178,7 @@ HELPERS: {
           space0StopPos = openTagData.space0StopPos,
           space1StartPos = openTagData.space1StartPos,
           space1StopPos = openTagData.space1StopPos;
-      var partialTextArr = [];
-      partialTextArr[0] = parseObj.otag.replace(/./g, "\x02"); //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
+      var partialTextArr = ["\x02".repeat(parseObj.otag.length)]; //partialTextArr[0] = '֍'.repeat(parseObj.otag.length); // For debugging.
 
       switch (parseObj.tag) {
         case '#':
@@ -186,35 +192,16 @@ HELPERS: {
           break;
       }
 
-      partialTextArr = function partialTextSlice(partialTextArr_, index) {
-        if (index < space0StopPos) {
-          var indexNew = index + 1;
-          partialTextArr_.push(partialText_[indexNew]);
-          return partialTextSlice(partialTextArr_, indexNew);
-        } else {
-          return partialTextArr_;
-        }
-      }(partialTextArr, space0StartPos);
-
+      partialTextArr.push(partialText_.slice(space0StartPos + 1, space0StopPos + 1));
       partialTextArr.push(parseObj.n);
-
-      partialTextArr = function partialTextSlice(partialTextArr_, index) {
-        if (index < space1StopPos) {
-          var indexNew = index + 1;
-          partialTextArr_.push(partialText_[indexNew]);
-          return partialTextSlice(partialTextArr_, indexNew);
-        } else {
-          return partialTextArr_;
-        }
-      }(partialTextArr, space1StartPos);
+      partialTextArr.push(partialText_.slice(space1StartPos + 1, space1StopPos + 1));
 
       switch (parseObj.tag) {
         case '{':
           partialTextArr.push(' ');
       }
 
-      var l = partialTextArr.length;
-      partialTextArr[l] = parseObj.otag.replace(/./g, "\x03"); //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
+      partialTextArr.push("\x03".repeat(parseObj.ctag.length)); //partialTextArr[partialTextArr.length - 1] = '֎'.repeat(parseObj.ctag.length); // For debugging.
 
       return {
         partialText: partialTextArr.join('')
@@ -224,32 +211,22 @@ HELPERS: {
     var closeTagParse = function closeTagParse(args) {
       var parseObj = args.parseObj,
           partialText_ = args.partialText_;
-      var startPos;
-      var space0StartPos;
-      var space0StopPos;
-      var space1StartPos;
-      var space1StopPos;
-      var stopPos;
-      startPos = parseObj.end;
-      stopPos = startPos;
-      stopPos += parseObj.otag.length;
-      stopPos += parseObj.tag.length;
-      space0StartPos = stopPos;
-      stopPos += spacesCount({
-        count_: stopPos,
+      var startPos = parseObj.end;
+      var space0StartPos = startPos + parseObj.otag.length + parseObj.tag.length;
+      var spacesCount0 = spacesCount({
+        count_: space0StartPos,
         inc: +1,
         partialText_: partialText_
       }).count;
-      space0StopPos = stopPos;
-      stopPos += parseObj.n.length;
-      space1StartPos = stopPos;
-      stopPos += spacesCount({
-        count_: stopPos,
+      var space0StopPos = space0StartPos + spacesCount0;
+      var space1StartPos = space0StopPos + parseObj.n.length;
+      var spacesCount1 = spacesCount({
+        count_: space1StartPos,
         inc: +1,
         partialText_: partialText_
       }).count;
-      space1StopPos = stopPos;
-      stopPos += parseObj.otag.length;
+      var space1StopPos = space1StartPos + spacesCount1;
+      var stopPos = space1StopPos + parseObj.otag.length;
       return {
         startPos: startPos,
         space0StartPos: space0StartPos,
@@ -268,33 +245,13 @@ HELPERS: {
           space0StopPos = closeTagData.space0StopPos,
           space1StartPos = closeTagData.space1StartPos,
           space1StopPos = closeTagData.space1StopPos;
-      var partialTextArr = [];
-      partialTextArr[0] = parseObj.otag.replace(/./g, "\x02"); //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
+      var partialTextArr = ["\x02".repeat(parseObj.otag.length)]; //partialTextArr[0] = '֍'.repeat(parseObj.otag.length); // For debugging.
 
       partialTextArr.push('/');
-
-      partialTextArr = function partialTextSlice(partialTextArr_, index) {
-        if (index < space0StopPos) {
-          partialTextArr_.push(partialText_[index]);
-          return partialTextSlice(partialTextArr_, index + 1);
-        } else {
-          return partialTextArr_;
-        }
-      }(partialTextArr, space0StartPos);
-
+      partialTextArr.push(partialText_.slice(space0StartPos, space0StopPos));
       partialTextArr.push(parseObj.n);
-
-      partialTextArr = function partialTextSlice(partialTextArr_, index) {
-        if (index < space1StopPos) {
-          partialTextArr_.push(partialText_[index]);
-          return partialTextSlice(partialTextArr_, index + 1);
-        } else {
-          return partialTextArr_;
-        }
-      }(partialTextArr, space1StartPos);
-
-      var l = partialTextArr.length;
-      partialTextArr[l] = parseObj.otag.replace(/./g, "\x03"); //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
+      partialTextArr.push(partialText_.slice(space1StartPos, space1StopPos));
+      partialTextArr.push("\x03".repeat(parseObj.ctag.length)); //partialTextArr[partialTextArr.length - 1] = '֎'.repeat(parseObj.ctag.length); // For debugging.
 
       return {
         partialText: partialTextArr.join('')
@@ -306,7 +263,7 @@ HELPERS: {
           partialText_ = args.partialText_;
       var otag = parseObj.otag;
       var ctag = parseObj.ctag;
-      var partialText = '';
+      var partialText;
 
       switch (parseObj.tag) {
         case '#':
@@ -321,15 +278,7 @@ HELPERS: {
             parseObj: parseObj,
             partialText_: partialText_
           });
-          var startPos = openTagData.startPos;
-          partialText += partialText_.substring(0, startPos);
-          partialText += startOfTextEncode({
-            openTagData: openTagData,
-            parseObj: parseObj,
-            partialText_: partialText_
-          }).partialText;
           var closeTagData;
-          /* eslint-enable no-case-declarations */
 
           switch (parseObj.tag) {
             case '#':
@@ -344,24 +293,30 @@ HELPERS: {
           }
 
           if (!closeTagData) {
-            partialText += partialText_.slice(openTagData.stopPos);
+            partialText = partialText_.substring(0, openTagData.startPos) + startOfTextEncode({
+              openTagData: openTagData,
+              parseObj: parseObj,
+              partialText_: partialText_
+            }).partialText + partialText_.slice(openTagData.stopPos);
             break;
           }
 
-          partialText += partialText_.substring(openTagData.stopPos, closeTagData.startPos);
-          partialText += endOfTextEncode({
+          partialText = partialText_.substring(0, openTagData.startPos) + startOfTextEncode({
+            openTagData: openTagData,
+            parseObj: parseObj,
+            partialText_: partialText_
+          }).partialText + partialText_.substring(openTagData.stopPos, closeTagData.startPos) + endOfTextEncode({
             closeTagData: closeTagData,
             parseObj: parseObj,
             partialText_: partialText_
-          }).partialText;
-          partialText += partialText_.slice(closeTagData.stopPos);
+          }).partialText + partialText_.slice(closeTagData.stopPos);
           break;
       }
 
       return {
         otag: otag,
         ctag: ctag,
-        partialText: partialText
+        partialText: partialText || ''
       };
     };
   }
@@ -419,12 +374,12 @@ COLLECTORS: {
     var dataKeys;
 
     if (dataObjItemKeys.length) {
-      var parentObjAsStrNew = parentObjAsStr;
+      var parentObjAsStrNew;
 
       if (Array.isArray(dataObjNestedObj)) {
-        parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey, ".").concat(index) : "".concat(dataKey, ".").concat(index);
+        parentObjAsStrNew = parentObjAsStr + (parentObjAsStr ? ".".concat(dataKey, ".").concat(index) : "".concat(dataKey, ".").concat(index));
       } else {
-        parentObjAsStrNew += parentObjAsStr ? ".".concat(dataKey) : dataKey;
+        parentObjAsStrNew = parentObjAsStr + (parentObjAsStr ? ".".concat(dataKey) : dataKey);
       }
 
       var parentObjSplit = parentObjAsStrNew.split('.');
@@ -612,16 +567,10 @@ PARAMS_APPLIER: {
     }
 
     if (!delimiterUnicodes_ && otag && ctag) {
-      var delimiterOpen = otag.split('').reduce(function (acc) {
-        var retVal = acc + "\x02"; //retVal = retVal.slice(0, -1) + '֍'; // For debugging.
+      var delimiterOpen = "\x02".repeat(otag.length); //delimiterOpen = '֍'.repeat(otag.length); // For debugging.
 
-        return retVal;
-      }, '');
-      var delimiterClose = ctag.split('').reduce(function (acc) {
-        var retVal = acc + "\x03"; //retVal = retVal.slice(0, -1) + '֎'; // For debugging.
+      var delimiterClose = "\x03".repeat(ctag.length); //delimiterClose = '֎'.repeat(ctag.length); // For debugging.
 
-        return retVal;
-      }, '');
       delimiterUnicodes = delimiterOpen + ' ' + delimiterClose;
     }
 
@@ -822,8 +771,8 @@ PARAMS_APPLIER: {
     }
 
     var paramsMatch = partialFull.match(paramRegex);
-    var paramsObj = {};
-    var partialShort = partialFull;
+    var paramsObj;
+    var partialShort;
 
     if (paramsMatch) {
       var paramsStr = paramsMatch[0];
@@ -855,6 +804,9 @@ PARAMS_APPLIER: {
         }
       }
     } else {
+      paramsObj = {};
+      partialShort = partialFull;
+
       var _styleModifierExtract2 = styleModifierExtract({
         partialName: partialFull
       });
@@ -913,11 +865,13 @@ PARAMS_APPLIER: {
     var paramKeys = dataKeys;
     var partialText_ = partials[partialShort] || '';
     var delimiterUnicodes;
-    var partialParseArr = [];
-    var partialText = '';
+    var partialParseArr;
+    var partialText;
 
     if (partialsComp[partialShort].parseArr) {
       partialParseArr = partialsComp[partialShort].parseArr;
+    } else {
+      partialParseArr = [];
     }
 
     if (partialParseArr.length) {
@@ -958,6 +912,8 @@ PARAMS_APPLIER: {
 
       delimiterUnicodes = _partialParseArr$redu.delimiterUnicodes;
       partialText = _partialParseArr$redu.partialText;
+    } else {
+      partialText = '';
     }
 
     if (delimiterUnicodes && partialText !== partialText_) {
@@ -1026,7 +982,7 @@ METHODS: {
       dataKeys = _contextArgKeys$reduc.dataKeys;
     }
 
-    var contextKeys = [];
+    var contextKeys;
 
     if (dataKeys.length) {
       var _this4 = this;
@@ -1048,6 +1004,8 @@ METHODS: {
       });
 
       contextKeys = _dataKeys$reduce.contextKeys;
+    } else {
+      contextKeys = [];
     }
 
     return contextKeys;
@@ -1057,12 +1015,13 @@ METHODS: {
     var options = options_ || this.options || {};
     var compilation = compilation_ || hogan.compile(text, options);
     var partialsKeys = Object.keys(compilation.partials);
-    var contextKeys = contextKeys_ || this && this.contextKeys;
+    var contextKeysOrig = contextKeys_ || this && this.contextKeys;
+    var contextKeys;
 
     var _contextKeys; // First, check if we still need to preprocess contextKeys because .render() was called statically.
 
 
-    if (typeof contextKeys === 'undefined' && partialsKeys.length) {
+    if (typeof contextKeysOrig === 'undefined' && partialsKeys.length) {
       var hasParam = partialsKeys.reduce(function (acc, partialsKey) {
         var partialFull = compilation.partials[partialsKey].name;
 
@@ -1078,6 +1037,8 @@ METHODS: {
       } else {
         contextKeys = [];
       }
+    } else {
+      contextKeys = contextKeysOrig;
     }
 
     var partials = partials_ || this.partials || {};
@@ -1131,8 +1092,7 @@ METHODS: {
 
   var compile = function compile(text, options_, partials_, partialsComp_, contextKeys_, context) {
     var options = options_ || this.options || {};
-    var compilation = hogan.compile(text, options);
-    var contextKeys = contextKeys_ || this && this.contextKeys;
+    var contextKeysOrig = contextKeys_ || this && this.contextKeys;
 
     var _contextKeys;
 
@@ -1166,7 +1126,7 @@ METHODS: {
         };
       }, {
         context: context,
-        contextKeys: contextKeys,
+        contextKeys: contextKeysOrig,
         _contextKeys: _contextKeys,
         partials: partials,
         partialsComp: partialsComp,
@@ -1178,9 +1138,8 @@ METHODS: {
       partialsComp = _partialsKeys$reduce.partialsComp;
     }
 
-    if (_contextKeys) {
-      contextKeys = _contextKeys;
-    }
+    var contextKeys = _contextKeys || contextKeysOrig;
+    var compilation = hogan.compile(text, options);
 
     var _preProcessPartialPar2 = preProcessPartialParams(text, compilation, partials, partialsComp, contextKeys, context, options);
 

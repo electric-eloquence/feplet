@@ -1,10 +1,9 @@
 // This package embraces functional programming to the extent that JavaScript allows. The benefits are mainly
 // theoretical and educational. Being able to think functionally will be extremely valuable when working in languages
-// that *are* purely functional.
+// that *are* purely functional or paradigms that are strongly functional.
 
 // We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance.
-// Fortunately, the functional master branch does not suffer from performance-loss compared to the more imperative
-// branch.
+// Fortunately, the functional master branch performs strongly compared to the more imperative branch.
 
 // Labeled block statements are used to organize functions into logical divisions. We could also achieve this by
 // breaking this file into multiple files. However, we need to compile our code into ES5 consumable by less modern
@@ -57,17 +56,25 @@ HELPERS: {
       partialName
     } = args;
 
-    let styleModClasses = '';
     // eslint-disable-next-line no-useless-escape
-    let styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
+    const styleModifierMatch = partialName.match(/\:([\w\-\|]+)/);
+    let styleModClasses;
+    let styleModifierMatchNew;
 
     if (styleModifierMatch && styleModifierMatch[1]) {
       styleModClasses = styleModifierMatch[1].replace(/\|/g, ' ').trim();
 
-      /* istanbul ignore if */
-      if (!styleModClasses) {
-        styleModifierMatch = null;
+      /* istanbul ignore else */
+      if (styleModClasses) {
+        styleModifierMatchNew = styleModifierMatch;
       }
+      else {
+        styleModifierMatchNew = null;
+      }
+    }
+    else {
+      styleModClasses = '';
+      styleModifierMatchNew = styleModifierMatch;
     }
 
     // Because we search and replace structured object properties to shorten the file prior to minification, we cannot
@@ -75,7 +82,7 @@ HELPERS: {
     // reserved as a property name on paramsObj. Using "styleModClasses" instead.
     return {
       styleModClasses,
-      styleModifierMatch
+      styleModifierMatch: styleModifierMatchNew
     };
   };
 
@@ -120,46 +127,44 @@ HELPERS: {
         partialText_
       } = args;
 
-      let startPos;
-      let space0StartPos;
-      let space0StopPos;
-      let space1StartPos;
-      let space1StopPos;
       let stopPos;
 
-      stopPos = parseObj.i;
+      switch (parseObj.tag) {
+        case '{':
+          stopPos = parseObj.i + 1;
+          break;
+        default:
+          stopPos = parseObj.i;
+      }
+
+      let space1StopPos;
 
       switch (parseObj.tag) {
         case '{':
-          stopPos++;
+          space1StopPos = stopPos - 1 - parseObj.ctag.length - 1;
+          break;
+        default:
+          space1StopPos = stopPos - 1 - parseObj.ctag.length;
       }
 
-      startPos = stopPos - 1;
-      startPos -= parseObj.ctag.length;
+      const spacesCount1 = spacesCount({count_: space1StopPos, inc: -1, partialText_}).count;
+      const space1StartPos = space1StopPos - spacesCount1;
+      const space0StopPos = space1StartPos - parseObj.n.length;
+      const spacesCount0 = spacesCount({count_: space0StopPos, inc: -1, partialText_}).count;
+      const space0StartPos = space0StopPos - spacesCount0;
 
-      switch (parseObj.tag) {
-        case '{':
-          startPos--;
-      }
-
-      space1StopPos = startPos;
-      startPos -= spacesCount({count_: startPos, inc: -1, partialText_}).count;
-      space1StartPos = startPos;
-      startPos -= parseObj.n.length;
-      space0StopPos = startPos;
-      startPos -= spacesCount({count_: startPos, inc: -1, partialText_}).count;
-      space0StartPos = startPos;
+      let startPos;
 
       switch (parseObj.tag) {
         case '#':
         case '&':
         case '^':
         case '{':
-          startPos -= parseObj.tag.length;
+          startPos = space0StartPos - parseObj.tag.length - parseObj.otag.length + 1;
+          break;
+        default:
+          startPos = space0StartPos - parseObj.otag.length + 1;
       }
-
-      startPos -= parseObj.otag.length;
-      startPos++;
 
       return {
         startPos,
@@ -187,10 +192,8 @@ HELPERS: {
         //stopPos // For debugging.
       } = openTagData;
 
-      let partialTextArr = [];
-
-      partialTextArr[0] = parseObj.otag.replace(/./g, '\u0002');
-      //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
+      const partialTextArr = ['\u0002'.repeat(parseObj.otag.length)];
+      //partialTextArr[0] = '֍'.repeat(parseObj.otag.length); // For debugging.
 
       switch (parseObj.tag) {
         case '#':
@@ -203,43 +206,17 @@ HELPERS: {
           break;
       }
 
-      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
-        if (index < space0StopPos) {
-          const indexNew = index + 1;
-
-          partialTextArr_.push(partialText_[indexNew]);
-
-          return partialTextSlice(partialTextArr_, indexNew);
-        }
-        else {
-          return partialTextArr_;
-        }
-      })(partialTextArr, space0StartPos);
-
+      partialTextArr.push(partialText_.slice(space0StartPos + 1, space0StopPos + 1));
       partialTextArr.push(parseObj.n);
-
-      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
-        if (index < space1StopPos) {
-          const indexNew = index + 1;
-
-          partialTextArr_.push(partialText_[indexNew]);
-
-          return partialTextSlice(partialTextArr_, indexNew);
-        }
-        else {
-          return partialTextArr_;
-        }
-      })(partialTextArr, space1StartPos);
+      partialTextArr.push(partialText_.slice(space1StartPos + 1, space1StopPos + 1));
 
       switch (parseObj.tag) {
         case '{':
           partialTextArr.push(' ');
       }
 
-      const l = partialTextArr.length;
-
-      partialTextArr[l] = parseObj.otag.replace(/./g, '\u0003');
-      //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
+      partialTextArr.push('\u0003'.repeat(parseObj.ctag.length));
+      //partialTextArr[partialTextArr.length - 1] = '֎'.repeat(parseObj.ctag.length); // For debugging.
 
       return {
         partialText: partialTextArr.join('')
@@ -252,25 +229,14 @@ HELPERS: {
         partialText_
       } = args;
 
-      let startPos;
-      let space0StartPos;
-      let space0StopPos;
-      let space1StartPos;
-      let space1StopPos;
-      let stopPos;
-
-      startPos = parseObj.end;
-      stopPos = startPos;
-      stopPos += parseObj.otag.length;
-      stopPos += parseObj.tag.length;
-      space0StartPos = stopPos;
-      stopPos += spacesCount({count_: stopPos, inc: +1, partialText_}).count;
-      space0StopPos = stopPos;
-      stopPos += parseObj.n.length;
-      space1StartPos = stopPos;
-      stopPos += spacesCount({count_: stopPos, inc: +1, partialText_}).count;
-      space1StopPos = stopPos;
-      stopPos += parseObj.otag.length;
+      const startPos = parseObj.end;
+      const space0StartPos = startPos + parseObj.otag.length + parseObj.tag.length;
+      const spacesCount0 = spacesCount({count_: space0StartPos, inc: +1, partialText_}).count;
+      const space0StopPos = space0StartPos + spacesCount0;
+      const space1StartPos = space0StopPos + parseObj.n.length;
+      const spacesCount1 = spacesCount({count_: space1StartPos, inc: +1, partialText_}).count;
+      const space1StopPos = space1StartPos + spacesCount1;
+      const stopPos = space1StopPos + parseObj.otag.length;
 
       return {
         startPos,
@@ -298,41 +264,15 @@ HELPERS: {
         //stopPos // For debugging.
       } = closeTagData;
 
-      let partialTextArr = [];
-
-      partialTextArr[0] = parseObj.otag.replace(/./g, '\u0002');
-      //partialTextArr[0] = parseObj.otag.replace(/./g, '֍'); // For debugging.
+      const partialTextArr = ['\u0002'.repeat(parseObj.otag.length)];
+      //partialTextArr[0] = '֍'.repeat(parseObj.otag.length); // For debugging.
 
       partialTextArr.push('/');
-
-      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
-        if (index < space0StopPos) {
-          partialTextArr_.push(partialText_[index]);
-
-          return partialTextSlice(partialTextArr_, index + 1);
-        }
-        else {
-          return partialTextArr_;
-        }
-      })(partialTextArr, space0StartPos);
-
+      partialTextArr.push(partialText_.slice(space0StartPos, space0StopPos));
       partialTextArr.push(parseObj.n);
-
-      partialTextArr = (function partialTextSlice(partialTextArr_, index) {
-        if (index < space1StopPos) {
-          partialTextArr_.push(partialText_[index]);
-
-          return partialTextSlice(partialTextArr_, index + 1);
-        }
-        else {
-          return partialTextArr_;
-        }
-      })(partialTextArr, space1StartPos);
-
-      const l = partialTextArr.length;
-
-      partialTextArr[l] = parseObj.otag.replace(/./g, '\u0003');
-      //partialTextArr[l] = parseObj.otag.replace(/./g, '֎'); // For debugging.;
+      partialTextArr.push(partialText_.slice(space1StartPos, space1StopPos));
+      partialTextArr.push('\u0003'.repeat(parseObj.ctag.length));
+      //partialTextArr[partialTextArr.length - 1] = '֎'.repeat(parseObj.ctag.length); // For debugging.
 
       return {
         partialText: partialTextArr.join('')
@@ -347,7 +287,7 @@ HELPERS: {
 
       const otag = parseObj.otag;
       const ctag = parseObj.ctag;
-      let partialText = '';
+      let partialText;
 
       switch (parseObj.tag) {
         case '#':
@@ -359,21 +299,8 @@ HELPERS: {
         case '{':
 
           /* eslint-disable no-case-declarations */
-          let openTagData = openTagParse({parseObj, partialText_});
-          let {
-            startPos,
-            //space0StartPos, // For debugging.
-            //space0StopPos, // For debugging.
-            //space1StartPos, // For debugging.
-            //space1StopPos, // For debugging.
-            //stopPos // For debugging.
-          } = openTagData;
-
-          partialText += partialText_.substring(0, startPos);
-          partialText += startOfTextEncode({openTagData, parseObj, partialText_}).partialText;
-
+          const openTagData = openTagParse({parseObj, partialText_});
           let closeTagData;
-          /* eslint-enable no-case-declarations */
 
           switch (parseObj.tag) {
             case '#':
@@ -385,14 +312,20 @@ HELPERS: {
           }
 
           if (!closeTagData) {
-            partialText += partialText_.slice(openTagData.stopPos);
+            partialText =
+              partialText_.substring(0, openTagData.startPos) +
+              startOfTextEncode({openTagData, parseObj, partialText_}).partialText +
+              partialText_.slice(openTagData.stopPos);
 
             break;
           }
 
-          partialText += partialText_.substring(openTagData.stopPos, closeTagData.startPos);
-          partialText += endOfTextEncode({closeTagData, parseObj, partialText_}).partialText;
-          partialText += partialText_.slice(closeTagData.stopPos);
+          partialText =
+            partialText_.substring(0, openTagData.startPos) +
+            startOfTextEncode({openTagData, parseObj, partialText_}).partialText +
+            partialText_.substring(openTagData.stopPos, closeTagData.startPos) +
+            endOfTextEncode({closeTagData, parseObj, partialText_}).partialText +
+            partialText_.slice(closeTagData.stopPos);
 
           break;
       }
@@ -400,7 +333,7 @@ HELPERS: {
       return {
         otag,
         ctag,
-        partialText
+        partialText: partialText || ''
       };
     };
   }
@@ -466,13 +399,13 @@ COLLECTORS: {
     let dataKeys;
 
     if (dataObjItemKeys.length) {
-      let parentObjAsStrNew = parentObjAsStr;
+      let parentObjAsStrNew;
 
       if (Array.isArray(dataObjNestedObj)) {
-        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}.${index}` : `${dataKey}.${index}`;
+        parentObjAsStrNew = parentObjAsStr + (parentObjAsStr ? `.${dataKey}.${index}` : `${dataKey}.${index}`);
       }
       else {
-        parentObjAsStrNew += parentObjAsStr ? `.${dataKey}` : dataKey;
+        parentObjAsStrNew = parentObjAsStr + (parentObjAsStr ? `.${dataKey}` : dataKey);
       }
 
       const parentObjSplit = parentObjAsStrNew.split('.');
@@ -673,19 +606,11 @@ PARAMS_APPLIER: {
     }
 
     if (!delimiterUnicodes_ && otag && ctag) {
-      const delimiterOpen = otag.split('').reduce((acc) => {
-        let retVal = acc + '\u0002';
-        //retVal = retVal.slice(0, -1) + '֍'; // For debugging.
+      let delimiterOpen = '\u0002'.repeat(otag.length);
+      //delimiterOpen = '֍'.repeat(otag.length); // For debugging.
 
-        return retVal;
-      }, '');
-
-      const delimiterClose = ctag.split('').reduce((acc) => {
-        let retVal = acc + '\u0003';
-        //retVal = retVal.slice(0, -1) + '֎'; // For debugging.
-
-        return retVal;
-      }, '');
+      let delimiterClose = '\u0003'.repeat(ctag.length);
+      //delimiterClose = '֎'.repeat(ctag.length); // For debugging.
 
       delimiterUnicodes = delimiterOpen + ' ' + delimiterClose;
     }
@@ -924,8 +849,8 @@ PARAMS_APPLIER: {
     }
 
     const paramsMatch = partialFull.match(paramRegex);
-    let paramsObj = {};
-    let partialShort = partialFull;
+    let paramsObj;
+    let partialShort;
 
     if (paramsMatch) {
       const paramsStr = paramsMatch[0];
@@ -955,6 +880,9 @@ PARAMS_APPLIER: {
       }
     }
     else {
+      paramsObj = {};
+      partialShort = partialFull;
+
       ({
         styleModClasses,
         styleModifierMatch
@@ -1015,11 +943,14 @@ PARAMS_APPLIER: {
     const paramKeys = dataKeys;
     const partialText_ = partials[partialShort] || '';
     let delimiterUnicodes;
-    let partialParseArr = [];
-    let partialText = '';
+    let partialParseArr;
+    let partialText;
 
     if (partialsComp[partialShort].parseArr) {
       partialParseArr = partialsComp[partialShort].parseArr;
+    }
+    else {
+      partialParseArr = [];
     }
 
     if (partialParseArr.length) {
@@ -1071,6 +1002,9 @@ PARAMS_APPLIER: {
           partialText: partialText_
         }
       ));
+    }
+    else {
+      partialText = '';
     }
 
     if (delimiterUnicodes && partialText !== partialText_) {
@@ -1163,7 +1097,7 @@ METHODS: {
       ));
     }
 
-    let contextKeys = [];
+    let contextKeys;
 
     if (dataKeys.length) {
       const _this = this;
@@ -1187,6 +1121,9 @@ METHODS: {
         }
       ));
     }
+    else {
+      contextKeys = [];
+    }
 
     return contextKeys;
   };
@@ -1196,11 +1133,12 @@ METHODS: {
     const options = options_ || this.options || {};
     const compilation = compilation_ || hogan.compile(text, options);
     const partialsKeys = Object.keys(compilation.partials);
-    let contextKeys = contextKeys_ || (this && this.contextKeys);
+    const contextKeysOrig = contextKeys_ || (this && this.contextKeys);
+    let contextKeys;
     let _contextKeys;
 
     // First, check if we still need to preprocess contextKeys because .render() was called statically.
-    if (typeof contextKeys === 'undefined' && partialsKeys.length) {
+    if (typeof contextKeysOrig === 'undefined' && partialsKeys.length) {
       const hasParam = partialsKeys.reduce((acc, partialsKey) => {
         const partialFull = compilation.partials[partialsKey].name;
 
@@ -1218,6 +1156,9 @@ METHODS: {
       else {
         contextKeys = [];
       }
+    }
+    else {
+      contextKeys = contextKeysOrig;
     }
 
     let partials = partials_ || this.partials || {};
@@ -1281,8 +1222,7 @@ METHODS: {
 
   var compile = function (text, options_, partials_, partialsComp_, contextKeys_, context) {
     const options = options_ || this.options || {};
-    let compilation = hogan.compile(text, options);
-    let contextKeys = contextKeys_ || (this && this.contextKeys);
+    const contextKeysOrig = contextKeys_ || (this && this.contextKeys);
     let _contextKeys;
     let partials = partials_ || this.partials || {};
     let partialsComp = partialsComp_ || this.partialsComp || {};
@@ -1334,7 +1274,7 @@ METHODS: {
         },
         {
           context,
-          contextKeys,
+          contextKeys: contextKeysOrig,
           _contextKeys,
           partials,
           partialsComp,
@@ -1343,9 +1283,8 @@ METHODS: {
       ));
     }
 
-    if (_contextKeys) {
-      contextKeys = _contextKeys;
-    }
+    const contextKeys = _contextKeys || contextKeysOrig;
+    let compilation = hogan.compile(text, options);
 
     ({
       compilation
