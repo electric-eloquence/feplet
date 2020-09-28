@@ -1,6 +1,6 @@
 // This package embraces functional programming to the extent that JavaScript allows. The benefits are mainly
 // theoretical and educational. Being able to think functionally will be extremely valuable when working in languages
-// that *are* purely functional or paradigms that are strongly functional.
+// that *are* purely functional, or paradigms that are strongly functional.
 // We'll try to retain an iteration-instead-of-recursion-where-doable branch for the purpose of comparing performance.
 // Fortunately, the functional master branch performs strongly compared to the more imperative branch.
 // Labeled block statements are used to organize functions into logical divisions. We could also achieve this by
