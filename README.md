@@ -9,14 +9,10 @@
 
 ## Powerful under the hood. Simple behind the wheel.
 
-Feplet mostly adheres to the 
-<a href="https://github.com/mustache/spec" target="_blank">Mustache spec</a>. 
-These are the main differences:
+Feplet adheres to the 
+<a href="https://github.com/mustache/spec" target="_blank">Mustache spec</a> 
+with the following addition:
 
-* Feplet does not allow space between an opening delimiter and a command 
-  character, such as `#`, `/`, or `>`. For example:
-  * `{{> partial }}` is allowed.
-  * `{{ > partial }}` is not allowed.
 * Feplet allows the passing of data parameters per template.
 
 ```handlebars
