@@ -50,7 +50,7 @@
     "browserify": "^16.5.1",
     "chai": "4.x",
     "chai-webdriverio": "^1.0.0",
-    "chromedriver": "^85.0.1",
+    "chromedriver": "^86.0.0",
     "coveralls": "3.x",
     "eslint": "7.x",
     "husky": "4.x",
