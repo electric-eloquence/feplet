@@ -46,7 +46,11 @@ HELPERS: {
       // Ok to return null because we only need keys, not values.
       return null;
     }
-  };
+  }; // TODO: prepare this to be DEPRECATED.
+  // It appears that Pattern Lab has dropped documentation of styleModifiers. If this persists to the point that it
+  // should be considered permanent, DEPRECATE and then remove all functionality for and references to styleModifiers.
+  // @see {@link https://patternlab.io/docs/installing-pattern-lab/} (There appears to be no documentation index page.)
+
 
   var styleModifierExtract = function styleModifierExtract(args) {
     var partialName = args.partialName; // eslint-disable-next-line no-useless-escape
