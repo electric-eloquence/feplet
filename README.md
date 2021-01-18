@@ -10,8 +10,9 @@
 ## Powerful under the hood. Simple behind the wheel.
 
 Feplet adheres to the 
-<a href="https://github.com/mustache/spec" target="_blank">Mustache spec</a> 
-with the following addition:
+<a href="https://github.com/mustache/spec" target="_blank">Mustache spec</a>, 
+as per the <a href="https://github.com/mustache/mustache" target="_blank">
+original Ruby implementation</a>, with the following addition:
 
 * Feplet allows the passing of data parameters per template.
 
