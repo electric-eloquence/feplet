@@ -46,10 +46,11 @@ HELPERS: {
       // Ok to return null because we only need keys, not values.
       return null;
     }
-  }; // TODO: prepare this to be DEPRECATED.
-  // It appears that Pattern Lab has dropped documentation of styleModifiers. If this persists to the point that it
-  // should be considered permanent, DEPRECATE and then remove all functionality for and references to styleModifiers.
+  }; // styleModifiers are DEPRECATED.
+  // It appears that Pattern Lab has dropped documentation of styleModifiers.
   // @see {@link https://patternlab.io/docs/installing-pattern-lab/} (There appears to be no documentation index page.)
+  // Even if at some future point, Pattern Lab reinstates documentation for styleModifiers, Fepper will REMOVE this
+  // functionality.
 
 
   var styleModifierExtract = function styleModifierExtract(args) {
