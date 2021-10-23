@@ -1438,12 +1438,12 @@ Feplet.prototype.render = render;
 
 Feplet.prototype.unregisterPartial = unregisterPartial;
 
+/* istanbul ignore else */
 if (typeof define === 'function') {
   define(function () {
     return Feplet;
   });
 }
-/* istanbul ignore next */
 else if (typeof window === 'object') {
   window.Feplet = Feplet;
 }
