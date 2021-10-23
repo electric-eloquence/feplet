@@ -1268,7 +1268,7 @@ if (typeof define === 'function') {
 }
 /* istanbul ignore next */
 else if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === 'object') {
-    window.Feplet = Feplet;
-  }
+  window.Feplet = Feplet;
+}
 
 module.exports = Feplet;
