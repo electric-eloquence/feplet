@@ -51,7 +51,7 @@
     "chai-webdriverio": "^1.0.0",
     "chromedriver": "^94.0.0",
     "coveralls": "3.x",
-    "eslint": "7.x",
+    "eslint": "8.x",
     "husky": "4.x",
     "mocha": "8.x",
     "nodemon": "^2.0.4",
