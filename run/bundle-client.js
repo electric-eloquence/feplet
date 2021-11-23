@@ -4,7 +4,7 @@ process.chdir(__dirname);
 
 const browserify = require('browserify');
 const fs = require('fs');
-const uglifyES = require('uglify-es');
+const uglifyJS = require('uglify-js');
 
 const src5 = '../dist/feplet.node.es5.js';
 const src6 = '../src/index.js';
@@ -28,7 +28,7 @@ browserify(src5)
       browserified = browserified.replace(regex, `a${i}`);
     }
 
-    const uglified = uglifyES.minify(browserified);
+    const uglified = uglifyJS.minify(browserified);
 
     if (uglified.error) {
       throw uglified.error;
@@ -51,7 +51,7 @@ browserify(src6)
       browserified = browserified.replace(regex, `a${i}`);
     }
 
-    const uglified = uglifyES.minify(browserified);
+    const uglified = uglifyJS.minify(browserified);
 
     if (uglified.error) {
       throw uglified.error;
