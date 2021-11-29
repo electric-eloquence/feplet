@@ -1,11 +1,13 @@
 /* eslint-disable strict */
 
 const expectation = require('./expectation');
-const delay = 200;
+const increment = 10;
+let delay = 10;
 
 module.exports = () => {
   it('0. Hydrates templates with variables', async () => {
     const assertion0 = await $('.assertion-0');
+    delay += increment;
     await browser.pause(delay);
     const assertion0Html = await assertion0.getHTML(false);
 
@@ -14,6 +16,7 @@ module.exports = () => {
 
   it('1. Hydrates templates with nested variables', async () => {
     const assertion1 = await $('.assertion-1');
+    delay += increment;
     await browser.pause(delay);
     const assertion1Html = await assertion1.getHTML(false);
 
@@ -22,6 +25,7 @@ module.exports = () => {
 
   it('2. Recursively hydrates templates with variables', async () => {
     const assertion2 = await $('.assertion-2');
+    delay += increment;
     await browser.pause(delay);
     const assertion2Html = await assertion2.getHTML(false);
 
@@ -30,6 +34,7 @@ module.exports = () => {
 
   it('3. Recursively hydrates templates with nested variables', async () => {
     const assertion3 = await $('.assertion-3');
+    delay += increment;
     await browser.pause(delay);
     const assertion3Html = await assertion3.getHTML(false);
 
@@ -38,7 +43,8 @@ module.exports = () => {
 
   it('4. Hydrates variables written in dot.notation', async () => {
     const assertion4 = await $('.assertion-4');
-    browser.pause(delay);
+    delay += increment;
+    await browser.pause(delay);
     const assertion4Html = await assertion4.getHTML(false);
 
     expect(assertion4Html).to.equal(expectation[4]);
@@ -46,6 +52,7 @@ module.exports = () => {
 
   it('5. Hydrates variables within an array written in dot.notation', async () => {
     const assertion5 = await $('.assertion-5');
+    delay += increment;
     await browser.pause(delay);
     const assertion5Html = await assertion5.getHTML(false);
 
@@ -54,6 +61,7 @@ module.exports = () => {
 
   it('6. Recursively hydrates variables written in dot.notation', async () => {
     const assertion6 = await $('.assertion-6');
+    delay += increment;
     await browser.pause(delay);
     const assertion6Html = await assertion6.getHTML(false);
 
@@ -62,6 +70,7 @@ module.exports = () => {
 
   it('7. Recursively hydrates variables within an array written in dot.notation', async () => {
     const assertion7 = await $('.assertion-7');
+    delay += increment;
     await browser.pause(delay);
     const assertion7Html = await assertion7.getHTML(false);
 
@@ -70,6 +79,7 @@ module.exports = () => {
 
   it('9. Hydrates templates with variables passed per the Pattern Lab styleModifier convention', async () => {
     const assertion9 = await $('.assertion-9');
+    delay += increment;
     await browser.pause(delay);
     const assertion9Html = await assertion9.getHTML(false);
 
@@ -79,6 +89,7 @@ module.exports = () => {
   it('10. Recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
 ', async () => {
     const assertion10 = await $('.assertion-10');
+    delay += increment;
     await browser.pause(delay);
     const assertion10Html = await assertion10.getHTML(false);
 
@@ -87,6 +98,7 @@ module.exports = () => {
 
   it('11. Hydrates templates with multiple classes passed per Pattern Lab styleModifier', async () => {
     const assertion11 = await $('.assertion-11');
+    delay += increment;
     await browser.pause(delay);
     const assertion11Html = await assertion11.getHTML(false);
 
@@ -95,6 +107,7 @@ module.exports = () => {
 
   it('12. Hydrates templates with both data parameters and a Pattern Lab styleModifier', async () => {
     const assertion12 = await $('.assertion-12');
+    delay += increment;
     await browser.pause(delay);
     const assertion12Html = await assertion12.getHTML(false);
 
@@ -103,6 +116,7 @@ module.exports = () => {
 
   it('13. Hydrates templates with both data parameters and a styleModifier with multiple classes', async () => {
     const assertion13 = await $('.assertion-13');
+    delay += increment;
     await browser.pause(delay);
     const assertion13Html = await assertion13.getHTML(false);
 
@@ -111,6 +125,7 @@ module.exports = () => {
 
   it('14. Recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', async () => {
     const assertion14 = await $('.assertion-14');
+    delay += increment;
     await browser.pause(delay);
     const assertion14Html = await assertion14.getHTML(false);
 
@@ -119,6 +134,7 @@ module.exports = () => {
 
   it('15. Recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', async () => {
     const assertion15 = await $('.assertion-15');
+    delay += increment;
     await browser.pause(delay);
     const assertion15Html = await assertion15.getHTML(false);
 
@@ -128,6 +144,7 @@ module.exports = () => {
   it('16. Recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
 ', async () => {
     const assertion16 = await $('.assertion-16');
+    delay += increment;
     await browser.pause(delay);
     const assertion16Html = await assertion16.getHTML(false);
 
@@ -136,6 +153,7 @@ module.exports = () => {
 
   it('17. Shuts off otherwise infinite recursion paths with default false conditions', async () => {
     const assertion17 = await $('.assertion-17');
+    delay += increment;
     await browser.pause(delay);
     const assertion17Html = await assertion17.getHTML(false);
 
@@ -144,6 +162,7 @@ module.exports = () => {
 
   it('18. Shuts off otherwise infinite recursion paths when flagged to do so by parameters', async () => {
     const assertion18 = await $('.assertion-18');
+    delay += increment;
     await browser.pause(delay);
     const assertion18Html = await assertion18.getHTML(false);
 
@@ -153,6 +172,7 @@ module.exports = () => {
   it('23. Renders a nested parameter variable differently than a non-parameter variable of the same name\
 ', async () => {
     const assertion23 = await $('.assertion-23');
+    delay += increment;
     await browser.pause(delay);
     const assertion23Html = await assertion23.getHTML(false);
 
@@ -162,6 +182,7 @@ module.exports = () => {
   it('24. Renders an array of nested parameter variables differently from non-parameter variables of the same name\
 ', async () => {
     const assertion24 = await $('.assertion-24');
+    delay += increment;
     await browser.pause(delay);
     const assertion24Html = await assertion24.getHTML(false);
 
@@ -171,6 +192,7 @@ module.exports = () => {
   it('25. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
 ', async () => {
     const assertion25 = await $('.assertion-25');
+    delay += increment;
     await browser.pause(delay);
     const assertion25Html = await assertion25.getHTML(false);
 
@@ -180,6 +202,7 @@ module.exports = () => {
   it('26. Renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
 ', async () => {
     const assertion26 = await $('.assertion-26');
+    delay += increment;
     await browser.pause(delay);
     const assertion26Html = await assertion26.getHTML(false);
 
@@ -189,6 +212,7 @@ module.exports = () => {
   it('27. Renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
 same name', async () => {
     const assertion27 = await $('.assertion-27');
+    delay += increment;
     await browser.pause(delay);
     const assertion27Html = await assertion27.getHTML(false);
 
@@ -198,6 +222,7 @@ same name', async () => {
   it('28. Renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same \
 name', async () => {
     const assertion28 = await $('.assertion-28');
+    delay += increment;
     await browser.pause(delay);
     const assertion28Html = await assertion28.getHTML(false);
 
@@ -207,6 +232,7 @@ name', async () => {
   it('29. Renders a moderately nested array of dot.notation parameters differently than non-parameter variables of \
 the same name', async () => {
     const assertion29 = await $('.assertion-29');
+    delay += increment;
     await browser.pause(delay);
     const assertion29Html = await assertion29.getHTML(false);
 
@@ -215,6 +241,7 @@ the same name', async () => {
 
   it('34. Renders a top-level dot.notation parameter that nests more tags', async () => {
     const assertion34 = await $('.assertion-34');
+    delay += increment;
     await browser.pause(delay);
     const assertion34Html = await assertion34.getHTML(false);
 
@@ -223,6 +250,7 @@ the same name', async () => {
 
   it('35. Renders an array of top-level dot.notation parameters that nest more tags', async () => {
     const assertion35 = await $('.assertion-35');
+    delay += increment;
     await browser.pause(delay);
     const assertion35Html = await assertion35.getHTML(false);
 
@@ -231,6 +259,7 @@ the same name', async () => {
 
   it('36. Renders a dot.notation parameter nested within a non-parameter', async () => {
     const assertion36 = await $('.assertion-36');
+    delay += increment;
     await browser.pause(delay);
     const assertion36Html = await assertion36.getHTML(false);
 
@@ -239,6 +268,7 @@ the same name', async () => {
 
   it('37. Renders an array of dot.notation parameters nested within a non-parameter', async () => {
     const assertion37 = await $('.assertion-37');
+    delay += increment;
     await browser.pause(delay);
     const assertion37Html = await assertion37.getHTML(false);
 
@@ -247,6 +277,7 @@ the same name', async () => {
 
   it('38. Renders dot.notation parameters nested aside each other within a non-parameter', async () => {
     const assertion38 = await $('.assertion-38');
+    delay += increment;
     await browser.pause(delay);
     const assertion38Html = await assertion38.getHTML(false);
 
@@ -255,6 +286,7 @@ the same name', async () => {
 
   it('39. Renders dot.notation parameter nested within another within a non-parameter', async () => {
     const assertion39 = await $('.assertion-39');
+    delay += increment;
     await browser.pause(delay);
     const assertion39Html = await assertion39.getHTML(false);
 
@@ -263,6 +295,7 @@ the same name', async () => {
 
   it('43. Renders a deeply nested dot.notation parameter containing an array', async () => {
     const assertion43 = await $('.assertion-43');
+    delay += increment;
     await browser.pause(delay);
     const assertion43Html = await assertion43.getHTML(false);
 
@@ -271,6 +304,7 @@ the same name', async () => {
 
   it('44. Renders a moderately nested dot.notation parameter containing an array', async () => {
     const assertion44 = await $('.assertion-44');
+    delay += increment;
     await browser.pause(delay);
     const assertion44Html = await assertion44.getHTML(false);
 
@@ -279,6 +313,7 @@ the same name', async () => {
 
   it('45. Renders a top-level dot.notation parameter containing an array', async () => {
     const assertion45 = await $('.assertion-45');
+    delay += increment;
     await browser.pause(delay);
     const assertion45Html = await assertion45.getHTML(false);
 
