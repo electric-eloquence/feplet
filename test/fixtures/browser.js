@@ -19,8 +19,8 @@ function fetchAndRender(recursionLevel) {
         window.partial[recursionLevel][partialKey] = template[partialKey];
       });
 
-      var assertion = document.getElementsByClassName('assertion-' + recursionLevel)[0];
-      assertion.innerHTML =
+      var assertions = document.getElementsByClassName('assertions-' + recursionLevel)[0];
+      assertions.innerHTML =
         window.Feplet.render(xhr.responseText, window.context[recursionLevel], window.partial[recursionLevel]);
 
       if (window.templateName[recursionLevel + 1]) {
@@ -33,7 +33,7 @@ function fetchAndRender(recursionLevel) {
 
 window.templateName.forEach(function (t, i) {
   var contentParagraph = document.createElement('p');
-  contentParagraph.className = 'assertion-' + i;
+  contentParagraph.className = 'assertions-' + i;
   main.appendChild(contentParagraph);
 });
 

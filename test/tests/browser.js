@@ -1,253 +1,334 @@
 /* eslint-disable strict */
 
-const expectation = require('./expectation');
-const delay = 500;
+const expectations = require('./expectations');
+
+async function waitUntilReady(i) {
+  await (await $('.assertions-' + i)).waitUntil(
+    async function () {
+      return (await this.getHTML(false)) !== '';
+    },
+    {
+      timeout: 60 * 1000,
+      timeoutMsg: `Element .assertions-${i} failed to load!`
+    }
+  );
+}
 
 module.exports = () => {
-  it('0. Hydrates templates with variables', async () => {
-    await browser.pause(delay);
+  const assertions = [];
 
-    const assertion0 = await (await $('.assertion-0')).getHTML(false);
-    expect(assertion0).to.equal(expectation[0]);
+  it('0. Hydrates templates with variables', async () => {
+    const i = 0;
+
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('1. Hydrates templates with nested variables', async () => {
-    await browser.pause(delay);
+    const i = 1;
 
-    const assertion1 = await (await $('.assertion-1')).getHTML(false);
-    expect(assertion1).to.equal(expectation[1]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('2. Recursively hydrates templates with variables', async () => {
-    await browser.pause(delay);
+    const i = 2;
 
-    const assertion2 = await (await $('.assertion-2')).getHTML(false);
-    expect(assertion2).to.equal(expectation[2]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('3. Recursively hydrates templates with nested variables', async () => {
-    await browser.pause(delay);
+    const i = 3;
 
-    const assertion3 = await (await $('.assertion-3')).getHTML(false);
-    expect(assertion3).to.equal(expectation[3]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('4. Hydrates variables written in dot.notation', async () => {
-    await browser.pause(delay);
+    const i = 4;
 
-    const assertion4 = await (await $('.assertion-4')).getHTML(false);
-    expect(assertion4).to.equal(expectation[4]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('5. Hydrates variables within an array written in dot.notation', async () => {
-    await browser.pause(delay);
+    const i = 5;
 
-    const assertion5 = await (await $('.assertion-5')).getHTML(false);
-    expect(assertion5).to.equal(expectation[5]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('6. Recursively hydrates variables written in dot.notation', async () => {
-    await browser.pause(delay);
+    const i = 6;
 
-    const assertion6 = await (await $('.assertion-6')).getHTML(false);
-    expect(assertion6).to.equal(expectation[6]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
   it('7. Recursively hydrates variables within an array written in dot.notation', async () => {
-    await browser.pause(delay);
+    const i = 7;
 
-    const assertion7 = await (await $('.assertion-7')).getHTML(false);
-    expect(assertion7).to.equal(expectation[7]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('9. Hydrates templates with variables passed per the Pattern Lab styleModifier convention', async () => {
-    await browser.pause(delay);
+  it('8. Hydrates templates with variables passed per the Pattern Lab styleModifier convention', async () => {
+    const i = 9;
 
-    const assertion9 = await (await $('.assertion-9')).getHTML(false);
-    expect(assertion9).to.equal(expectation[9]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('10. Recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
+  it('9. Recursively hydrates templates with variables passed per the Pattern Lab styleModifier convention\
 ', async () => {
-    await browser.pause(delay);
+    const i = 10;
 
-    const assertion10 = await (await $('.assertion-10')).getHTML(false);
-    expect(assertion10).to.equal(expectation[10]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('11. Hydrates templates with multiple classes passed per Pattern Lab styleModifier', async () => {
-    await browser.pause(delay);
+  it('10. Hydrates templates with multiple classes passed per Pattern Lab styleModifier', async () => {
+    const i = 11;
 
-    const assertion11 = await (await $('.assertion-11')).getHTML(false);
-    expect(assertion11).to.equal(expectation[11]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('12. Hydrates templates with both data parameters and a Pattern Lab styleModifier', async () => {
-    await browser.pause(delay);
+  it('11. Hydrates templates with both data parameters and a Pattern Lab styleModifier', async () => {
+    const i = 12;
 
-    const assertion12 = await (await $('.assertion-12')).getHTML(false);
-    expect(assertion12).to.equal(expectation[12]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('13. Hydrates templates with both data parameters and a styleModifier with multiple classes', async () => {
-    await browser.pause(delay);
+  it('12. Hydrates templates with both data parameters and a styleModifier with multiple classes', async () => {
+    const i = 13;
 
-    const assertion13 = await (await $('.assertion-13')).getHTML(false);
-    expect(assertion13).to.equal(expectation[13]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('14. Recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', async () => {
-    await browser.pause(delay);
+  it('13. Recursively hydrates templates with multiple classes passed per Pattern Lab styleModifier', async () => {
+    const i = 14;
 
-    const assertion14 = await (await $('.assertion-14')).getHTML(false);
-    expect(assertion14).to.equal(expectation[14]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('15. Recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', async () => {
-    await browser.pause(delay);
+  it('14. Recursively hydrates templates with both data parameters and a Pattern Lab styleModifier', async () => {
+    const i = 15;
 
-    const assertion15 = await (await $('.assertion-15')).getHTML(false);
-    expect(assertion15).to.equal(expectation[15]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('16. Recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
+  it('15. Recursively hydrates templates with both data parameters and a styleModifier with multiple classes\
 ', async () => {
-    await browser.pause(delay);
+    const i = 16;
 
-    const assertion16 = await (await $('.assertion-16')).getHTML(false);
-    expect(assertion16).to.equal(expectation[16]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('17. Shuts off otherwise infinite recursion paths with default false conditions', async () => {
-    await browser.pause(delay);
+  it('16. Shuts off otherwise infinite recursion paths with default false conditions', async () => {
+    const i = 17;
 
-    const assertion17 = await (await $('.assertion-17')).getHTML(false);
-    expect(assertion17).to.equal(expectation[17]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('18. Shuts off otherwise infinite recursion paths when flagged to do so by parameters', async () => {
-    await browser.pause(delay);
+  it('17. Shuts off otherwise infinite recursion paths when flagged to do so by parameters', async () => {
+    const i = 18;
 
-    const assertion18 = await (await $('.assertion-18')).getHTML(false);
-    expect(assertion18).to.equal(expectation[18]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('23. Renders a nested parameter variable differently than a non-parameter variable of the same name\
+  it('18. Renders a nested parameter variable differently than a non-parameter variable of the same name\
 ', async () => {
-    await browser.pause(delay);
+    const i = 23;
 
-    const assertion23 = await (await $('.assertion-23')).getHTML(false);
-    expect(assertion23).to.equal(expectation[23]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('24. Renders an array of nested parameter variables differently from non-parameter variables of the same name\
+  it('19. Renders an array of nested parameter variables differently from non-parameter variables of the same name\
 ', async () => {
-    await browser.pause(delay);
+    const i = 24;
 
-    const assertion24 = await (await $('.assertion-24')).getHTML(false);
-    expect(assertion24).to.equal(expectation[24]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('25. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
+  it('20. Renders a more deeply nested parameter variable differently then a non-parameter variable of the same name\
 ', async () => {
-    await browser.pause(delay);
+    const i = 25;
 
-    const assertion25 = await (await $('.assertion-25')).getHTML(false);
-    expect(assertion25).to.equal(expectation[25]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('26. Renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
+  it('21. Renders a deeply nested dot.notation parameter differently than a non-parameter variable of the same name\
 ', async () => {
-    await browser.pause(delay);
+    const i = 26;
 
-    const assertion26 = await (await $('.assertion-26')).getHTML(false);
-    expect(assertion26).to.equal(expectation[26]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('27. Renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
+  it('22. Renders a deeply nested array of dot.notation parameters differently than non-parameter variables of the \
 same name', async () => {
-    await browser.pause(delay);
+    const i = 27;
 
-    const assertion27 = await (await $('.assertion-27')).getHTML(false);
-    expect(assertion27).to.equal(expectation[27]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('28. Renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same \
+  it('23. Renders a moderately nested dot.notation parameter differently than a non-parameter variable of the same \
 name', async () => {
-    await browser.pause(delay);
+    const i = 28;
 
-    const assertion28 = await (await $('.assertion-28')).getHTML(false);
-    expect(assertion28).to.equal(expectation[28]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('29. Renders a moderately nested array of dot.notation parameters differently than non-parameter variables of \
+  it('24. Renders a moderately nested array of dot.notation parameters differently than non-parameter variables of \
 the same name', async () => {
-    await browser.pause(delay);
+    const i = 29;
 
-    const assertion29 = await (await $('.assertion-29')).getHTML(false);
-    expect(assertion29).to.equal(expectation[29]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('34. Renders a top-level dot.notation parameter that nests more tags', async () => {
-    await browser.pause(delay);
+  it('25. Renders a top-level dot.notation parameter that nests more tags', async () => {
+    const i = 34;
 
-    const assertion34 = await (await $('.assertion-34')).getHTML(false);
-    expect(assertion34).to.equal(expectation[34]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('35. Renders an array of top-level dot.notation parameters that nest more tags', async () => {
-    await browser.pause(delay);
+  it('26. Renders an array of top-level dot.notation parameters that nest more tags', async () => {
+    const i = 35;
 
-    const assertion35 = await (await $('.assertion-35')).getHTML(false);
-    expect(assertion35).to.equal(expectation[35]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('36. Renders a dot.notation parameter nested within a non-parameter', async () => {
-    await browser.pause(delay);
+  it('27. Renders a dot.notation parameter nested within a non-parameter', async () => {
+    const i = 36;
 
-    const assertion36 = await (await $('.assertion-36')).getHTML(false);
-    expect(assertion36).to.equal(expectation[36]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('37. Renders an array of dot.notation parameters nested within a non-parameter', async () => {
-    await browser.pause(delay);
+  it('28. Renders an array of dot.notation parameters nested within a non-parameter', async () => {
+    const i = 37;
 
-    const assertion37 = await (await $('.assertion-37')).getHTML(false);
-    expect(assertion37).to.equal(expectation[37]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('38. Renders dot.notation parameters nested aside each other within a non-parameter', async () => {
-    await browser.pause(delay);
+  it('29. Renders dot.notation parameters nested aside each other within a non-parameter', async () => {
+    const i = 38;
 
-    const assertion38 = await (await $('.assertion-38')).getHTML(false);
-    expect(assertion38).to.equal(expectation[38]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('39. Renders dot.notation parameter nested within another within a non-parameter', async () => {
-    await browser.pause(delay);
+  it('30. Renders dot.notation parameter nested within another within a non-parameter', async () => {
+    const i = 39;
 
-    const assertion39 = await (await $('.assertion-39')).getHTML(false);
-    expect(assertion39).to.equal(expectation[39]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('43. Renders a deeply nested dot.notation parameter containing an array', async () => {
-    await browser.pause(delay);
+  it('31. Renders a deeply nested dot.notation parameter containing an array', async () => {
+    const i = 43;
 
-    const assertion43 = await (await $('.assertion-43')).getHTML(false);
-    expect(assertion43).to.equal(expectation[43]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('44. Renders a moderately nested dot.notation parameter containing an array', async () => {
-    await browser.pause(delay);
+  it('32. Renders a moderately nested dot.notation parameter containing an array', async () => {
+    const i = 44;
 
-    const assertion44 = await (await $('.assertion-44')).getHTML(false);
-    expect(assertion44).to.equal(expectation[44]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 
-  it('45. Renders a top-level dot.notation parameter containing an array', async () => {
-    await browser.pause(delay);
+  it('33. Renders a top-level dot.notation parameter containing an array', async () => {
+    const i = 45;
 
-    const assertion45 = await (await $('.assertion-45')).getHTML(false);
-    expect(assertion45).to.equal(expectation[45]);
+    await waitUntilReady(i);
+
+    assertions[i] = await (await $('.assertions-' + i)).getHTML(false);
+    expect(assertions[i]).to.equal(expectations[i]);
   });
 };
