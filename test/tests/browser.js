@@ -1,7 +1,7 @@
 /* eslint-disable strict */
 
 const expectation = require('./expectation');
-const delay = 750;
+const delay = 500;
 
 module.exports = () => {
   it('0. Hydrates templates with variables', async () => {
